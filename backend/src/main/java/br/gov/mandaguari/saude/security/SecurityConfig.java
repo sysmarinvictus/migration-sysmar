@@ -3,6 +3,7 @@ package br.gov.mandaguari.saude.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -32,8 +34,16 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())                       // stateless API, no cookies
             .cors(Customizer.withDefaults())
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // Unauthenticated (no/invalid token) → 401; authenticated-but-forbidden → 403 (default
+            // access-denied handler). Without this, the anonymous principal fails @PreAuthorize and
+            // the default Http403ForbiddenEntryPoint returns 403 for missing-auth too.
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/login", "/auth/refresh").permitAll()
+                // Allow the servlet error dispatch through: an authenticated-but-forbidden request
+                // forwards to /error, where the JWT filter is skipped (shouldNotFilterErrorDispatch).
+                // Without this it is re-secured as anonymous and returns 401 instead of 403.
+                .requestMatchers("/error").permitAll()
                 .requestMatchers("/actuator/health", "/v3/api-docs/**", "/swagger-ui/**",
                                  "/swagger-ui.html").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
