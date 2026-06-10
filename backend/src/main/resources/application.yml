@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: receituario-backend
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://127.0.0.1:5432/saude-mandaguari}
+    username: ${DB_USER:saude}
+    password: ${DB_PASSWORD}          # MUST come from the environment — never committed
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:10}
+  jpa:
+    open-in-view: false               # avoid lazy-loading in the view layer
+    hibernate:
+      ddl-auto: validate              # NEVER let Hibernate touch the existing schema; Flyway owns DDL
+    properties:
+      hibernate.jdbc.time_zone: America/Sao_Paulo
+      # Preserve GeneXus physical table/column names exactly as written in @Table/@Column.
+      # (Boot's default CamelCaseToUnderscores strategy would rewrite them — do NOT use it here.)
+      hibernate.physical_naming_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  flyway:
+    enabled: true
+    baseline-on-migrate: true         # adopt the already-populated GeneXus DB as the baseline
+    baseline-version: 1
+    locations: classpath:db/migration
+
+# Stateless JWT settings (HS256). Secret MUST be supplied via env (>= 32 bytes).
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-ttl: ${JWT_ACCESS_TTL:PT30M}
+    refresh-token-ttl: ${JWT_REFRESH_TTL:P7D}
+    issuer: receituario-modern
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    br.gov.mandaguari.saude: INFO

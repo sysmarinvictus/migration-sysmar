@@ -1,0 +1,16 @@
+# Integration-test profile. DB is provided by Testcontainers (see AbstractIntegrationTest), so no
+# static datasource URL here. Flyway runs the baseline into the throwaway container.
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    baseline-on-migrate: false   # the container DB is empty; migrate from scratch
+security:
+  jwt:
+    secret: test-only-secret-not-used-in-prod-needs-32-bytes-min
+    access-token-ttl: PT30M
+    refresh-token-ttl: P7D
+logging:
+  level:
+    br.gov.mandaguari.saude: DEBUG

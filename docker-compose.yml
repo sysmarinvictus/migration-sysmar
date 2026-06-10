@@ -1,0 +1,31 @@
+# Local dev dependencies. NEVER point this at production. For realistic data, restore a COPY of
+# saude-mandaguari into this container and set spring.flyway.baseline-on-migrate=true (see
+# application-local.yml). Out of the box it starts empty and Flyway runs the V1 (partial) baseline.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: receituario-postgres
+    environment:
+      POSTGRES_DB: saude-mandaguari
+      POSTGRES_USER: ${DB_USER:-saude}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-change_me_local_only}
+    ports:
+      - "5432:5432"
+    volumes:
+      - receituario_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-saude} -d saude-mandaguari"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  adminer:
+    image: adminer:4
+    container_name: receituario-adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  receituario_pgdata:

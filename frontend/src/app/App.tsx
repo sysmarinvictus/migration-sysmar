@@ -1,0 +1,59 @@
+import { Navigate, Route, Routes, Link, useLocation } from "react-router-dom";
+import { useAuth } from "../lib/auth";
+import LoginPage from "./LoginPage";
+import EspecialidadeListPage from "../features/especialidade/EspecialidadeListPage";
+import EspecialidadeFormPage from "../features/especialidade/EspecialidadeFormPage";
+import ConselhoClasseListPage from "../features/conselho-classe/ConselhoClasseListPage";
+import ConselhoClasseFormPage from "../features/conselho-classe/ConselhoClasseFormPage";
+import type { ReactNode } from "react";
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/*"
+        element={
+          <RequireAuth>
+            <Shell />
+          </RequireAuth>
+        }
+      />
+    </Routes>
+  );
+}
+
+function RequireAuth({ children }: { children: ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  if (!isAuthenticated) return <Navigate to="/login" state={{ from: location }} replace />;
+  return <>{children}</>;
+}
+
+/** App shell with nav (entries gated by role, mirroring GeneXus menu permissions). */
+function Shell() {
+  const { username, hasRole, logout } = useAuth();
+  return (
+    <div className="min-h-screen">
+      <nav className="flex items-center gap-4 border-b bg-gray-50 px-6 py-3">
+        <strong>Receituário</strong>
+        {hasRole("SAUDE_CADASTRO") && <Link to="/especialidades">Especialidades</Link>}
+        {hasRole("SAUDE_CADASTRO") && <Link to="/conselhos-classe">Conselhos de Classe</Link>}
+        <span className="ml-auto text-sm text-gray-600">{username}</span>
+        <button onClick={logout} className="text-sm text-blue-600">Sair</button>
+      </nav>
+      <main>
+        <Routes>
+          <Route path="/" element={<Navigate to="/especialidades" replace />} />
+          <Route path="/especialidades" element={<EspecialidadeListPage />} />
+          <Route path="/especialidades/nova" element={<EspecialidadeFormPage />} />
+          <Route path="/especialidades/:codigo" element={<EspecialidadeFormPage />} />
+          <Route path="/conselhos-classe" element={<ConselhoClasseListPage />} />
+          <Route path="/conselhos-classe/novo" element={<ConselhoClasseFormPage />} />
+          <Route path="/conselhos-classe/:codigo" element={<ConselhoClasseFormPage />} />
+          <Route path="*" element={<p className="p-6">Página não encontrada.</p>} />
+        </Routes>
+      </main>
+    </div>
+  );
+}

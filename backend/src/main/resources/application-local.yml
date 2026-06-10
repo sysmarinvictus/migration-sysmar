@@ -1,0 +1,24 @@
+# Local dev profile. Pairs with docker-compose.yml (Postgres on 5432).
+# Provide secrets via env or a local untracked .env — see README. Defaults here are dev-only
+# placeholders and are intentionally non-production; the secret-scan hook rejects real secrets.
+spring:
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/saude-mandaguari
+    username: ${DB_USER:saude}
+    password: ${DB_PASSWORD:change_me_local_only}
+  jpa:
+    properties:
+      hibernate.format_sql: true
+  flyway:
+    # Local docker Postgres starts EMPTY → run V1 to create the (partial) schema.
+    # When you instead point local at a COPY of the real populated DB, set this back to `true`
+    # so Flyway adopts the existing schema instead of trying to recreate it.
+    baseline-on-migrate: false
+logging:
+  level:
+    br.gov.mandaguari.saude: DEBUG
+    org.hibernate.SQL: DEBUG
+security:
+  jwt:
+    # dev-only 32+ byte secret; override via JWT_SECRET in real environments
+    secret: ${JWT_SECRET:dev-local-insecure-secret-change-me-please-32b}

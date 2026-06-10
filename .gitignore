@@ -1,0 +1,19 @@
+# Java / Maven
+backend/target/
+*.class
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/src/lib/generated/
+
+# Env / secrets — never commit credentials (enforced by the .claude secret-scan hook)
+.env
+.env.*
+*.local
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
