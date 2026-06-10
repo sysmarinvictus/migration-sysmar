@@ -30,7 +30,7 @@ public class ConselhoClasse {
     @Column(name = "ConClaNom", length = 100)
     private String nome;
 
-    protected ConselhoClasse() {} // JPA
+    public ConselhoClasse() {} // JPA + service instantiation (different package)
 
     public Short getCodigo() { return codigo; }
     public void setCodigo(Short codigo) { this.codigo = codigo; }

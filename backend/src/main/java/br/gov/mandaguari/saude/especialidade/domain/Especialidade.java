@@ -53,7 +53,7 @@ public class Especialidade {
     @Column(name = "EspLstAgendVagaUrgMax")        private Integer agendaVagaUrgenteMax;
     @Column(name = "EspLstAgendVagaUrgMin")        private Integer agendaVagaUrgenteMin;
 
-    protected Especialidade() {} // JPA
+    public Especialidade() {} // JPA + service instantiation (different package)
 
     // --- getters / setters ---
     public Integer getCodigo() { return codigo; }
