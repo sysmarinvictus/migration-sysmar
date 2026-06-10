@@ -9,11 +9,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 
@@ -22,16 +21,31 @@ import java.util.List;
  * the full Spring context on a random port, and RestAssured. {@link #bearer(String...)} mints a
  * valid JWT directly via {@link JwtService} so tests don't depend on the (not-yet-migrated) SAU_USU
  * auth slice.
+ *
+ * <p><b>Singleton container.</b> The Postgres container is started ONCE per JVM in the static
+ * initializer and shared by every integration test class — NOT via {@code @Container}/
+ * {@code @Testcontainers}, which start and stop one container per class and exhaust resources when
+ * several IT classes run in the same build. Because the container (and therefore the datasource
+ * URL) is identical for all subclasses, Spring reuses a single cached application context across
+ * them. The container is reaped by Testcontainers' Ryuk sidecar / the JVM shutdown.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@Testcontainers
 public abstract class AbstractIntegrationTest {
 
-    @Container
-    @ServiceConnection
     static final PostgreSQLContainer<?> POSTGRES =
             new PostgreSQLContainer<>("postgres:16-alpine");
+
+    static {
+        POSTGRES.start();
+    }
+
+    @DynamicPropertySource
+    static void datasourceProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
+        registry.add("spring.datasource.username", POSTGRES::getUsername);
+        registry.add("spring.datasource.password", POSTGRES::getPassword);
+    }
 
     @LocalServerPort int port;
     @Autowired protected JwtService jwt;
