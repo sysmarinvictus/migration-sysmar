@@ -15,11 +15,11 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
-      - name: Build & test (unit + Testcontainers IT)
+      - name: Build & test (unit via surefire + Testcontainers IT via failsafe)
         working-directory: backend
         run: mvn -B verify
-      # Parity tests run separately (need the legacy app reachable):
-      #   mvn -B -Pparity test
+      # Parity tests run separately (need the legacy GeneXus app reachable):
+      #   mvn -B -Pparity verify
 
   frontend:
     runs-on: ubuntu-latest

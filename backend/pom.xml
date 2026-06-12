@@ -63,7 +63,7 @@
       <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>testcontainers-bom</artifactId>
-        <version>1.20.4</version>
+        <version>1.21.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -87,23 +87,48 @@
           <compilerArgs><arg>-parameters</arg></compilerArgs>
         </configuration>
       </plugin>
-      <!-- Run @Tag("parity") tests only under the 'parity' profile -->
+      <!-- Unit tests (test phase): *Test classes. Never run @Tag("parity"). -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration><excludedGroups>parity</excludedGroups></configuration>
       </plugin>
+      <!-- Integration tests (integration-test + verify phases): *IT classes (Testcontainers).
+           Excludes @Tag("parity") — those need the legacy app and run under the 'parity' profile. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration><excludedGroups>parity</excludedGroups></configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
   <profiles>
+    <!-- Golden-master parity: `mvn -B -Pparity verify` (legacy GeneXus app must be reachable).
+         Runs ONLY @Tag("parity") *IT classes via failsafe; skips unit tests. -->
     <profile>
       <id>parity</id>
       <build><plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <configuration><groups>parity</groups><excludedGroups></excludedGroups></configuration>
+          <configuration><skip>true</skip></configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <groups>parity</groups>
+            <excludedGroups></excludedGroups>
+          </configuration>
         </plugin>
       </plugins></build>
     </profile>
