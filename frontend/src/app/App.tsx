@@ -5,6 +5,8 @@ import EspecialidadeListPage from "../features/especialidade/EspecialidadeListPa
 import EspecialidadeFormPage from "../features/especialidade/EspecialidadeFormPage";
 import ConselhoClasseListPage from "../features/conselho-classe/ConselhoClasseListPage";
 import ConselhoClasseFormPage from "../features/conselho-classe/ConselhoClasseFormPage";
+import LocalListPage from "../features/local/LocalListPage";
+import LocalFormPage from "../features/local/LocalFormPage";
 import type { ReactNode } from "react";
 
 export default function App() {
@@ -39,6 +41,7 @@ function Shell() {
         <strong>Receituário</strong>
         {hasRole("SAUDE_CADASTRO") && <Link to="/especialidades">Especialidades</Link>}
         {hasRole("SAUDE_CADASTRO") && <Link to="/conselhos-classe">Conselhos de Classe</Link>}
+        {hasRole("SAUDE_CADASTRO") && <Link to="/locais">Locais</Link>}
         <span className="ml-auto text-sm text-gray-600">{username}</span>
         <button onClick={logout} className="text-sm text-blue-600">Sair</button>
       </nav>
@@ -51,6 +54,9 @@ function Shell() {
           <Route path="/conselhos-classe" element={<ConselhoClasseListPage />} />
           <Route path="/conselhos-classe/novo" element={<ConselhoClasseFormPage />} />
           <Route path="/conselhos-classe/:codigo" element={<ConselhoClasseFormPage />} />
+          <Route path="/locais" element={<LocalListPage />} />
+          <Route path="/locais/novo" element={<LocalFormPage />} />
+          <Route path="/locais/:codigo" element={<LocalFormPage />} />
           <Route path="*" element={<p className="p-6">Página não encontrada.</p>} />
         </Routes>
       </main>

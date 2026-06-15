@@ -75,3 +75,23 @@ CREATE TABLE IF NOT EXISTS SAU_PRO (
     ConClaCod  SMALLINT,
     CONSTRAINT pk_sau_pro PRIMARY KEY (ProCod)
 );
+
+-- Município (SYS_MUN) — MINIMAL stub: columns used by the SAU_LOC FK existence + derived display
+-- (municipioNome/Uf/Ibge). SYS_MUN is a SYS_* system table migrated separately; expand then.
+CREATE TABLE IF NOT EXISTS SYS_MUN (
+    MunCod   INTEGER NOT NULL,
+    MunNom   VARCHAR(60),
+    MunUF    VARCHAR(2),
+    MunIBGE  VARCHAR(7),
+    CONSTRAINT pk_sys_mun PRIMARY KEY (MunCod)
+);
+
+-- Local (SAU_LOC) — locality within a município. From the reorg DDL (new table).
+CREATE TABLE IF NOT EXISTS SAU_LOC (
+    LocCod     INTEGER     NOT NULL,
+    LocNom     VARCHAR(50),
+    LocMunCod  INTEGER,
+    CONSTRAINT pk_sau_loc PRIMARY KEY (LocCod),
+    CONSTRAINT fk_sau_loc_mun FOREIGN KEY (LocMunCod) REFERENCES SYS_MUN (MunCod)
+);
+CREATE INDEX IF NOT EXISTS isau_loc1 ON SAU_LOC (LocMunCod);
