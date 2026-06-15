@@ -95,3 +95,18 @@ CREATE TABLE IF NOT EXISTS SAU_LOC (
     CONSTRAINT fk_sau_loc_mun FOREIGN KEY (LocMunCod) REFERENCES SYS_MUN (MunCod)
 );
 CREATE INDEX IF NOT EXISTS isau_loc1 ON SAU_LOC (LocMunCod);
+
+-- Tipo de Medicamento (SAU_TIPREM) — medication-type catalog. From the reorg DDL.
+CREATE TABLE IF NOT EXISTS SAU_TIPREM (
+    TipRemCod  INTEGER     NOT NULL,
+    TipRemDes  VARCHAR(50),
+    CONSTRAINT pk_sau_tiprem PRIMARY KEY (TipRemCod)
+);
+
+-- Medicamento (SAU_REM) — MINIMAL stub: only the column used by the SAU_TIPREM delete-guard (R3).
+-- The full table is an L Wave-3 slice; this definition will be expanded when SAU_REM is migrated.
+CREATE TABLE IF NOT EXISTS SAU_REM (
+    RemCod     INTEGER NOT NULL,
+    TipRemCod  INTEGER,
+    CONSTRAINT pk_sau_rem PRIMARY KEY (RemCod)
+);
