@@ -123,4 +123,22 @@ class EspecialidadeServiceTest {
         service().create(validCreate());
         verify(audit).record(eq("CREATE"), eq("SAU_ESP"), eq(100));
     }
+
+    @Test
+    void writesAuditOnUpdate() {
+        Especialidade e = new Especialidade(); e.setCodigo(100); e.setNome("Cardiologia");
+        when(repo.findById(100)).thenReturn(Optional.of(e));
+        when(repo.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        service().update(100, new EspecialidadeUpdateRequest("Cardiologia Geral", null, null, null, null));
+        verify(audit).record(eq("UPDATE"), eq("SAU_ESP"), eq(100));
+    }
+
+    @Test
+    void writesAuditOnDelete() {
+        Especialidade e = new Especialidade(); e.setCodigo(100); e.setNome("Cardiologia");
+        when(repo.findById(100)).thenReturn(Optional.of(e));
+        when(repo.isReferencedByProfissional(100)).thenReturn(false);
+        service().delete(100);
+        verify(audit).record(eq("DELETE"), eq("SAU_ESP"), eq(100));
+    }
 }

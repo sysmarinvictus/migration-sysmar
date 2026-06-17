@@ -23,10 +23,10 @@ public interface EspecialidadeRepository extends JpaRepository<Especialidade, In
     Optional<String> findCborDescricao(@Param("cod") Integer cod);
 
     /** R3: existence check for the CBO FK. */
-    @Query(value = "select count(*) > 0 from SAU_CBOR where CborCod = :cod", nativeQuery = true)
+    @Query(value = "select exists(select 1 from SAU_CBOR where CborCod = :cod)", nativeQuery = true)
     boolean cborExists(@Param("cod") Integer cod);
 
     /** R4: block delete when referenced by a profissional (SAU_PROESP). */
-    @Query(value = "select count(*) > 0 from SAU_PROESP where EspCod = :cod", nativeQuery = true)
+    @Query(value = "select exists(select 1 from SAU_PROESP where EspCod = :cod)", nativeQuery = true)
     boolean isReferencedByProfissional(@Param("cod") Integer cod);
 }

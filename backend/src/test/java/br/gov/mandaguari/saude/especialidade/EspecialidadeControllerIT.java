@@ -119,4 +119,10 @@ class EspecialidadeControllerIT extends AbstractIntegrationTest {
             .then().statusCode(200).body("size()", greaterThanOrEqualTo(1))
                 .body("[0].nome", notNullValue());
     }
+
+    @Test
+    void lookupRequiresAuthentication() {
+        given().spec(anonymous()).when().get("/api/especialidades/lookup?q=ped")
+            .then().statusCode(401);
+    }
 }
