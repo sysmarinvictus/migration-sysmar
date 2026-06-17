@@ -184,10 +184,163 @@ CREATE TABLE IF NOT EXISTS SAU_DIS (
     CONSTRAINT pk_sau_dis PRIMARY KEY (DisCod)
 );
 
--- Unidade de Atendimento (SAU_UNI) — MINIMAL stub: only UniCod + UniDisCod for the SAU_DIS
--- delete-guard R5. Full table is Wave-2 (uni↔unisetor cycle); this will be expanded when migrated.
+-- Tipo de Unidade (SAU_TIPUNI) — MINIMAL stub for the TipUniCod FK in SAU_UNI.
+CREATE TABLE IF NOT EXISTS SAU_TIPUNI (
+    TipUniCod  INTEGER NOT NULL,
+    TipUniNom  VARCHAR(50),
+    CONSTRAINT pk_sau_tipuni PRIMARY KEY (TipUniCod)
+);
+
+-- Unidade de Atendimento (SAU_UNI) — full Wave-2 definition (all 55 columns from GeneXus INSERT SQL).
 CREATE TABLE IF NOT EXISTS SAU_UNI (
-    UniCod    SMALLINT NOT NULL,
-    UniDisCod SMALLINT,
-    CONSTRAINT pk_sau_uni PRIMARY KEY (UniCod)
+    UniCod                  INTEGER  NOT NULL,
+    UniForPesCod            BIGINT,
+    UniNom                  VARCHAR(50),
+    UniRazSoc               VARCHAR(50),
+    UniCnpj                 VARCHAR(18),
+    UniCep                  VARCHAR(8),
+    UniEnd                  VARCHAR(70),
+    UniEndNum               VARCHAR(10),
+    UnEndCom                VARCHAR(40),
+    UniBai                  VARCHAR(70),
+    UniFon                  VARCHAR(20),
+    UniFax                  VARCHAR(20),
+    UniLicFun               VARCHAR(10),
+    UniRes                  VARCHAR(50),
+    UniEMail                VARCHAR(70),
+    UniCnes                 INTEGER,
+    UniBPA                  SMALLINT,
+    UniSIPNI                SMALLINT,
+    UniOrgEmi               VARCHAR(10),
+    UniEsfAdm               SMALLINT,
+    UniPSF                  SMALLINT,
+    UniSisPreNatal          SMALLINT,
+    UniHiperdia             SMALLINT,
+    UniGes                  SMALLINT,
+    UniSia                  VARCHAR(7),
+    UniSigla                VARCHAR(6),
+    UniSit                  SMALLINT,
+    UniSIASUS               VARCHAR(7),
+    UniScnesID              VARCHAR(20),
+    UniExpEsus              BOOLEAN,
+    UniExpBNAFAR            BOOLEAN,
+    UniCadCNS               BOOLEAN,
+    UniCadEnd               BOOLEAN,
+    UniAteSemCNS            BOOLEAN,
+    UniAteSemEnd            BOOLEAN,
+    UniEncFisio             BOOLEAN,
+    UniExt                  BOOLEAN,
+    TipUniCod               INTEGER,
+    UniAtencaoSecundaria    BOOLEAN,
+    UniBloqPacSemCadInd     BOOLEAN,
+    UniAvisoVacinaAtrasada  BOOLEAN,
+    UniCadCPF               BOOLEAN,
+    UniPainel               BOOLEAN,
+    UniRecInterMedMpp       BOOLEAN,
+    UniRecInterMedMppImp    BOOLEAN,
+    UniBaiRemSemCns         BOOLEAN,
+    UniBloqLancPcdAut       BOOLEAN,
+    UniBloqDispPacExt       BOOLEAN,
+    UniBloqAgSolExaPacExt   BOOLEAN,
+    UniMunCod               INTEGER,
+    UniProPesRespCod        BIGINT,
+    UniProPesDirCod         BIGINT,
+    UniProPesAudCod         BIGINT,
+    UniProPesAutCod         BIGINT,
+    UniDisCod               SMALLINT,
+    CONSTRAINT pk_sau_uni PRIMARY KEY (UniCod),
+    CONSTRAINT fk_sau_uni_dis FOREIGN KEY (UniDisCod) REFERENCES SAU_DIS (DisCod),
+    CONSTRAINT fk_sau_uni_tipuni FOREIGN KEY (TipUniCod) REFERENCES SAU_TIPUNI (TipUniCod)
+);
+CREATE INDEX IF NOT EXISTS isau_uni_nom ON SAU_UNI (UniNom);
+
+-- Setor (SAU_SETOR) — MINIMAL stub: only SetorCod PK used by SAU_UNISETOR.
+CREATE TABLE IF NOT EXISTS SAU_SETOR (
+    SetorCod  INTEGER NOT NULL,
+    SetorNom  VARCHAR(50),
+    CONSTRAINT pk_sau_setor PRIMARY KEY (SetorCod)
+);
+
+-- Unidade × Setor (SAU_UNISETOR) — MINIMAL stub: delete-guard for SAU_UNI.
+CREATE TABLE IF NOT EXISTS SAU_UNISETOR (
+    UniCod    INTEGER  NOT NULL,
+    SetorCod  INTEGER  NOT NULL,
+    CONSTRAINT pk_sau_unisetor PRIMARY KEY (UniCod, SetorCod),
+    CONSTRAINT fk_sau_unisetor_uni FOREIGN KEY (UniCod) REFERENCES SAU_UNI (UniCod)
+);
+
+-- Receituário Controle Especial (SAU_RECESP) — MINIMAL stub: delete-guard for SAU_UNI.
+-- Full table is Wave-6 / Portaria 344/98 (regulatory sign-off required before cutover).
+CREATE TABLE IF NOT EXISTS SAU_RECESP (
+    RecEspUniCod  INTEGER NOT NULL,
+    RecEspCod     BIGINT  NOT NULL,
+    CONSTRAINT pk_sau_recesp PRIMARY KEY (RecEspUniCod, RecEspCod),
+    CONSTRAINT fk_sau_recesp_uni FOREIGN KEY (RecEspUniCod) REFERENCES SAU_UNI (UniCod)
+);
+
+-- Profissionais × Unidade link sub-table (SAU_PROESP1) — MINIMAL stub: delete-guard for SAU_UNI.
+CREATE TABLE IF NOT EXISTS SAU_PROESP1 (
+    ProEspUniCod  INTEGER NOT NULL,
+    EspCod        INTEGER,
+    ProPesCod     BIGINT,
+    CONSTRAINT pk_sau_proesp1 PRIMARY KEY (ProEspUniCod),
+    CONSTRAINT fk_sau_proesp1_uni FOREIGN KEY (ProEspUniCod) REFERENCES SAU_UNI (UniCod)
+);
+
+-- Parâmetros 5 (SAU_PAR5) — MINIMAL stub: delete-guards for SAU_UNI (ParSalUniCod, ParSolUniCod).
+CREATE TABLE IF NOT EXISTS SAU_PAR5 (
+    ParEmpCod     INTEGER NOT NULL,
+    ParSalUniCod  INTEGER,
+    ParSolUniCod  INTEGER,
+    CONSTRAINT pk_sau_par5 PRIMARY KEY (ParEmpCod)
+);
+
+-- Parâmetros de Agendamento (SAU_PAR2) — MINIMAL stub: delete-guards for SAU_UNI.
+CREATE TABLE IF NOT EXISTS SAU_PAR2 (
+    ParEmpCod         INTEGER  NOT NULL,
+    ParAgendUniCod    INTEGER,
+    ParAgendTipAge    SMALLINT NOT NULL DEFAULT 0,
+    ParAgendDesUniCod INTEGER,
+    CONSTRAINT pk_sau_par2 PRIMARY KEY (ParEmpCod, ParAgendTipAge)
+);
+
+-- Usuário × Unidade link (SAU_USUUNI) — MINIMAL stub: delete-guard for SAU_UNI.
+CREATE TABLE IF NOT EXISTS SAU_USUUNI (
+    UsuCod     INTEGER NOT NULL,
+    UniUsuCod  INTEGER,
+    CONSTRAINT pk_sau_usuuni PRIMARY KEY (UsuCod)
+);
+
+-- Usuário (SAU_USU) — MINIMAL stub: delete-guard for SAU_UNI (UsuUniCod).
+CREATE TABLE IF NOT EXISTS SAU_USU (
+    UsuCod     INTEGER NOT NULL,
+    UsuUniCod  INTEGER,
+    CONSTRAINT pk_sau_usu PRIMARY KEY (UsuCod)
+);
+
+-- Remessa 1 (SAU_REM1) — MINIMAL stub: delete-guard for SAU_UNI (RemUniCod).
+CREATE TABLE IF NOT EXISTS SAU_REM1 (
+    RemCod     INTEGER NOT NULL,
+    RemUniCod  INTEGER,
+    CONSTRAINT pk_sau_rem1 PRIMARY KEY (RemCod)
+);
+
+-- Remessa × Unidade × Setor (SAU_REM_UNISETOR) — MINIMAL stub: delete-guard for SAU_UNI.
+CREATE TABLE IF NOT EXISTS SAU_REM_UNISETOR (
+    RemCod              INTEGER  NOT NULL,
+    RemUniSetorSeq      SMALLINT NOT NULL,
+    RemUniSetorUniCod   INTEGER,
+    CONSTRAINT pk_sau_rem_unisetor PRIMARY KEY (RemCod, RemUniSetorSeq)
+);
+
+-- Paciente (SAU_PAC) — MINIMAL stub: delete-guards for SAU_UNI (3 UniCod columns)
+-- + columns required by ProntuarioPaciente entity (SAU_PACPRN slice).
+CREATE TABLE IF NOT EXISTS SAU_PAC (
+    PacPesCod           BIGINT       NOT NULL,
+    PacUniCod           INTEGER,
+    PacPesCadAltUniCod  INTEGER,
+    PacPesCadInsUniCod  INTEGER,
+    PacPesNom           VARCHAR(50),           -- display copy from SYS_PES; SAU_PACPRN slice
+    PacProNum           VARCHAR(10),           -- prontuário number; SAU_PACPRN slice
+    CONSTRAINT pk_sau_pac PRIMARY KEY (PacPesCod)
 );

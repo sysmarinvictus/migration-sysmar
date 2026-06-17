@@ -15,6 +15,8 @@ import BairroListPage from "../features/bairro/BairroListPage";
 import BairroFormPage from "../features/bairro/BairroFormPage";
 import DistritoListPage from "../features/distrito/DistritoListPage";
 import DistritoFormPage from "../features/distrito/DistritoFormPage";
+import UnidadeListPage from "../features/unidade/UnidadeListPage";
+import UnidadeFormPage from "../features/unidade/UnidadeFormPage";
 import type { ReactNode } from "react";
 
 export default function App() {
@@ -54,6 +56,7 @@ function Shell() {
         {hasRole("SAUDE_CADASTRO") && <Link to="/posologias">Posologias</Link>}
         {hasRole("SAUDE_CADASTRO") && <Link to="/bairros">Bairros</Link>}
         {hasRole("SAUDE_CADASTRO") && <Link to="/distritos">Distritos</Link>}
+        {hasRole("SAUDE_CADASTRO") && <Link to="/unidades">Unidades</Link>}
         <span className="ml-auto text-sm text-gray-600">{username}</span>
         <button onClick={logout} className="text-sm text-blue-600">Sair</button>
       </nav>
@@ -81,6 +84,9 @@ function Shell() {
           <Route path="/distritos" element={<DistritoListPage />} />
           <Route path="/distritos/novo" element={<DistritoFormPage />} />
           <Route path="/distritos/:codigo" element={<DistritoFormPage />} />
+          <Route path="/unidades" element={<UnidadeListPage />} />
+          <Route path="/unidades/nova" element={<UnidadeFormPage />} />
+          <Route path="/unidades/:codigo" element={<UnidadeFormPage />} />
           <Route path="*" element={<p className="p-6">Página não encontrada.</p>} />
         </Routes>
       </main>
