@@ -159,10 +159,20 @@ CREATE TABLE IF NOT EXISTS SYS_PES (
     CONSTRAINT pk_sys_pes PRIMARY KEY (PesCod)
 );
 
+-- Tipo de Logradouro (SAU_TIPLOG) — address/street-type catalog (Rua, Av., etc.).
+-- No GeneXus transaction form — read-only reference data. From SAU_TIPLOGConversion.xml.
+CREATE TABLE IF NOT EXISTS SAU_TIPLOG (
+    TipLogCod  INTEGER      NOT NULL,
+    TipLogNom  VARCHAR(100),
+    TipLogSig  VARCHAR(15),
+    CONSTRAINT pk_sau_tiplog PRIMARY KEY (TipLogCod)
+);
+
 -- Distrito Sanitário (SAU_DIS) — MINIMAL stub: only DisCod + DisBaiCod for the SAU_BAI
 -- delete-guard R5. Full table is Wave-2; this definition will be expanded when SAU_DIS is migrated.
 CREATE TABLE IF NOT EXISTS SAU_DIS (
-    DisCod    SMALLINT NOT NULL,
-    DisBaiCod INTEGER,
+    DisCod       SMALLINT NOT NULL,
+    DisBaiCod    INTEGER,
+    DisTipLogCod INTEGER,
     CONSTRAINT pk_sau_dis PRIMARY KEY (DisCod)
 );
