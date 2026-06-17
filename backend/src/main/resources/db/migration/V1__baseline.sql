@@ -168,11 +168,26 @@ CREATE TABLE IF NOT EXISTS SAU_TIPLOG (
     CONSTRAINT pk_sau_tiplog PRIMARY KEY (TipLogCod)
 );
 
--- Distrito Sanitário (SAU_DIS) — MINIMAL stub: only DisCod + DisBaiCod for the SAU_BAI
--- delete-guard R5. Full table is Wave-2; this definition will be expanded when SAU_DIS is migrated.
+-- Distrito Sanitário (SAU_DIS) — full Wave-2 definition (all 11 columns from GeneXus INSERT cursor).
 CREATE TABLE IF NOT EXISTS SAU_DIS (
-    DisCod       SMALLINT NOT NULL,
-    DisBaiCod    INTEGER,
+    DisCod       SMALLINT    NOT NULL,
+    DisNom       VARCHAR(30),
+    DisEnd       VARCHAR(50),
+    DisNum       SMALLINT,
+    DisCom       VARCHAR(15),
+    DisCEP       INTEGER,
+    DisDDD       VARCHAR(3),
+    DisFon       INTEGER,
+    DisFax       INTEGER,
     DisTipLogCod INTEGER,
+    DisBaiCod    INTEGER,
     CONSTRAINT pk_sau_dis PRIMARY KEY (DisCod)
+);
+
+-- Unidade de Atendimento (SAU_UNI) — MINIMAL stub: only UniCod + UniDisCod for the SAU_DIS
+-- delete-guard R5. Full table is Wave-2 (uni↔unisetor cycle); this will be expanded when migrated.
+CREATE TABLE IF NOT EXISTS SAU_UNI (
+    UniCod    SMALLINT NOT NULL,
+    UniDisCod SMALLINT,
+    CONSTRAINT pk_sau_uni PRIMARY KEY (UniCod)
 );

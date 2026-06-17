@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import apiClient from "../../lib/apiClient";
+import { http } from "../../lib/apiClient";
 import type { PosologiaFormValues } from "./schema";
 
 export interface PosologiaResponse {
@@ -25,14 +25,14 @@ export function usePosologias(descricao: string, page: number) {
   if (descricao) params.set("descricao", descricao);
   return useQuery<Page<PosologiaResponse>>({
     queryKey: ["posologias", descricao, page],
-    queryFn: () => apiClient.get(`/api/posologias?${params}`).then((r) => r.data),
+    queryFn: () => http.get(`/api/posologias?${params}`).then((r) => r.data),
   });
 }
 
 export function usePosologia(codigo: number | null) {
   return useQuery<PosologiaResponse>({
     queryKey: ["posologias", codigo],
-    queryFn: () => apiClient.get(`/api/posologias/${codigo}`).then((r) => r.data),
+    queryFn: () => http.get(`/api/posologias/${codigo}`).then((r) => r.data),
     enabled: codigo != null,
   });
 }
@@ -40,7 +40,7 @@ export function usePosologia(codigo: number | null) {
 export function useCreatePosologia() {
   const qc = useQueryClient();
   return useMutation<PosologiaResponse, unknown, PosologiaFormValues>({
-    mutationFn: (body) => apiClient.post("/api/posologias", body).then((r) => r.data),
+    mutationFn: (body) => http.post("/api/posologias", body).then((r) => r.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["posologias"] }),
   });
 }
@@ -48,7 +48,7 @@ export function useCreatePosologia() {
 export function useUpdatePosologia(codigo: number) {
   const qc = useQueryClient();
   return useMutation<PosologiaResponse, unknown, PosologiaFormValues>({
-    mutationFn: (body) => apiClient.put(`/api/posologias/${codigo}`, body).then((r) => r.data),
+    mutationFn: (body) => http.put(`/api/posologias/${codigo}`, body).then((r) => r.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["posologias"] }),
   });
 }
@@ -56,7 +56,7 @@ export function useUpdatePosologia(codigo: number) {
 export function useDeletePosologia() {
   const qc = useQueryClient();
   return useMutation<void, unknown, number>({
-    mutationFn: (codigo) => apiClient.delete(`/api/posologias/${codigo}`).then(() => {}),
+    mutationFn: (codigo) => http.delete(`/api/posologias/${codigo}`).then(() => {}),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["posologias"] }),
   });
 }
