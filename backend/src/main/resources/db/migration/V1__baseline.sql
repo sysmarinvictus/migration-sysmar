@@ -142,3 +142,27 @@ CREATE TABLE IF NOT EXISTS SAU_RECESP1 (
     RemObsCod     INTEGER,
     CONSTRAINT pk_sau_recesp1 PRIMARY KEY (RecEspUniCod, RecEspCod, RecEspSeq)
 );
+
+-- Bairro (SAU_BAI) — neighborhood catalog. From the reorg DDL (SAU_BAIConversion.xml).
+CREATE TABLE IF NOT EXISTS SAU_BAI (
+    BaiCod  INTEGER     NOT NULL,
+    BaiNom  VARCHAR(50),
+    CONSTRAINT pk_sau_bai PRIMARY KEY (BaiCod)
+);
+CREATE INDEX IF NOT EXISTS usau_bai_desc ON SAU_BAI (BaiCod DESC);
+
+-- Pessoa (SYS_PES) — MINIMAL stub: only PesBaiCod used by the SAU_BAI delete-guard R4.
+-- Full table is Wave-0 (person/auth foundation); this definition will be expanded then.
+CREATE TABLE IF NOT EXISTS SYS_PES (
+    PesCod    BIGINT  NOT NULL,
+    PesBaiCod INTEGER,
+    CONSTRAINT pk_sys_pes PRIMARY KEY (PesCod)
+);
+
+-- Distrito Sanitário (SAU_DIS) — MINIMAL stub: only DisCod + DisBaiCod for the SAU_BAI
+-- delete-guard R5. Full table is Wave-2; this definition will be expanded when SAU_DIS is migrated.
+CREATE TABLE IF NOT EXISTS SAU_DIS (
+    DisCod    SMALLINT NOT NULL,
+    DisBaiCod INTEGER,
+    CONSTRAINT pk_sau_dis PRIMARY KEY (DisCod)
+);

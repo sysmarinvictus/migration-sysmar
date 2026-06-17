@@ -11,6 +11,8 @@ import TipoMedicamentoListPage from "../features/tipo-medicamento/TipoMedicament
 import TipoMedicamentoFormPage from "../features/tipo-medicamento/TipoMedicamentoFormPage";
 import PosologiaListPage from "../features/posologia/PosologiaListPage";
 import PosologiaFormPage from "../features/posologia/PosologiaFormPage";
+import BairroListPage from "../features/bairro/BairroListPage";
+import BairroFormPage from "../features/bairro/BairroFormPage";
 import type { ReactNode } from "react";
 
 export default function App() {
@@ -48,6 +50,7 @@ function Shell() {
         {hasRole("SAUDE_CADASTRO") && <Link to="/locais">Locais</Link>}
         {hasRole("SAUDE_CADASTRO") && <Link to="/tipos-medicamento">Tipos de Medicamento</Link>}
         {hasRole("SAUDE_CADASTRO") && <Link to="/posologias">Posologias</Link>}
+        {hasRole("SAUDE_CADASTRO") && <Link to="/bairros">Bairros</Link>}
         <span className="ml-auto text-sm text-gray-600">{username}</span>
         <button onClick={logout} className="text-sm text-blue-600">Sair</button>
       </nav>
@@ -69,6 +72,9 @@ function Shell() {
           <Route path="/posologias" element={<PosologiaListPage />} />
           <Route path="/posologias/nova" element={<PosologiaFormPage />} />
           <Route path="/posologias/:codigo" element={<PosologiaFormPage />} />
+          <Route path="/bairros" element={<BairroListPage />} />
+          <Route path="/bairros/novo" element={<BairroFormPage />} />
+          <Route path="/bairros/:codigo" element={<BairroFormPage />} />
           <Route path="*" element={<p className="p-6">Página não encontrada.</p>} />
         </Routes>
       </main>
