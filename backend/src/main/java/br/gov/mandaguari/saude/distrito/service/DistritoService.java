@@ -1,5 +1,6 @@
 package br.gov.mandaguari.saude.distrito.service;
 
+import br.gov.mandaguari.saude.bairro.repository.BairroRepository;
 import br.gov.mandaguari.saude.common.audit.AuditService;
 import br.gov.mandaguari.saude.common.error.DomainExceptions.BusinessRule;
 import br.gov.mandaguari.saude.common.error.DomainExceptions.Conflict;
@@ -8,6 +9,7 @@ import br.gov.mandaguari.saude.distrito.domain.Distrito;
 import br.gov.mandaguari.saude.distrito.dto.DistritoDtos.*;
 import br.gov.mandaguari.saude.distrito.mapper.DistritoMapper;
 import br.gov.mandaguari.saude.distrito.repository.DistritoRepository;
+import br.gov.mandaguari.saude.tipologradouro.repository.TipoLogradouroRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,22 +28,27 @@ public class DistritoService {
     private final DistritoRepository repo;
     private final DistritoMapper mapper;
     private final AuditService audit;
+    private final TipoLogradouroRepository tiplogRepo;
+    private final BairroRepository bairroRepo;
 
-    public DistritoService(DistritoRepository repo, DistritoMapper mapper, AuditService audit) {
+    public DistritoService(DistritoRepository repo, DistritoMapper mapper, AuditService audit,
+                           TipoLogradouroRepository tiplogRepo, BairroRepository bairroRepo) {
         this.repo = repo;
         this.mapper = mapper;
         this.audit = audit;
+        this.tiplogRepo = tiplogRepo;
+        this.bairroRepo = bairroRepo;
     }
 
     public Page<DistritoResponse> list(String nome, Pageable pageable) {
         Page<Distrito> page = (nome == null || nome.isBlank())
                 ? repo.findAll(pageable)
                 : repo.findByNomeContainingIgnoreCase(nome, pageable);
-        return page.map(mapper::toResponse);
+        return page.map(this::enrich);
     }
 
     public DistritoResponse get(Short codigo) {
-        return mapper.toResponse(find(codigo));
+        return enrich(find(codigo));
     }
 
     public List<DistritoLookupItem> lookup(String q, Pageable pageable) {
@@ -50,13 +57,17 @@ public class DistritoService {
 
     @Transactional
     public DistritoResponse create(DistritoCreateRequest req) {
-        String nome = req.nome().trim();
-        requireNome(nome);                                            // R1
-        validateTipLog(req.tipoLogradouroCodigo());                  // R2
-        validateBairro(req.bairroCodigo());                         // R3
-        validateDdd(req.ddd());                                      // R4
+        String nome = req.nome().trim().toUpperCase();                // R4: stored uppercase
+        requireNome(nome);                                            // R2
+        validateTipLog(req.tipoLogradouroCodigo());                  // R5
+        validateBairro(req.bairroCodigo());                         // R8
+        validateDdd(req.ddd());                                      // R11
 
-        Short nextCodigo = (short) (repo.findMaxCodigo() + 1);      // R6: system-assigned MAX+1
+        int next = repo.findMaxCodigo() + 1;
+        if (next > Short.MAX_VALUE) {                                 // R13: SMALLINT overflow guard
+            throw new BusinessRule("dis.codigo.overflow", "Capacidade máxima de códigos atingida");
+        }
+        Short nextCodigo = (short) next;                              // R13: system-assigned MAX+1
 
         Distrito d = buildFrom(req.endereco(), req.numero(), req.complemento(),
                 req.cep(), req.ddd(), req.telefone(), req.fax(),
@@ -65,23 +76,23 @@ public class DistritoService {
         d.setNome(nome);
 
         Distrito saved = repo.save(d);
-        audit.record("CREATE", "SAU_DIS", saved.getCodigo());        // R7
-        return mapper.toResponse(saved);
+        audit.record("CREATE", "SAU_DIS", saved.getCodigo());        // R17
+        return enrich(saved);
     }
 
     @Transactional
     public DistritoResponse update(Short codigo, DistritoUpdateRequest req) {
         Distrito d = find(codigo);
-        String nome = req.nome().trim();
-        requireNome(nome);                                            // R1
-        validateTipLog(req.tipoLogradouroCodigo());                  // R2
-        validateBairro(req.bairroCodigo());                         // R3
-        validateDdd(req.ddd());                                      // R4
+        String nome = req.nome().trim().toUpperCase();                // R4: stored uppercase
+        requireNome(nome);                                            // R3
+        validateTipLog(req.tipoLogradouroCodigo());                  // R6
+        validateBairro(req.bairroCodigo());                         // R9
+        validateDdd(req.ddd());                                      // R12
 
         d.setNome(nome);
-        d.setEndereco(nullableTrim(req.endereco()));
+        d.setEndereco(nullableUpperTrim(req.endereco()));             // R4
         d.setNumero(req.numero());
-        d.setComplemento(nullableTrim(req.complemento()));
+        d.setComplemento(nullableUpperTrim(req.complemento()));       // R4
         d.setCep(req.cep());
         d.setDdd(nullableTrim(req.ddd()));
         d.setTelefone(req.telefone());
@@ -90,18 +101,18 @@ public class DistritoService {
         d.setBairroCodigo(req.bairroCodigo());
 
         Distrito saved = repo.save(d);
-        audit.record("UPDATE", "SAU_DIS", saved.getCodigo());        // R7
-        return mapper.toResponse(saved);
+        audit.record("UPDATE", "SAU_DIS", saved.getCodigo());        // R17
+        return enrich(saved);
     }
 
     @Transactional
     public void delete(Short codigo) {
         Distrito d = find(codigo);
-        if (repo.isReferencedByUnidade(codigo)) {                   // R5
+        if (repo.isReferencedByUnidade(codigo)) {                   // R16
             throw new Conflict("Distrito está vinculado a uma Unidade de Atendimento e não pode ser excluído");
         }
         repo.delete(d);
-        audit.record("DELETE", "SAU_DIS", codigo);                  // R7
+        audit.record("DELETE", "SAU_DIS", codigo);                  // R17
     }
 
     // --- helpers ---
@@ -145,13 +156,21 @@ public class DistritoService {
         return t.isEmpty() ? null : t;
     }
 
+    /** R4: uppercase + trim for address text fields. */
+    private static String nullableUpperTrim(String s) {
+        if (s == null) return null;
+        String t = s.trim().toUpperCase();
+        return t.isEmpty() ? null : t;
+    }
+
+    /** Builds entity from address + contact fields; applies R4 uppercase on endereco/complemento. */
     private static Distrito buildFrom(String endereco, Short numero, String complemento,
                                           Integer cep, String ddd, Integer telefone, Integer fax,
                                           Integer tipLogCod, Integer bairroCod) {
         Distrito d = new Distrito();
-        d.setEndereco(nullableTrim(endereco));
+        d.setEndereco(nullableUpperTrim(endereco));                    // R4
         d.setNumero(numero);
-        d.setComplemento(nullableTrim(complemento));
+        d.setComplemento(nullableUpperTrim(complemento));              // R4
         d.setCep(cep);
         d.setDdd(nullableTrim(ddd));
         d.setTelefone(telefone);
@@ -159,5 +178,20 @@ public class DistritoService {
         d.setTipoLogradouroCodigo(tipLogCod);
         d.setBairroCodigo(bairroCod);
         return d;
+    }
+
+    /** Enriches the mapped response with derived R7 (tiplogSigla) and R10 (bairroNome) fields. */
+    private DistritoResponse enrich(Distrito d) {
+        DistritoResponse base = mapper.toResponse(d);
+        String tiplogSigla = (d.getTipoLogradouroCodigo() != null && d.getTipoLogradouroCodigo() > 0)
+                ? tiplogRepo.findById(d.getTipoLogradouroCodigo()).map(t -> t.getSigla()).orElse(null)
+                : null;
+        String bairroNome = (d.getBairroCodigo() != null && d.getBairroCodigo() > 0)
+                ? bairroRepo.findById(d.getBairroCodigo()).map(b -> b.getNome()).orElse(null)
+                : null;
+        return new DistritoResponse(
+                base.codigo(), base.nome(), base.endereco(), base.numero(), base.complemento(),
+                base.cep(), base.ddd(), base.telefone(), base.fax(),
+                base.tipoLogradouroCodigo(), base.bairroCodigo(), tiplogSigla, bairroNome);
     }
 }

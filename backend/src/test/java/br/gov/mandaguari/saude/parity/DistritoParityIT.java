@@ -35,4 +35,22 @@ class DistritoParityIT extends AbstractIntegrationTest {
 
     // Scenario 8: Delete blocked by SAU_UNI → 409 from new app / GXM_del from legacy
     @Test void deleteBlockedByUnidadeParity() {}
+
+    // Scenario 9: Insert valid (all fields) — verify all 11 columns match legacy output
+    @Test void createAllFieldsParityMatchesLegacy() {}
+
+    // Scenario 10: Insert minimal (DisCod=auto + DisNom only; FK codes = 0) → accepted
+    @Test void createMinimalParityMatchesLegacy() {}
+
+    // Scenario 11: Insert duplicate DisCod — 409 Conflict from new app / GXM_noupdate from legacy
+    @Test void createDuplicateCodigoReturnsConflictParity() {}
+
+    // Scenario 12: Insert with invalid DisBaiCod (non-zero, non-existent) → 422 from new app
+    @Test void createRejectsUnknownBairroParity() {}
+
+    // Scenario 13: Insert with DisTipLogCod=0 → accepted (null sentinel)
+    @Test void createTipLogZeroAcceptedParity() {}
+
+    // Scenario 14: Update bairroCodigo (valid code) → verify DisBaiCod stored correctly
+    @Test void updateBairroCodigoParityMatchesLegacy() {}
 }

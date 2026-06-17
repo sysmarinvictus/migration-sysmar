@@ -41,7 +41,7 @@ class DistritoControllerIT extends AbstractIntegrationTest {
                 .when().get("/api/distritos")
                 .then().statusCode(200)
                 .body("content.size()", equalTo(1))
-                .body("content[0].nome", equalTo("DS Norte"));
+                .body("content[0].nome", equalTo("DS NORTE"));
     }
 
     @Test
@@ -52,7 +52,7 @@ class DistritoControllerIT extends AbstractIntegrationTest {
                 .when().get("/api/distritos/" + cod)
                 .then().statusCode(200)
                 .body("codigo", equalTo((int) cod))
-                .body("nome", equalTo("DS Leste"));
+                .body("nome", equalTo("DS LESTE"));
     }
 
     @Test
@@ -71,7 +71,7 @@ class DistritoControllerIT extends AbstractIntegrationTest {
                 .when().get("/api/distritos/lookup")
                 .then().statusCode(200)
                 .body("size()", equalTo(1))
-                .body("[0].nome", equalTo("DS Oeste"));
+                .body("[0].nome", equalTo("DS OESTE"));
     }
 
     @Test
@@ -84,7 +84,7 @@ class DistritoControllerIT extends AbstractIntegrationTest {
                 .when().post("/api/distritos")
                 .then().statusCode(201)
                 .body("codigo", notNullValue())
-                .body("nome", equalTo("DS Central"));
+                .body("nome", equalTo("DS CENTRAL"));
     }
 
     @Test
@@ -140,7 +140,7 @@ class DistritoControllerIT extends AbstractIntegrationTest {
                         """)
                 .when().put("/api/distritos/" + cod)
                 .then().statusCode(200)
-                .body("nome", equalTo("DS Atualizada"));
+                .body("nome", equalTo("DS ATUALIZADA"));
     }
 
     @Test
@@ -174,6 +174,53 @@ class DistritoControllerIT extends AbstractIntegrationTest {
         given().spec(anonymous())
                 .when().get("/api/distritos")
                 .then().statusCode(401);
+    }
+
+    @Test
+    void createRejectsUnknownTipLogCod() {
+        // Non-existent TipLogCod (non-zero) → 422 (R5)
+        given().spec(asUser("SAUDE_CADASTRO"))
+                .contentType(ContentType.JSON)
+                .body("""
+                        {"nome":"DS Teste","tipoLogradouroCodigo":9999}
+                        """)
+                .when().post("/api/distritos")
+                .then().statusCode(422);
+    }
+
+    @Test
+    void createRejectsUnknownBairroCod() {
+        // Non-existent BairroCodigo (non-zero) → 422 (R8)
+        given().spec(asUser("SAUDE_CADASTRO"))
+                .contentType(ContentType.JSON)
+                .body("""
+                        {"nome":"DS Teste","bairroCodigo":9999}
+                        """)
+                .when().post("/api/distritos")
+                .then().statusCode(422);
+    }
+
+    @Test
+    void createWithTipLogZeroIsAccepted() {
+        // FK code = 0 is the null sentinel — must not trigger FK existence check (R5)
+        given().spec(asUser("SAUDE_CADASTRO"))
+                .contentType(ContentType.JSON)
+                .body("""
+                        {"nome":"DS Sentinela","tipoLogradouroCodigo":0,"bairroCodigo":0}
+                        """)
+                .when().post("/api/distritos")
+                .then().statusCode(201);
+    }
+
+    @Test
+    void nomeStoredAsUppercase() {
+        // R4: uppercase normalisation applied by service before persist
+        short cod = createViaApi("centro norte");
+
+        given().spec(asUser("SAUDE_CADASTRO"))
+                .when().get("/api/distritos/" + cod)
+                .then().statusCode(200)
+                .body("nome", equalTo("CENTRO NORTE"));
     }
 
     // --- helper ---

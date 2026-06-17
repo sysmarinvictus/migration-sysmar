@@ -44,7 +44,8 @@ export default function DistritoListPage() {
               <tr className="border-b">
                 <th className="py-2">Código</th>
                 <th className="py-2">Nome</th>
-                <th className="py-2">Endereço</th>
+                <th className="py-2">Tipo Logradouro</th>
+                <th className="py-2">Bairro</th>
                 <th className="py-2">DDD</th>
                 <th />
               </tr>
@@ -54,7 +55,8 @@ export default function DistritoListPage() {
                 <tr key={d.codigo} className="border-b hover:bg-gray-50">
                   <td className="py-2">{d.codigo}</td>
                   <td className="py-2">{d.nome}</td>
-                  <td className="py-2">{d.endereco ?? "—"}</td>
+                  <td className="py-2">{d.tiplogSigla ?? "—"}</td>
+                  <td className="py-2">{d.bairroNome ?? "—"}</td>
                   <td className="py-2">{d.ddd ?? "—"}</td>
                   <td className="py-2 text-right flex gap-3 justify-end">
                     <Link to={`/distritos/${d.codigo}`} className="text-blue-600">

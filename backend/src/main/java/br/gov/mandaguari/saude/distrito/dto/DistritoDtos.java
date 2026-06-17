@@ -1,5 +1,7 @@
 package br.gov.mandaguari.saude.distrito.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -10,27 +12,27 @@ public final class DistritoDtos {
     public record DistritoCreateRequest(
             @NotBlank @Size(max = 30) String nome,
             @Size(max = 50) String endereco,
-            Short numero,
+            @Min(0) @Max(9999) Short numero,                         // R21
             @Size(max = 15) String complemento,
             Integer cep,
             @Size(max = 3) String ddd,
             Integer telefone,
             Integer fax,
-            Integer tipoLogradouroCodigo,
-            Integer bairroCodigo
+            @Min(0) @Max(999999) Integer tipoLogradouroCodigo,       // R21
+            @Min(0) @Max(999999) Integer bairroCodigo                // R21
     ) {}
 
     public record DistritoUpdateRequest(
             @NotBlank @Size(max = 30) String nome,
             @Size(max = 50) String endereco,
-            Short numero,
+            @Min(0) @Max(9999) Short numero,                         // R21
             @Size(max = 15) String complemento,
             Integer cep,
             @Size(max = 3) String ddd,
             Integer telefone,
             Integer fax,
-            Integer tipoLogradouroCodigo,
-            Integer bairroCodigo
+            @Min(0) @Max(999999) Integer tipoLogradouroCodigo,       // R21
+            @Min(0) @Max(999999) Integer bairroCodigo                // R21
     ) {}
 
     public record DistritoResponse(
@@ -44,7 +46,9 @@ public final class DistritoDtos {
             Integer telefone,
             Integer fax,
             Integer tipoLogradouroCodigo,
-            Integer bairroCodigo
+            Integer bairroCodigo,
+            String tiplogSigla,   // derived from SAU_TIPLOG.TipLogSig — R7
+            String bairroNome     // derived from SAU_BAI.BaiNom — R10
     ) {}
 
     public record DistritoLookupItem(Short codigo, String nome) {}

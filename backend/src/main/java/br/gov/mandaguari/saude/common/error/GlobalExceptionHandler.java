@@ -1,6 +1,7 @@
 package br.gov.mandaguari.saude.common.error;
 
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -25,6 +26,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DomainExceptions.Conflict.class)
     ProblemDetail handleConflict(DomainExceptions.Conflict ex) {
         return problem(HttpStatus.CONFLICT, "conflict", "Conflito", ex.getMessage());
+    }
+
+    /** R14: duplicate PK from MAX+1 race condition → 409. */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    ProblemDetail handleDataIntegrity(DataIntegrityViolationException ex) {
+        return problem(HttpStatus.CONFLICT, "duplicate-key", "Conflito de dados", "Registro duplicado.");
     }
 
     @ExceptionHandler(DomainExceptions.BusinessRule.class)

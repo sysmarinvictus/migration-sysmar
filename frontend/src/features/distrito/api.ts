@@ -14,6 +14,8 @@ export interface DistritoResponse {
   fax?: number | null;
   tipoLogradouroCodigo?: number | null;
   bairroCodigo?: number | null;
+  tiplogSigla?: string | null;   // derived from SAU_TIPLOG.TipLogSig (R7)
+  bairroNome?: string | null;    // derived from SAU_BAI.BaiNom (R10)
 }
 
 interface Page<T> {

@@ -31,7 +31,7 @@ public class DistritoController {
     @PreAuthorize("hasRole('SAUDE_CADASTRO')")
     @Operation(summary = "Listar/buscar distritos sanitários (paginado)")
     public Page<DistritoResponse> list(@RequestParam(required = false) String nome,
-                                       @PageableDefault(size = 20, sort = "nome") Pageable pageable) {
+                                       @PageableDefault(size = 20, sort = "codigo") Pageable pageable) {
         return service.list(nome, pageable);
     }
 
