@@ -110,3 +110,35 @@ CREATE TABLE IF NOT EXISTS SAU_REM (
     TipRemCod  INTEGER,
     CONSTRAINT pk_sau_rem PRIMARY KEY (RemCod)
 );
+
+-- Posologia (SAU_REMOBS) — dosage-instructions catalog. From the reorg DDL.
+CREATE TABLE IF NOT EXISTS SAU_REMOBS (
+    RemObsCod             INTEGER      NOT NULL,
+    RemObsDes             VARCHAR(60),
+    RemObsInternamento    BOOLEAN,
+    RemObsQuantidadeDose  NUMERIC(8,2),
+    RemObsMedidaDose      INTEGER,
+    RemObsIntervaloHoras  SMALLINT,
+    RemObsDuracaoDias     SMALLINT,
+    RemObsUsuCod          INTEGER,
+    CONSTRAINT pk_sau_remobs PRIMARY KEY (RemObsCod)
+);
+CREATE INDEX IF NOT EXISTS usau_remobs_desc ON SAU_REMOBS (RemObsCod DESC);
+
+-- Posologia de Medicamento (SAU_REMPOSO) — MINIMAL stub: only columns used by the
+-- SAU_REMOBS delete-guard R3 (PosoRemObsCod). Full table is Wave-3.
+CREATE TABLE IF NOT EXISTS SAU_REMPOSO (
+    RemCod         INTEGER NOT NULL,
+    PosoRemObsCod  INTEGER NOT NULL,
+    CONSTRAINT pk_sau_remposo PRIMARY KEY (RemCod, PosoRemObsCod)
+);
+
+-- Receituário Controle Especial items (SAU_RECESP1) — MINIMAL stub: only the column used by the
+-- SAU_REMOBS delete-guard R4 (RemObsCod). Full table is Wave-6 / Portaria 344/98.
+CREATE TABLE IF NOT EXISTS SAU_RECESP1 (
+    RecEspUniCod  INTEGER NOT NULL,
+    RecEspCod     BIGINT  NOT NULL,
+    RecEspSeq     SMALLINT NOT NULL,
+    RemObsCod     INTEGER,
+    CONSTRAINT pk_sau_recesp1 PRIMARY KEY (RecEspUniCod, RecEspCod, RecEspSeq)
+);
