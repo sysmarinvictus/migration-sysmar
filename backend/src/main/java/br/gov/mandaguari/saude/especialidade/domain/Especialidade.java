@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import java.sql.Types;
 
 /**
  * Especialidade médica — maps the existing GeneXus table {@code SAU_ESP}.
@@ -32,8 +34,10 @@ public class Especialidade {
     @Column(name = "EspAux")
     private Boolean auxiliar;
 
-    @Column(name = "EspCborCod")
-    private Integer cborCodigo;
+    /** CBO occupation code — CHAR(6) in live DB (confirmed 2026-06-21). */
+    @Column(name = "EspCborCod", length = 6)
+    @JdbcTypeCode(Types.CHAR)
+    private String cborCodigo;
 
     // --- scheduling-queue parameters (estagnado / tempo-máximo / vagas) per urgency tier ---
     @Column(name = "EspLstAgendEstagnadoMuitoUrg") private Integer agendaEstagnadoMuitoUrgente;
@@ -64,8 +68,8 @@ public class Especialidade {
     public void setSituacao(String situacao) { this.situacao = situacao; }
     public Boolean getAuxiliar() { return auxiliar; }
     public void setAuxiliar(Boolean auxiliar) { this.auxiliar = auxiliar; }
-    public Integer getCborCodigo() { return cborCodigo; }
-    public void setCborCodigo(Integer cborCodigo) { this.cborCodigo = cborCodigo; }
+    public String getCborCodigo() { return cborCodigo; }
+    public void setCborCodigo(String cborCodigo) { this.cborCodigo = cborCodigo; }
 
     public Integer getAgendaEstagnadoMuitoUrgente() { return agendaEstagnadoMuitoUrgente; }
     public void setAgendaEstagnadoMuitoUrgente(Integer v) { this.agendaEstagnadoMuitoUrgente = v; }

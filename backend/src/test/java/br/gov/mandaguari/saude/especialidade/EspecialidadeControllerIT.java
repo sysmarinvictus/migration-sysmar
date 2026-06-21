@@ -25,8 +25,8 @@ class EspecialidadeControllerIT extends AbstractIntegrationTest {
         jdbc.update("DELETE FROM SAU_PROESP");
         jdbc.update("DELETE FROM SAU_ESP");
         jdbc.update("DELETE FROM SAU_CBOR");
-        jdbc.update("INSERT INTO SAU_CBOR (CborCod, CborDes) VALUES (225125, 'Médico cardiologista')");
-        jdbc.update("INSERT INTO SAU_ESP (EspCod, EspNom, EspSit, EspCborCod) VALUES (1, 'Cardiologia', 'A', 225125)");
+        jdbc.update("INSERT INTO SAU_CBOR (CborCod, CborDes) VALUES ('225125', 'Médico cardiologista')");
+        jdbc.update("INSERT INTO SAU_ESP (EspCod, EspNom, EspSit, EspCborCod) VALUES (1, 'Cardiologia', 'A', '225125')");
         jdbc.update("INSERT INTO SAU_ESP (EspCod, EspNom) VALUES (2, 'Pediatria')");
     }
 
@@ -87,7 +87,7 @@ class EspecialidadeControllerIT extends AbstractIntegrationTest {
     @Test
     void rejectsUnknownCbor() { // R3
         given().spec(asUser("SAUDE_CADASTRO"))
-            .body(Map.of("codigo", 12, "nome", "Neuro", "cborCodigo", 999999))
+            .body(Map.of("codigo", 12, "nome", "Neuro", "cborCodigo", "999999"))
             .when().post("/api/especialidades")
             .then().statusCode(422).body("code", equalTo("esp.cbor.unknown"));
     }
@@ -108,7 +108,7 @@ class EspecialidadeControllerIT extends AbstractIntegrationTest {
 
     @Test
     void blocksDeleteWhenReferenced() { // R4
-        jdbc.update("INSERT INTO SAU_PROESP (ProCod, EspCod) VALUES (500, 1)");
+        jdbc.update("INSERT INTO SAU_PROESP (ProPesCod, EspCod) VALUES (500, 1)");
         given().spec(asUser("SAUDE_CADASTRO")).when().delete("/api/especialidades/1")
             .then().statusCode(409);
     }

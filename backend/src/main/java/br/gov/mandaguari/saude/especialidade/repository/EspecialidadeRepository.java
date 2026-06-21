@@ -20,11 +20,11 @@ public interface EspecialidadeRepository extends JpaRepository<Especialidade, In
 
     /** R3: derive the CBO description from SAU_CBOR (cross-wave FK, raw-id; no Cbor entity yet). */
     @Query(value = "select CborDes from SAU_CBOR where CborCod = :cod", nativeQuery = true)
-    Optional<String> findCborDescricao(@Param("cod") Integer cod);
+    Optional<String> findCborDescricao(@Param("cod") String cod);
 
     /** R3: existence check for the CBO FK. */
     @Query(value = "select exists(select 1 from SAU_CBOR where CborCod = :cod)", nativeQuery = true)
-    boolean cborExists(@Param("cod") Integer cod);
+    boolean cborExists(@Param("cod") String cod);
 
     /** R4: block delete when referenced by a profissional (SAU_PROESP). */
     @Query(value = "select exists(select 1 from SAU_PROESP where EspCod = :cod)", nativeQuery = true)

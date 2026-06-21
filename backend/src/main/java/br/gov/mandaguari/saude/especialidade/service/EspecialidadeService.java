@@ -108,7 +108,7 @@ public class EspecialidadeService {
 
     private EspecialidadeResponse toResponseWithCbor(Especialidade e) {
         EspecialidadeResponse base = mapper.toResponse(e);
-        String cborDes = e.getCborCodigo() == null ? null
+        String cborDes = (e.getCborCodigo() == null || e.getCborCodigo().isBlank()) ? null
                 : repo.findCborDescricao(e.getCborCodigo()).orElse(null);   // R3: derive description
         return new EspecialidadeResponse(base.codigo(), base.nome(), base.situacao(), base.auxiliar(),
                 base.cborCodigo(), cborDes, base.agenda());
@@ -120,7 +120,7 @@ public class EspecialidadeService {
         }
     }
 
-    private void validateCbor(Integer cborCodigo) {               // R3
+    private void validateCbor(String cborCodigo) {                // R3
         if (cborCodigo != null && !repo.cborExists(cborCodigo)) {
             throw new BusinessRule("esp.cbor.unknown", "Ocupação (CBO) " + cborCodigo + " não existe");
         }

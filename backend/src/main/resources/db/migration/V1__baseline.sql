@@ -17,11 +17,13 @@
 -- ============================================================================
 
 -- CBO occupation lookup (SAU_CBOR) — minimal columns used by especialidade FK display.
+-- Types confirmed against live saude-mandaguari DB: cborcod CHAR(6), cbordes VARCHAR(150).
 CREATE TABLE IF NOT EXISTS SAU_CBOR (
-    CborCod  INTEGER     NOT NULL,
-    CborDes  VARCHAR(100),
+    CborCod  CHAR(6)      NOT NULL,
+    CborDes  VARCHAR(150),
     CONSTRAINT pk_sau_cbor PRIMARY KEY (CborCod)
 );
+CREATE INDEX IF NOT EXISTS usau_cbor ON SAU_CBOR (CborDes);
 
 -- Especialidade (SAU_ESP) — reference slice.
 CREATE TABLE IF NOT EXISTS SAU_ESP (
@@ -29,7 +31,7 @@ CREATE TABLE IF NOT EXISTS SAU_ESP (
     EspNom                          VARCHAR(50) NOT NULL,
     EspSit                          VARCHAR(1),
     EspAux                          BOOLEAN,
-    EspCborCod                      INTEGER,
+    EspCborCod                      CHAR(6),     -- confirmed CHAR(6) in live DB (matches SAU_CBOR.CborCod)
     -- scheduling-queue parameters per urgency tier (estagnado / tempo-máximo / vagas min-max)
     EspLstAgendEstagnadoMuitoUrg    INTEGER,
     EspLstAgendEstagnadoNormal      INTEGER,
@@ -53,10 +55,11 @@ CREATE TABLE IF NOT EXISTS SAU_ESP (
 
 -- Profissional × Especialidade link (SAU_PROESP) — minimal, used by the R4 delete-guard query.
 -- Full definition belongs to the profissional-especialidade slice (Wave 4).
+-- PK column confirmed against live DB: ProPesCod BIGINT (not ProCod INTEGER).
 CREATE TABLE IF NOT EXISTS SAU_PROESP (
-    ProCod   INTEGER NOT NULL,
-    EspCod   INTEGER NOT NULL,
-    CONSTRAINT pk_sau_proesp PRIMARY KEY (ProCod, EspCod)
+    ProPesCod  BIGINT  NOT NULL,
+    EspCod     INTEGER NOT NULL,
+    CONSTRAINT pk_sau_proesp PRIMARY KEY (ProPesCod, EspCod)
 );
 
 -- Conselho de Classe (SAU_CONCLA) — professional licensing board (CRM/COREN/CRF).
@@ -68,12 +71,15 @@ CREATE TABLE IF NOT EXISTS SAU_CONCLA (
     CONSTRAINT pk_sau_concla PRIMARY KEY (ConClaCod)
 );
 
--- Profissionais (SAU_PRO) — MINIMAL stub: only the column used by the SAU_CONCLA delete-guard (R3).
+-- Profissionais (SAU_PRO) — MINIMAL stub: only columns used by delete-guards in migrated slices.
 -- The full table is an XL Wave-4 slice; this definition will be expanded when SAU_PRO is migrated.
+-- PK column confirmed against live DB: ProPesCod BIGINT (was incorrectly stubbed as ProCod INTEGER).
 CREATE TABLE IF NOT EXISTS SAU_PRO (
-    ProCod     INTEGER  NOT NULL,
-    ConClaCod  SMALLINT,
-    CONSTRAINT pk_sau_pro PRIMARY KEY (ProCod)
+    ProPesCod          BIGINT   NOT NULL,
+    ConClaCod          SMALLINT,
+    ProSit             SMALLINT,           -- situação do profissional; used by SAU_IMP response
+    ProPesNomSoundex   VARCHAR(50),        -- soundex index; used by SAU_IMP list search
+    CONSTRAINT pk_sau_pro PRIMARY KEY (ProPesCod)
 );
 
 -- Município (SYS_MUN) — MINIMAL stub: columns used by the SAU_LOC FK existence + derived display
@@ -151,11 +157,13 @@ CREATE TABLE IF NOT EXISTS SAU_BAI (
 );
 CREATE INDEX IF NOT EXISTS usau_bai_desc ON SAU_BAI (BaiCod DESC);
 
--- Pessoa (SYS_PES) — MINIMAL stub: only PesBaiCod used by the SAU_BAI delete-guard R4.
+-- Pessoa (SYS_PES) — MINIMAL stub: columns used by delete-guards and SAU_IMP profissional display.
 -- Full table is Wave-0 (person/auth foundation); this definition will be expanded then.
 CREATE TABLE IF NOT EXISTS SYS_PES (
-    PesCod    BIGINT  NOT NULL,
-    PesBaiCod INTEGER,
+    PesCod          BIGINT       NOT NULL,
+    PesBaiCod       INTEGER,
+    PesNom          VARCHAR(50),            -- professional/patient name; needed by SAU_IMP list JOIN
+    PesNomSoundex   VARCHAR(50),            -- soundex index; used by profissional nome search
     CONSTRAINT pk_sys_pes PRIMARY KEY (PesCod)
 );
 
@@ -344,3 +352,22 @@ CREATE TABLE IF NOT EXISTS SAU_PAC (
     PacProNum           VARCHAR(10),           -- prontuário number; SAU_PACPRN slice
     CONSTRAINT pk_sau_pac PRIMARY KEY (PacPesCod)
 );
+
+-- Impedimento do Profissional (SAU_IMP) — Wave-2.
+-- Columns and types confirmed against live saude-mandaguari DB (table has 0 rows; structure verified).
+-- No FK constraints exist in the legacy DB; fk_sau_imp_esp is added here since SAU_ESP is migrated.
+-- FK to SAU_PRO (ProPesCod) is intentionally omitted: SAU_PRO is Wave-4; add after cutover.
+-- No PostgreSQL SEQUENCE exists for ImpCod in legacy — GeneXus used MAX+1 via psau_inc_imp.
+-- The new service layer must assign ImpCod; a SEQUENCE is recommended to avoid race conditions.
+CREATE TABLE IF NOT EXISTS SAU_IMP (
+    ImpCod    INTEGER NOT NULL,
+    ImpDat    DATE,
+    ImpDatIni DATE,
+    ImpDatFim DATE,
+    ProPesCod BIGINT,
+    EspCod    INTEGER,
+    CONSTRAINT pk_sau_imp     PRIMARY KEY (ImpCod),
+    CONSTRAINT fk_sau_imp_esp FOREIGN KEY (EspCod) REFERENCES SAU_ESP (EspCod)
+);
+CREATE INDEX IF NOT EXISTS isau_imp1     ON SAU_IMP (ProPesCod, EspCod);
+CREATE INDEX IF NOT EXISTS usau_imp_desc ON SAU_IMP (ImpCod DESC);

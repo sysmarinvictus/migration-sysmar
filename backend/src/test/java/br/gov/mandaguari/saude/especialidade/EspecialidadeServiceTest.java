@@ -73,8 +73,8 @@ class EspecialidadeServiceTest {
     @Test
     void rejectsUnknownCbor() {
         when(repo.existsById(100)).thenReturn(false);
-        when(repo.cborExists(55)).thenReturn(false);
-        var req = new EspecialidadeCreateRequest(100, "Cardiologia", "A", false, 55, null);
+        when(repo.cborExists("225055")).thenReturn(false);
+        var req = new EspecialidadeCreateRequest(100, "Cardiologia", "A", false, "225055", null);
         assertThatThrownBy(() -> service().create(req))
                 .isInstanceOf(BusinessRule.class)
                 .hasMessageContaining("CBO");
@@ -84,9 +84,9 @@ class EspecialidadeServiceTest {
     @Test
     void derivesCborDescricao() {
         Especialidade e = new Especialidade();
-        e.setCodigo(100); e.setNome("Cardiologia"); e.setCborCodigo(55);
+        e.setCodigo(100); e.setNome("Cardiologia"); e.setCborCodigo("225125");
         when(repo.findById(100)).thenReturn(Optional.of(e));
-        when(repo.findCborDescricao(55)).thenReturn(Optional.of("Médico cardiologista"));
+        when(repo.findCborDescricao("225125")).thenReturn(Optional.of("Médico cardiologista"));
 
         EspecialidadeResponse resp = service().get(100);
         assertThat(resp.cborDescricao()).isEqualTo("Médico cardiologista");

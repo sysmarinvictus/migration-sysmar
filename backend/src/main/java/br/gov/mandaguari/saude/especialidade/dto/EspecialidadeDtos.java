@@ -34,7 +34,7 @@ public final class EspecialidadeDtos {
             String nome,
             String situacao,
             Boolean auxiliar,
-            Integer cborCodigo,
+            String cborCodigo,
             String cborDescricao,      // R3: derived read-only from SAU_CBOR
             AgendaParametros agenda) {}
 
@@ -43,14 +43,14 @@ public final class EspecialidadeDtos {
             @NotBlank @Size(max = 50) String nome,  // R1
             @Size(max = 1) String situacao,
             Boolean auxiliar,
-            Integer cborCodigo,                      // R3
+            String cborCodigo,                      // R3
             AgendaParametros agenda) {}
 
     public record EspecialidadeUpdateRequest(
             @NotBlank @Size(max = 50) String nome,   // R1 (codigo is immutable — R2)
             @Size(max = 1) String situacao,
             Boolean auxiliar,
-            Integer cborCodigo,
+            String cborCodigo,
             AgendaParametros agenda) {}
 
     public record EspecialidadeLookupItem(Integer codigo, String nome) {}
