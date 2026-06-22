@@ -11,8 +11,9 @@ import java.util.List;
 
 public interface UnidadeRepository extends JpaRepository<Unidade, Integer> {
 
-    @Query("select coalesce(max(u.codigo), 0) from Unidade u")
-    Integer findMaxCodigo();
+    /** R16: next UniCod from the dedicated sequence (seeded from MAX(UniCod)+1 in V4). */
+    @Query(value = "select nextval('seq_sau_uni_cod')", nativeQuery = true)
+    Integer nextCodigo();
 
     Page<Unidade> findByNomeContainingIgnoreCase(String nome, Pageable pageable);
 

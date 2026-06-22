@@ -1,6 +1,7 @@
 package br.gov.mandaguari.saude.especialidade.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -28,10 +29,12 @@ public class Especialidade {
     @Column(name = "EspNom", length = 50, nullable = false)
     private String nome;
 
-    @Column(name = "EspSit", length = 1)
+    @Column(name = "EspSit")                         // live: SMALLINT (1/2)
+    @Convert(converter = SituacaoToShortConverter.class)
     private String situacao;
 
-    @Column(name = "EspAux")
+    @Column(name = "EspAux")                         // live: INTEGER (0/1)
+    @Convert(converter = BooleanToIntegerConverter.class)
     private Boolean auxiliar;
 
     /** CBO occupation code — CHAR(6) in live DB (confirmed 2026-06-21). */
@@ -40,22 +43,23 @@ public class Especialidade {
     private String cborCodigo;
 
     // --- scheduling-queue parameters (estagnado / tempo-máximo / vagas) per urgency tier ---
-    @Column(name = "EspLstAgendEstagnadoMuitoUrg") private Integer agendaEstagnadoMuitoUrgente;
-    @Column(name = "EspLstAgendEstagnadoNormal")   private Integer agendaEstagnadoNormal;
-    @Column(name = "EspLstAgendEstagnadoPri")      private Integer agendaEstagnadoPrioritario;
-    @Column(name = "EspLstAgendEstagnadoUrg")      private Integer agendaEstagnadoUrgente;
-    @Column(name = "EspLstAgendTempoMaxMuitoUrg")  private Integer agendaTempoMaxMuitoUrgente;
-    @Column(name = "EspLstAgendTempoMaxNormal")    private Integer agendaTempoMaxNormal;
-    @Column(name = "EspLstAgendTempoMaxPri")       private Integer agendaTempoMaxPrioritario;
-    @Column(name = "EspLstAgendTempoMaxUrg")       private Integer agendaTempoMaxUrgente;
-    @Column(name = "EspLstAgendVagaMuitoUrgMax")   private Integer agendaVagaMuitoUrgenteMax;
-    @Column(name = "EspLstAgendVagaMuitoUrgMin")   private Integer agendaVagaMuitoUrgenteMin;
-    @Column(name = "EspLstAgendVagaNorMax")        private Integer agendaVagaNormalMax;
-    @Column(name = "EspLstAgendVagaNorMin")        private Integer agendaVagaNormalMin;
-    @Column(name = "EspLstAgendVagaPriMax")        private Integer agendaVagaPrioritarioMax;
-    @Column(name = "EspLstAgendVagaPriMin")        private Integer agendaVagaPrioritarioMin;
-    @Column(name = "EspLstAgendVagaUrgMax")        private Integer agendaVagaUrgenteMax;
-    @Column(name = "EspLstAgendVagaUrgMin")        private Integer agendaVagaUrgenteMin;
+    // live columns are SMALLINT → @JdbcTypeCode(Types.SMALLINT) so ddl-auto=validate matches.
+    @Column(name = "EspLstAgendEstagnadoMuitoUrg") @JdbcTypeCode(Types.SMALLINT) private Integer agendaEstagnadoMuitoUrgente;
+    @Column(name = "EspLstAgendEstagnadoNormal")   @JdbcTypeCode(Types.SMALLINT) private Integer agendaEstagnadoNormal;
+    @Column(name = "EspLstAgendEstagnadoPri")      @JdbcTypeCode(Types.SMALLINT) private Integer agendaEstagnadoPrioritario;
+    @Column(name = "EspLstAgendEstagnadoUrg")      @JdbcTypeCode(Types.SMALLINT) private Integer agendaEstagnadoUrgente;
+    @Column(name = "EspLstAgendTempoMaxMuitoUrg")  @JdbcTypeCode(Types.SMALLINT) private Integer agendaTempoMaxMuitoUrgente;
+    @Column(name = "EspLstAgendTempoMaxNormal")    @JdbcTypeCode(Types.SMALLINT) private Integer agendaTempoMaxNormal;
+    @Column(name = "EspLstAgendTempoMaxPri")       @JdbcTypeCode(Types.SMALLINT) private Integer agendaTempoMaxPrioritario;
+    @Column(name = "EspLstAgendTempoMaxUrg")       @JdbcTypeCode(Types.SMALLINT) private Integer agendaTempoMaxUrgente;
+    @Column(name = "EspLstAgendVagaMuitoUrgMax")   @JdbcTypeCode(Types.SMALLINT) private Integer agendaVagaMuitoUrgenteMax;
+    @Column(name = "EspLstAgendVagaMuitoUrgMin")   @JdbcTypeCode(Types.SMALLINT) private Integer agendaVagaMuitoUrgenteMin;
+    @Column(name = "EspLstAgendVagaNorMax")        @JdbcTypeCode(Types.SMALLINT) private Integer agendaVagaNormalMax;
+    @Column(name = "EspLstAgendVagaNorMin")        @JdbcTypeCode(Types.SMALLINT) private Integer agendaVagaNormalMin;
+    @Column(name = "EspLstAgendVagaPriMax")        @JdbcTypeCode(Types.SMALLINT) private Integer agendaVagaPrioritarioMax;
+    @Column(name = "EspLstAgendVagaPriMin")        @JdbcTypeCode(Types.SMALLINT) private Integer agendaVagaPrioritarioMin;
+    @Column(name = "EspLstAgendVagaUrgMax")        @JdbcTypeCode(Types.SMALLINT) private Integer agendaVagaUrgenteMax;
+    @Column(name = "EspLstAgendVagaUrgMin")        @JdbcTypeCode(Types.SMALLINT) private Integer agendaVagaUrgenteMin;
 
     public Especialidade() {} // JPA + service instantiation (different package)
 

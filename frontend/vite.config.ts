@@ -6,9 +6,9 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      // dev proxy to the Spring Boot backend
-      "/api": "http://localhost:8080",
-      "/auth": "http://localhost:8080",
+      // dev proxy to the NEW Spring Boot backend on 8090 (legacy GeneXus app owns 8080)
+      "/api": "http://localhost:8090",
+      "/auth": "http://localhost:8090",
     },
   },
   test: {

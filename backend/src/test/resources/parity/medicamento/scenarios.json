@@ -1,0 +1,37 @@
+{
+  "_comment": "SAU_REM parity fixtures (2026-06-21) — new app :8090 vs shared snapshot. Real FK ids redacted: <UNI>=SAU_UNI.UniCod, <SETOR> SAU_UNISETOR.SetorCod, <REMOBS> SAU_REMOBS.RemObsCod, <TIPREM> SAU_TIPREM.TipRemCod. Created rows use the ZZREM marker and are deleted in teardown. No PHI (medication catalog).",
+  "auth": { "scheme": "Bearer HS256 JWT", "roles": ["SAUDE_CADASTRO"] },
+  "scenarios": [
+    { "id": 9, "method": "POST", "path": "/api/medicamentos", "expectStatus": 201,
+      "request": {"nome": "ZZREM MINIMAL", "situacao": 1},
+      "note": "R15 RemCod from seq_sau_rem_cod; R16 RemUsuLogin stamped; R50 boolean flags default false." },
+    { "id": 10, "method": "POST(+sub-resources)", "path": "/api/medicamentos then /{id}/unidades,/codigos-barras,/unidade-setores,/posologias", "expectStatus": 201,
+      "request": {"nome": "ZZREM FULL", "situacao": 1, "usarPosologia": true},
+      "subRequests": {
+        "unidades": {"unidadeCodigo": "<UNI>", "situacao": 1},
+        "codigos-barras": {"ean13": 7891234567890},
+        "unidade-setores": {"unidadeCodigo": "<UNI>", "situacao": 1},
+        "posologias": {"posologiaCodigo": "<REMOBS>"}
+      },
+      "note": "RD1: embedded-payload create expressed via sub-resource endpoints; R36 sync runs per sub-call." },
+    { "id": 12, "method": "POST", "path": "/api/medicamentos", "expectStatus": 422,
+      "request": {"nome": "ZZREM BADTIP", "tipoMedicamentoCodigo": 888888, "situacao": 1},
+      "note": "R2 — TipRemCod not in SAU_TIPREM." },
+    { "id": 17, "method": "POST", "path": "/api/medicamentos/{id}/unidade-setores", "expectStatus": 409,
+      "setup": {"unidadeCodigo": "<UNI>", "situacao": 1},
+      "request": {"unidadeCodigo": "<UNI>", "situacao": 1},
+      "note": "R30 — duplicate (UniCod,SetorCod,RemCod)." },
+    { "id": 19, "method": "DELETE", "path": "/api/medicamentos/{id-referenced-by-recesp1}", "expectStatus": 409, "note": "R21" },
+    { "id": 20, "method": "DELETE", "path": "/api/medicamentos/{id-referenced-by-remlot}", "expectStatus": 409, "note": "R22" },
+    { "id": 21, "method": "DELETE", "path": "/api/medicamentos/{id}", "expectStatus": 409,
+      "setup": "INSERT InteracaoMedicamentosa(InteraRemCod1 = id)", "note": "R20 (REM1 side)" },
+    { "id": 24, "method": "POST then PUT", "path": "/api/medicamentos[/{id}]", "expectStatus": "201 then 200",
+      "request": {"create": {"nome": "ZZREM MPP", "situacao": 1, "medicamentoPotencialmentePerigoso": true, "mppEfeitos": "risco"},
+                  "update": {"nome": "ZZREM MPP", "situacao": 1, "medicamentoPotencialmentePerigoso": false, "mppCancelamentoMotivo": "erro de cadastro"}},
+      "note": "R44 — clearing MPP requires motivo; login+data server-stamped." }
+  ],
+  "divergences": [
+    { "ids": [23, 25], "rule": "RD6/OQ-8", "expect": "200 from /api/medicamentos/lookup/receita", "actual": "404 (endpoint not implemented)", "disposition": "deferred — needs legacy filter-predicate comparison" }
+  ],
+  "schema_fix": "RemMPP/RemOmitirSaldo/RemSemRename/RemUsarPosologia are BOOLEAN in the live DB (not smallint as spec/V3 said). Entity/DTO→Boolean; V5 converts the Flyway schema. (OQ-1)"
+}

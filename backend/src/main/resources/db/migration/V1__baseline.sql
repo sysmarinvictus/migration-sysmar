@@ -71,16 +71,29 @@ CREATE TABLE IF NOT EXISTS SAU_CONCLA (
     CONSTRAINT pk_sau_concla PRIMARY KEY (ConClaCod)
 );
 
--- Profissionais (SAU_PRO) — MINIMAL stub: only columns used by delete-guards in migrated slices.
--- The full table is an XL Wave-4 slice; this definition will be expanded when SAU_PRO is migrated.
--- PK column confirmed against live DB: ProPesCod BIGINT (was incorrectly stubbed as ProCod INTEGER).
+-- Profissionais (SAU_PRO) — Wave-4 slice. All 16 columns per the live saude-mandaguari shape.
+-- PK = SYS_PES.PesCod (user-supplied, not generated). Physical names/types match production so
+-- ddl-auto=validate passes against both Testcontainers and live DB. Blobs are bytea (NOT oid).
 CREATE TABLE IF NOT EXISTS SAU_PRO (
-    ProPesCod          BIGINT   NOT NULL,
-    ConClaCod          SMALLINT,
-    ProSit             SMALLINT,           -- situação do profissional; used by SAU_IMP response
-    ProPesNomSoundex   VARCHAR(50),        -- soundex index; used by SAU_IMP list search
+    ProPesCod             BIGINT       NOT NULL,
+    ProPesNumCns          CHAR(20),
+    ProPesNomSoundex      VARCHAR(50),
+    ProNumCr              CHAR(20),
+    ProDatIni             DATE,
+    ProDatFim             DATE,
+    ProScnesId            VARCHAR(20),
+    ProExpeSus            BOOLEAN,
+    ProExt                SMALLINT,
+    ProSit                SMALLINT,
+    AssinaturaImagem      BYTEA,
+    AssinaturaImagemTipo  CHAR(3),
+    ConClaCod             SMALLINT,
+    ProUfConselho         VARCHAR(2),
+    ProCertificado        BYTEA,
+    ProCertificadoSenha   VARCHAR(50),
     CONSTRAINT pk_sau_pro PRIMARY KEY (ProPesCod)
 );
+CREATE INDEX IF NOT EXISTS isau_pro2 ON SAU_PRO (ConClaCod);
 
 -- Município (SYS_MUN) — MINIMAL stub: columns used by the SAU_LOC FK existence + derived display
 -- (municipioNome/Uf/Ibge). SYS_MUN is a SYS_* system table migrated separately; expand then.

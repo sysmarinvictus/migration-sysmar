@@ -21,6 +21,13 @@ import SetorListPage from "../features/setor/SetorListPage";
 import SetorFormPage from "../features/setor/SetorFormPage";
 import ImpedimentoListPage from "../features/impedimento/ImpedimentoListPage";
 import ImpedimentoFormPage from "../features/impedimento/ImpedimentoFormPage";
+import MedicamentoListPage from "../features/medicamento/MedicamentoListPage";
+import MedicamentoFormPage from "../features/medicamento/MedicamentoFormPage";
+import FormaApresentacaoListPage from "../features/forma-apresentacao/FormaApresentacaoListPage";
+import FormaApresentacaoFormPage from "../features/forma-apresentacao/FormaApresentacaoFormPage";
+import ProfissionalListPage from "../features/profissional/ProfissionalListPage";
+import ProfissionalDetailPage from "../features/profissional/ProfissionalDetailPage";
+import ProfissionalFormPage from "../features/profissional/ProfissionalFormPage";
 import type { ReactNode } from "react";
 
 export default function App() {
@@ -63,6 +70,9 @@ function Shell() {
         {hasRole("SAUDE_CADASTRO") && <Link to="/unidades">Unidades</Link>}
         {hasRole("SAUDE_CADASTRO") && <Link to="/unidades">Setores</Link>}
         {hasRole("SAUDE_CADASTRO") && <Link to="/impedimentos">Impedimentos</Link>}
+        {hasRole("SAUDE_CADASTRO") && <Link to="/medicamentos">Medicamentos</Link>}
+        {hasRole("SAUDE_CADASTRO") && <Link to="/formas-apresentacao">Formas de Apresentação</Link>}
+        {hasRole("SAUDE_CADASTRO") && <Link to="/profissionais">Profissionais</Link>}
         <span className="ml-auto text-sm text-gray-600">{username}</span>
         <button onClick={logout} className="text-sm text-blue-600">Sair</button>
       </nav>
@@ -99,6 +109,16 @@ function Shell() {
           <Route path="/impedimentos" element={<ImpedimentoListPage />} />
           <Route path="/impedimentos/novo" element={<ImpedimentoFormPage />} />
           <Route path="/impedimentos/:codigo" element={<ImpedimentoFormPage />} />
+          <Route path="/medicamentos" element={<MedicamentoListPage />} />
+          <Route path="/medicamentos/novo" element={<MedicamentoFormPage />} />
+          <Route path="/medicamentos/:id" element={<MedicamentoFormPage />} />
+          <Route path="/formas-apresentacao" element={<FormaApresentacaoListPage />} />
+          <Route path="/formas-apresentacao/nova" element={<FormaApresentacaoFormPage />} />
+          <Route path="/formas-apresentacao/:id" element={<FormaApresentacaoFormPage />} />
+          <Route path="/profissionais" element={<ProfissionalListPage />} />
+          <Route path="/profissionais/novo" element={<ProfissionalFormPage />} />
+          <Route path="/profissionais/:id" element={<ProfissionalDetailPage />} />
+          <Route path="/profissionais/:id/editar" element={<ProfissionalFormPage />} />
           <Route path="*" element={<p className="p-6">Página não encontrada.</p>} />
         </Routes>
       </main>

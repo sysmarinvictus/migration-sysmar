@@ -17,3 +17,6 @@ frontend/src/lib/generated/
 .vscode/
 *.iml
 .DS_Store
+
+# dev-stack runtime (logs + PID files)
+.devstack/

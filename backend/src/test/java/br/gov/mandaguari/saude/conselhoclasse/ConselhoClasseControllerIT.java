@@ -109,7 +109,7 @@ class ConselhoClasseControllerIT extends AbstractIntegrationTest {
 
     @Test
     void blocksDeleteWhenReferencedByProfissional() { // R3
-        jdbc.update("INSERT INTO SAU_PRO (ProCod, ConClaCod) VALUES (500, 1)");
+        jdbc.update("INSERT INTO SAU_PRO (ProPesCod, ConClaCod) VALUES (500, 1)");
         given().spec(asUser("SAUDE_CADASTRO")).when().delete("/api/conselhos-classe/1")
             .then().statusCode(409);
     }

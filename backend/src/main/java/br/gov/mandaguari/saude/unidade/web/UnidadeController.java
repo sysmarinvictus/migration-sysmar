@@ -15,7 +15,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/unidades")
-@PreAuthorize("hasRole('SAUDE_CADASTRO')")
 public class UnidadeController {
 
     private final UnidadeService service;
@@ -25,23 +24,27 @@ public class UnidadeController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
     public Page<UnidadeResponse> list(
             @RequestParam(required = false) String nome, Pageable pageable) {
         return service.list(nome, pageable);
     }
 
     @GetMapping("/lookup")
+    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
     public List<UnidadeLookupItem> lookup(
             @RequestParam(defaultValue = "") String q, Pageable pageable) {
         return service.lookup(q, pageable);
     }
 
     @GetMapping("/{codigo}")
+    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
     public UnidadeResponse get(@PathVariable Integer codigo) {
         return service.get(codigo);
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('SAUDE_ADMIN')")
     public ResponseEntity<UnidadeResponse> create(@Valid @RequestBody UnidadeCreateRequest req) {
         UnidadeResponse body = service.create(req);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -50,12 +53,14 @@ public class UnidadeController {
     }
 
     @PutMapping("/{codigo}")
+    @PreAuthorize("hasRole('SAUDE_ADMIN')")
     public UnidadeResponse update(@PathVariable Integer codigo,
                                   @Valid @RequestBody UnidadeUpdateRequest req) {
         return service.update(codigo, req);
     }
 
     @DeleteMapping("/{codigo}")
+    @PreAuthorize("hasRole('SAUDE_ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Integer codigo) {
         service.delete(codigo);
         return ResponseEntity.noContent().build();

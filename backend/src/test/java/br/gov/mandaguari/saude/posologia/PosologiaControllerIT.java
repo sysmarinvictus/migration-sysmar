@@ -86,6 +86,8 @@ class PosologiaControllerIT extends AbstractIntegrationTest {
     @Test
     void deleteBlockedByRemposo() {
         Integer id = createViaApi("Posologia em uso REMPOSO");
+        // SAU_REMPOSO.RemCod → SAU_REM.RemCod (fk_sau_remposo_rem, added in V3): parent must exist.
+        jdbc.update("insert into SAU_REM(RemCod) values(9001) on conflict do nothing");
         jdbc.update("insert into SAU_REMPOSO(RemCod,PosoRemObsCod) values(9001,?)", id);
         try {
             given().spec(asUser("SAUDE_CADASTRO"))
@@ -93,6 +95,7 @@ class PosologiaControllerIT extends AbstractIntegrationTest {
                     .then().statusCode(409);
         } finally {
             jdbc.update("delete from SAU_REMPOSO where RemCod=9001");
+            jdbc.update("delete from SAU_REM where RemCod=9001");
         }
     }
 

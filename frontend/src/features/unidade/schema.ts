@@ -45,7 +45,7 @@ export const unidadeFormSchema = z.object({
   bpa: optShort,
   sipni: optShort,
   orgaoEmissor: z.string().max(10).optional().nullable(),
-  estrategiaFamiliar: optShort,
+  esferaAdministrativa: optShort,
   psf: optShort,
   sisPreNatal: optShort,
   hiperdia: optShort,

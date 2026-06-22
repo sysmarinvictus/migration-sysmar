@@ -11,6 +11,12 @@ security:
     secret: test-only-secret-not-used-in-prod-needs-32-bytes-min
     access-token-ttl: PT30M
     refresh-token-ttl: P7D
+  cert:
+    # AES-256 key (Base64 of 32 zero bytes) — TEST ONLY. The SAU_PRO certificadoSenha converter is
+    # fail-closed: without a key it refuses to persist a managed Profissional whose senha column is
+    # non-null (e.g. a legacy-plaintext row), which would 500 any update/delete. Production supplies
+    # CERT_ENC_KEY from the environment; never a real secret here.
+    enc-key: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
 logging:
   level:
     br.gov.mandaguari.saude: DEBUG

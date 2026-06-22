@@ -1,0 +1,21 @@
+{
+  "_comment": "SAU_APRREM parity fixtures (2026-06-21) — new app :8090 vs shared snapshot. SAU_APRREM is EMPTY in the snapshot (OQ-5), so every scenario self-seeds with the ZZAPR marker and cleans up. No PHI (reference lookup).",
+  "auth": { "scheme": "Bearer HS256 JWT", "roles": ["SAUDE_CADASTRO"] },
+  "scenarios": [
+    { "id": 5, "method": "POST", "path": "/api/formas-apresentacao", "expectStatus": 201,
+      "request": {"descricao": "zzapr comprimido", "abreviacao": "zac"},
+      "response": {"id": "<generated>", "descricao": "ZZAPR COMPRIMIDO", "abreviacao": "ZAC"},
+      "note": "R1 seq code; R4/R5 stored UPPERCASE." },
+    { "id": 6, "method": "POST", "path": "/api/formas-apresentacao", "expectStatus": 422,
+      "request": {"abreviacao": "ZB"}, "note": "R2 — 'Informe a Descrição da Forma de Apresentação!'" },
+    { "id": 7, "method": "POST", "path": "/api/formas-apresentacao", "expectStatus": 422,
+      "request": {"descricao": "ZZAPR SEMABREV"}, "note": "R3 — 'Informe a Abreviação!'" },
+    { "id": 8, "method": "PUT", "path": "/api/formas-apresentacao/{id}", "expectStatus": 200,
+      "request": {"descricao": "zzapr xarope", "abreviacao": "zxr"},
+      "response": {"descricao": "ZZAPR XAROPE", "abreviacao": "ZXR"} },
+    { "id": 10, "method": "DELETE", "path": "/api/formas-apresentacao/{id}", "expectStatus": 409,
+      "setup": "INSERT SAU_REM(RemCod, AprRemCod = id)", "note": "R7 delete-guard vs Medicamento." },
+    { "id": 11, "method": "GET", "path": "/api/formas-apresentacao/lookup?q=ZZAPR", "expectStatus": 200 }
+  ],
+  "divergences": []
+}

@@ -20,15 +20,15 @@ public interface ImpedimentoRepository extends JpaRepository<Impedimento, Intege
             SELECT i.* FROM SAU_IMP i
             WHERE (:profissionalId IS NULL OR i.ProPesCod = :profissionalId)
               AND (:especialidadeId IS NULL OR i.EspCod = :especialidadeId)
-              AND (:dataInicioFrom IS NULL OR i.ImpDatIni >= CAST(:dataInicioFrom AS DATE))
-              AND (:dataFimAte IS NULL OR i.ImpDatFim <= CAST(:dataFimAte AS DATE))
+              AND (CAST(:dataInicioFrom AS DATE) IS NULL OR i.ImpDatIni >= CAST(:dataInicioFrom AS DATE))
+              AND (CAST(:dataFimAte AS DATE) IS NULL OR i.ImpDatFim <= CAST(:dataFimAte AS DATE))
             """,
             countQuery = """
             SELECT COUNT(*) FROM SAU_IMP i
             WHERE (:profissionalId IS NULL OR i.ProPesCod = :profissionalId)
               AND (:especialidadeId IS NULL OR i.EspCod = :especialidadeId)
-              AND (:dataInicioFrom IS NULL OR i.ImpDatIni >= CAST(:dataInicioFrom AS DATE))
-              AND (:dataFimAte IS NULL OR i.ImpDatFim <= CAST(:dataFimAte AS DATE))
+              AND (CAST(:dataInicioFrom AS DATE) IS NULL OR i.ImpDatIni >= CAST(:dataInicioFrom AS DATE))
+              AND (CAST(:dataFimAte AS DATE) IS NULL OR i.ImpDatFim <= CAST(:dataFimAte AS DATE))
             """,
             nativeQuery = true)
     Page<Impedimento> findByFilters(
@@ -46,8 +46,8 @@ public interface ImpedimentoRepository extends JpaRepository<Impedimento, Intege
             WHERE (:profissionalNome IS NULL OR lower(s.PesNom) LIKE lower(concat('%',:profissionalNome,'%')))
               AND (:profissionalId IS NULL OR i.ProPesCod = :profissionalId)
               AND (:especialidadeId IS NULL OR i.EspCod = :especialidadeId)
-              AND (:dataInicioFrom IS NULL OR i.ImpDatIni >= CAST(:dataInicioFrom AS DATE))
-              AND (:dataFimAte IS NULL OR i.ImpDatFim <= CAST(:dataFimAte AS DATE))
+              AND (CAST(:dataInicioFrom AS DATE) IS NULL OR i.ImpDatIni >= CAST(:dataInicioFrom AS DATE))
+              AND (CAST(:dataFimAte AS DATE) IS NULL OR i.ImpDatFim <= CAST(:dataFimAte AS DATE))
             """,
             countQuery = """
             SELECT COUNT(*) FROM SAU_IMP i
@@ -56,8 +56,8 @@ public interface ImpedimentoRepository extends JpaRepository<Impedimento, Intege
             WHERE (:profissionalNome IS NULL OR lower(s.PesNom) LIKE lower(concat('%',:profissionalNome,'%')))
               AND (:profissionalId IS NULL OR i.ProPesCod = :profissionalId)
               AND (:especialidadeId IS NULL OR i.EspCod = :especialidadeId)
-              AND (:dataInicioFrom IS NULL OR i.ImpDatIni >= CAST(:dataInicioFrom AS DATE))
-              AND (:dataFimAte IS NULL OR i.ImpDatFim <= CAST(:dataFimAte AS DATE))
+              AND (CAST(:dataInicioFrom AS DATE) IS NULL OR i.ImpDatIni >= CAST(:dataInicioFrom AS DATE))
+              AND (CAST(:dataFimAte AS DATE) IS NULL OR i.ImpDatFim <= CAST(:dataFimAte AS DATE))
             """,
             nativeQuery = true)
     Page<Impedimento> findByFiltersWithNome(

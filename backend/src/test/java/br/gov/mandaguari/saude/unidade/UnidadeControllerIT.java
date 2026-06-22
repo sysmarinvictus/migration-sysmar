@@ -29,6 +29,10 @@ class UnidadeControllerIT extends AbstractIntegrationTest {
         jdbc.update("DELETE FROM SAU_REM_UNISETOR");
         jdbc.update("DELETE FROM SAU_PAC");
         jdbc.update("DELETE FROM SAU_PAR2");
+        jdbc.update("DELETE FROM SAU_UNISALA");
+        jdbc.update("DELETE FROM SAU_UNI1");
+        jdbc.update("DELETE FROM SAU_UNI2");
+        jdbc.update("DELETE FROM SAU_UNI3");
         jdbc.update("DELETE FROM SAU_UNI");
         jdbc.update("DELETE FROM SAU_LOC");
         jdbc.update("DELETE FROM SYS_MUN");
@@ -91,7 +95,7 @@ class UnidadeControllerIT extends AbstractIntegrationTest {
 
     @Test
     void createReturns201WithAutoAssignedCodigo() {
-        given().spec(asUser("SAUDE_CADASTRO"))
+        given().spec(asUser("SAUDE_ADMIN"))
                 .contentType(ContentType.JSON)
                 .body(minimalJson("UBS Nova"))
                 .when().post("/api/unidades")
@@ -102,7 +106,7 @@ class UnidadeControllerIT extends AbstractIntegrationTest {
 
     @Test
     void createRejectsMissingNome() {
-        given().spec(asUser("SAUDE_CADASTRO"))
+        given().spec(asUser("SAUDE_ADMIN"))
                 .contentType(ContentType.JSON)
                 .body("{\"cnpj\":\"" + VALID_CNPJ + "\",\"cep\":\"87900000\",\"endereco\":\"Rua A\",\"enderecoNumero\":\"1\",\"bairro\":\"Centro\",\"municipioCodigo\":1}")
                 .when().post("/api/unidades")
@@ -111,7 +115,7 @@ class UnidadeControllerIT extends AbstractIntegrationTest {
 
     @Test
     void createRejectsInvalidCnpj() {
-        given().spec(asUser("SAUDE_CADASTRO"))
+        given().spec(asUser("SAUDE_ADMIN"))
                 .contentType(ContentType.JSON)
                 .body("{\"nome\":\"UBS A\",\"cnpj\":\"11111111111111\",\"cep\":\"87900000\",\"endereco\":\"Rua A\",\"enderecoNumero\":\"1\",\"bairro\":\"Centro\",\"municipioCodigo\":1}")
                 .when().post("/api/unidades")
@@ -120,7 +124,7 @@ class UnidadeControllerIT extends AbstractIntegrationTest {
 
     @Test
     void createRejectsMissingCep() {
-        given().spec(asUser("SAUDE_CADASTRO"))
+        given().spec(asUser("SAUDE_ADMIN"))
                 .contentType(ContentType.JSON)
                 .body("{\"nome\":\"UBS A\",\"cnpj\":\"" + VALID_CNPJ + "\",\"endereco\":\"Rua A\",\"enderecoNumero\":\"1\",\"bairro\":\"Centro\",\"municipioCodigo\":1}")
                 .when().post("/api/unidades")
@@ -131,7 +135,7 @@ class UnidadeControllerIT extends AbstractIntegrationTest {
     void updateUpdatesUnidade() {
         Integer cod = createViaApi("UBS Antiga");
 
-        given().spec(asUser("SAUDE_CADASTRO"))
+        given().spec(asUser("SAUDE_ADMIN"))
                 .contentType(ContentType.JSON)
                 .body(minimalJson("UBS Atualizada"))
                 .when().put("/api/unidades/" + cod)
@@ -143,7 +147,7 @@ class UnidadeControllerIT extends AbstractIntegrationTest {
     void deleteDeletesUnidade() {
         Integer cod = createViaApi("UBS Efêmera");
 
-        given().spec(asUser("SAUDE_CADASTRO"))
+        given().spec(asUser("SAUDE_ADMIN"))
                 .when().delete("/api/unidades/" + cod)
                 .then().statusCode(204);
 
@@ -158,7 +162,7 @@ class UnidadeControllerIT extends AbstractIntegrationTest {
         jdbc.update("INSERT INTO SAU_SETOR(SetorCod, SetorNom) VALUES(1, 'Geral') ON CONFLICT DO NOTHING");
         jdbc.update("INSERT INTO SAU_UNISETOR(UniCod, SetorCod) VALUES(?, 1)", cod);
         try {
-            given().spec(asUser("SAUDE_CADASTRO"))
+            given().spec(asUser("SAUDE_ADMIN"))
                     .when().delete("/api/unidades/" + cod)
                     .then().statusCode(409);
         } finally {
@@ -173,10 +177,37 @@ class UnidadeControllerIT extends AbstractIntegrationTest {
                 .then().statusCode(401);
     }
 
+    // Auth: main SAU_UNI writes require SAUDE_ADMIN (policy flags have system-wide effects).
+    @Test
+    void createForbiddenForCadastroRole() {
+        given().spec(asUser("SAUDE_CADASTRO"))
+                .contentType(ContentType.JSON)
+                .body(minimalJson("UBS Proibida"))
+                .when().post("/api/unidades")
+                .then().statusCode(403);
+    }
+
+    @Test
+    void deleteForbiddenForCadastroRole() {
+        Integer cod = createViaApi("UBS Protegida");
+        given().spec(asUser("SAUDE_CADASTRO"))
+                .when().delete("/api/unidades/" + cod)
+                .then().statusCode(403);
+    }
+
+    // Reads remain available to SAUDE_CADASTRO.
+    @Test
+    void getAllowedForCadastroRole() {
+        Integer cod = createViaApi("UBS Visível");
+        given().spec(asUser("SAUDE_CADASTRO"))
+                .when().get("/api/unidades/" + cod)
+                .then().statusCode(200);
+    }
+
     // --- helpers ---
 
     private Integer createViaApi(String nome) {
-        return given().spec(asUser("SAUDE_CADASTRO"))
+        return given().spec(asUser("SAUDE_ADMIN"))
                 .contentType(ContentType.JSON)
                 .body(minimalJson(nome))
                 .when().post("/api/unidades")

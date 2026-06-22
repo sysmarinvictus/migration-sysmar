@@ -28,7 +28,7 @@ class ImpedimentoControllerIT extends AbstractIntegrationTest {
     void seed() {
         cleanAll();
         jdbc.update("INSERT INTO SAU_CBOR (CborCod, CborDes) VALUES ('225125', 'Médico cardiologista')");
-        jdbc.update("INSERT INTO SAU_ESP (EspCod, EspNom, EspSit, EspCborCod) VALUES (1, 'Cardiologia', 'A', '225125')");
+        jdbc.update("INSERT INTO SAU_ESP (EspCod, EspNom, EspSit, EspCborCod) VALUES (1, 'Cardiologia', 1, '225125')");
         jdbc.update("INSERT INTO SYS_PES (PesCod, PesNom) VALUES (100, 'Dr. Silva Sintético')");
         jdbc.update("INSERT INTO SAU_PRO (ProPesCod, ProSit) VALUES (100, 1)");
         jdbc.update("INSERT INTO SAU_PROESP (ProPesCod, EspCod) VALUES (100, 1)");
@@ -65,6 +65,29 @@ class ImpedimentoControllerIT extends AbstractIntegrationTest {
                 .body("content[0].profissionalNome", equalTo("Dr. Silva Sintético"))
                 .body("content[0].especialidadeNome", equalTo("Cardiologia"))
                 .body("content[0].cboDescricao", equalTo("Médico cardiologista"));
+    }
+
+    @Test
+    void filtersByDateRange() {
+        // Regression: a date filter previously 500'd — native query had `:param IS NULL` on an
+        // untyped date param (PostgreSQL 42P18 "could not determine data type"). Caught by parity,
+        // not by earlier ITs (none supplied both date bounds). Fix casts the param in the IS NULL check.
+        // in-range (both bounds) -> findByFilters returns the seeded row
+        given().spec(asUser("SAUDE_CADASTRO"))
+            .queryParam("dataInicioFrom", "2026-06-01").queryParam("dataFimAte", "2026-08-31")
+            .when().get("/api/impedimentos")
+            .then().statusCode(200).body("content", hasSize(1)).body("content[0].codigo", equalTo(1));
+        // out-of-range bounds exclude it (proves the predicate is actually applied, not ignored)
+        given().spec(asUser("SAUDE_CADASTRO"))
+            .queryParam("dataInicioFrom", "2026-09-01").queryParam("dataFimAte", "2026-12-31")
+            .when().get("/api/impedimentos")
+            .then().statusCode(200).body("content", hasSize(0));
+        // name + date path -> findByFiltersWithNome (carries the same date CAST fix)
+        given().spec(asUser("SAUDE_CADASTRO"))
+            .queryParam("profissionalNome", "Silva")
+            .queryParam("dataInicioFrom", "2026-06-01").queryParam("dataFimAte", "2026-08-31")
+            .when().get("/api/impedimentos")
+            .then().statusCode(200).body("content", hasSize(1)).body("content[0].codigo", equalTo(1));
     }
 
     @Test

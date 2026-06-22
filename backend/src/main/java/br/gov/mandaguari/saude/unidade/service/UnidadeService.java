@@ -26,11 +26,14 @@ public class UnidadeService {
     private final UnidadeRepository repo;
     private final UnidadeMapper mapper;
     private final AuditService audit;
+    private final UnidadeSubService subService;
 
-    public UnidadeService(UnidadeRepository repo, UnidadeMapper mapper, AuditService audit) {
+    public UnidadeService(UnidadeRepository repo, UnidadeMapper mapper, AuditService audit,
+                          UnidadeSubService subService) {
         this.repo = repo;
         this.mapper = mapper;
         this.audit = audit;
+        this.subService = subService;
     }
 
     public Page<UnidadeResponse> list(String nome, Pageable pageable) {
@@ -41,7 +44,10 @@ public class UnidadeService {
     }
 
     public UnidadeResponse get(Integer codigo) {
-        return mapper.toResponse(find(codigo));
+        Unidade u = find(codigo);
+        // LGPD: detail read exposes PHI (responsavel, professional FKs) — audit it (phi_fields).
+        audit.record("READ", "SAU_UNI", codigo);
+        return mapper.toResponse(u);
     }
 
     public List<UnidadeLookupItem> lookup(String q, Pageable pageable) {
@@ -52,7 +58,7 @@ public class UnidadeService {
     public UnidadeResponse create(UnidadeCreateRequest req) {
         validateRequired(req);
 
-        Integer nextCodigo = repo.findMaxCodigo() + 1;               // R16: system MAX+1
+        Integer nextCodigo = repo.nextCodigo();                      // R16: seq_sau_uni_cod
         Unidade u = buildFrom(req);
         u.setCodigo(nextCodigo);
 
@@ -74,7 +80,7 @@ public class UnidadeService {
                 req.endereco(), req.enderecoNumero(), req.enderecoComplemento(),
                 req.bairro(), req.telefone(), req.fax(), req.licencaFuncionamento(),
                 req.responsavel(), req.email(), req.cnes(), req.bpa(), req.sipni(),
-                req.orgaoEmissor(), req.estrategiaFamiliar(), req.psf(),
+                req.orgaoEmissor(), req.esferaAdministrativa(), req.psf(),
                 req.sisPreNatal(), req.hiperdia(), req.gestao(), req.sia(),
                 req.sigla(), req.situacao(), req.siaSus(), req.scnesId(),
                 req.exportarEsus(), req.exportarBnafar(), req.cadastroCns(),
@@ -97,6 +103,7 @@ public class UnidadeService {
     public void delete(Integer codigo) {
         Unidade u = find(codigo);
         guardDeleteConstraints(codigo);
+        subService.cascadeDeleteForUnidade(codigo); // R52–R55: SALA→UNI3→UNI2→UNI1
         repo.delete(u);
         audit.record("DELETE", "SAU_UNI", codigo);                   // R17
     }
@@ -164,6 +171,12 @@ public class UnidadeService {
         if (orgaoEmissor != null && !orgaoEmissor.isBlank()
                 && (autorizadorCodigo == null || autorizadorCodigo == 0))
             throw new BusinessRule("uni.autorizador.required", "Informe o Profissional Auditor!");
+        // R26: Autorizador and Diretor Clínico must differ, UNLESS UniOrgEmi starts with 'U' or 'S'.
+        if (diretorCodigo != null && diretorCodigo != 0
+                && diretorCodigo.equals(autorizadorCodigo)
+                && !startsWithUorS(orgaoEmissor))
+            throw new BusinessRule("uni.autorizador.diferente.diretor",
+                    "Profissional Autorizador deve ser diferente do Diretor Clínico!");
         // FK validations (skip zero/null)
         if (distritoCodigo != null && distritoCodigo != 0 && !repo.distritoExists(distritoCodigo))
             throw new BusinessRule("uni.distrito.notfound", "Não existe 'Distrito Sanitário'.");
@@ -210,7 +223,7 @@ public class UnidadeService {
                 req.endereco(), req.enderecoNumero(), req.enderecoComplemento(),
                 req.bairro(), req.telefone(), req.fax(), req.licencaFuncionamento(),
                 req.responsavel(), req.email(), req.cnes(), req.bpa(), req.sipni(),
-                req.orgaoEmissor(), req.estrategiaFamiliar(), req.psf(),
+                req.orgaoEmissor(), req.esferaAdministrativa(), req.psf(),
                 req.sisPreNatal(), req.hiperdia(), req.gestao(), req.sia(),
                 req.sigla(), req.situacao(), req.siaSus(), req.scnesId(),
                 req.exportarEsus(), req.exportarBnafar(), req.cadastroCns(),
@@ -227,6 +240,8 @@ public class UnidadeService {
         if (u.getGestao() == null || u.getGestao() == 0) u.setGestao((short) 1);
         // R15: situacao defaults to 1 (ATIVADO) when not provided
         if (u.getSituacao() == null || u.getSituacao() == 0) u.setSituacao((short) 1);
+        // R4: UniExt defaults to false
+        if (u.getExterno() == null) u.setExterno(false);
         return u;
     }
 
@@ -235,7 +250,7 @@ public class UnidadeService {
                                     String enderecoComplemento, String bairro, String telefone,
                                     String fax, String licencaFuncionamento, String responsavel,
                                     String email, Integer cnes, Short bpa, Short sipni,
-                                    String orgaoEmissor, Short estrategiaFamiliar, Short psf,
+                                    String orgaoEmissor, Short esferaAdministrativa, Short psf,
                                     Short sisPreNatal, Short hiperdia, Short gestao,
                                     String sia, String sigla, Short situacao, String siaSus,
                                     String scnesId, Boolean exportarEsus, Boolean exportarBnafar,
@@ -251,32 +266,32 @@ public class UnidadeService {
                                     Boolean bloqueioAgendSolExaPacExt, Integer municipioCodigo,
                                     Long respProfissionalCodigo, Long diretorCodigo,
                                     Long auditorCodigo, Long autorizadorCodigo, Short distritoCodigo) {
-        u.setNome(upperTrim(nome));
-        u.setRazaoSocial(trim(razaoSocial));
+        u.setNome(upperTrim(nome));               // R32
+        u.setRazaoSocial(upperTrim(razaoSocial)); // R34
         u.setCnpj(trim(cnpj));
         u.setCep(trim(cep));
-        u.setEndereco(trim(endereco));
+        u.setEndereco(upperTrim(endereco));                       // R35
         u.setEnderecoNumero(trim(enderecoNumero));
-        u.setEnderecoComplemento(trim(enderecoComplemento));
-        u.setBairro(trim(bairro));
+        u.setEnderecoComplemento(upperTrim(enderecoComplemento)); // R35
+        u.setBairro(upperTrim(bairro));                           // R35
         u.setTelefone(trim(telefone));
         u.setFax(trim(fax));
         u.setLicencaFuncionamento(trim(licencaFuncionamento));
-        u.setResponsavel(trim(responsavel));
+        u.setResponsavel(upperTrim(responsavel)); // R35
         u.setEmail(trim(email));
         u.setCnes(cnes);
         u.setBpa(bpa);
         u.setSipni(sipni);
-        u.setOrgaoEmissor(trim(orgaoEmissor));
-        u.setEstrategiaFamiliar(estrategiaFamiliar);
+        u.setOrgaoEmissor(upperTrim(orgaoEmissor)); // R35
+        u.setEsferaAdministrativa(esferaAdministrativa);
         u.setPsf(psf);
         u.setSisPreNatal(sisPreNatal);
         u.setHiperdia(hiperdia);
         u.setGestao(gestao);
         u.setSia(trim(sia));
-        u.setSigla(trim(sigla));
         u.setSituacao(situacao);
         u.setSiaSus(trim(siaSus));
+        u.setSigla(upperTrim(sigla)); // R33
         u.setScnesId(trim(scnesId));
         u.setExportarEsus(exportarEsus);
         u.setExportarBnafar(exportarBnafar);
@@ -318,6 +333,13 @@ public class UnidadeService {
 
     private static boolean isFlag1(Short flag) {
         return flag != null && flag == 1;
+    }
+
+    /** R26 exception: UniOrgEmi starting with 'U' or 'S' allows Autorizador == Diretor. */
+    private static boolean startsWithUorS(String orgaoEmissor) {
+        if (orgaoEmissor == null || orgaoEmissor.isBlank()) return false;
+        char c = Character.toUpperCase(orgaoEmissor.trim().charAt(0));
+        return c == 'U' || c == 'S';
     }
 
     private static String trim(String s) {

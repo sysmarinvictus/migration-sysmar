@@ -1,0 +1,35 @@
+{
+  "_comment": "SAU_UNI parity fixtures captured 2026-06-21 against the new app (:8090) + shared snapshot. Real FK ids redacted: <MUN_ID>=existing SYS_MUN.MunCod (Mandaguari), <PROF_ID>=existing SAU_PRO.ProPesCod. Synthetic unidades use the ZZPARITY name marker and are deleted in teardown. No real PHI included.",
+  "auth": { "scheme": "Bearer HS256 JWT", "roles": ["SAUDE_ADMIN", "SAUDE_CADASTRO"] },
+  "scenarios": [
+    { "id": 4, "method": "POST", "path": "/api/unidades", "expectStatus": 201,
+      "request": {"nome":"ZZPARITY UBS","cnpj":"11.222.333/0001-81","cep":"87900000","endereco":"Rua Teste","enderecoNumero":"1","bairro":"Centro","municipioCodigo":"<MUN_ID>"},
+      "response": {"codigo":"<generated>","nome":"ZZPARITY UBS","endereco":"RUA TESTE","bairro":"CENTRO","cnpj":"11.222.333/0001-81"},
+      "note": "R16 UniCod from seq_sau_uni_cod; R32/R35 nome/endereco/bairro stored UPPERCASE." },
+
+    { "id": 6, "method": "POST", "path": "/api/unidades", "expectStatus": 422,
+      "request": {"nome":"ZZPARITY UBS","cnpj":"11111111111111","cep":"87900000","endereco":"Rua Teste","enderecoNumero":"1","bairro":"Centro","municipioCodigo":"<MUN_ID>"},
+      "response": {"status":422,"code":"uni.cnpj.invalido","detail":"CNPJ inválido! Tente novamente."} },
+
+    { "id": 10, "method": "POST", "path": "/api/unidades", "expectStatus": 422,
+      "request": {"nome":"ZZPARITY UBS","cnpj":"11.222.333/0001-81","cep":"87900000","endereco":"Rua Teste","enderecoNumero":"1","bairro":"Centro","orgaoEmissor":"OEM","diretorCodigo":"<PROF_ID>","autorizadorCodigo":"<PROF_ID>","municipioCodigo":"<MUN_ID>"},
+      "response": {"status":422,"code":"uni.autorizador.diferente.diretor","detail":"Profissional Autorizador deve ser diferente do Diretor Clínico!"},
+      "note": "R26 — same person as Diretor & Autorizador, OrgEmi not starting U/S." },
+
+    { "id": 17, "method": "POST", "path": "/api/unidades/{id}/hiperdia-profissionais", "expectStatus": 201,
+      "request": {"profissionalId":"<PROF_ID>","dataInclusao":"2026-01-01","status":1} },
+
+    { "id": 18, "method": "POST", "path": "/api/unidades/{id}/hiperdia-profissionais", "expectStatus": 422,
+      "request": {"profissionalId":"<PROF_ID>","status":1},
+      "response": {"detail":"Informe a Data de Inclusão!"} },
+
+    { "id": 20, "method": "POST", "path": "/api/unidades/{id}/salas", "expectStatus": 409,
+      "setup": {"salaCodigo":1,"nome":"Sala A","status":"A"},
+      "request": {"salaCodigo":1,"nome":"Sala dup","status":"A"},
+      "note": "Duplicate (UniCod,SalaCod) → Conflict 409 (fixed: addSala existsById guard)." }
+  ],
+  "divergences": [
+    { "id": 5, "rule": "RF6", "expect": "422 + 'Informe o Nome da Unidade!'", "actual": "400 (Bean Validation @NotBlank)", "disposition": "accepted; field still rejected" },
+    { "id": 19, "rule": "RF2", "expect": "422 'CBO inválido para o SISPRENATAL!'", "actual": "201 (CBO validation deferred to Wave 4)", "disposition": "known deferral; cutover caveat for SISPRENATAL sub-resource" }
+  ]
+}

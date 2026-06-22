@@ -26,7 +26,7 @@ class EspecialidadeControllerIT extends AbstractIntegrationTest {
         jdbc.update("DELETE FROM SAU_ESP");
         jdbc.update("DELETE FROM SAU_CBOR");
         jdbc.update("INSERT INTO SAU_CBOR (CborCod, CborDes) VALUES ('225125', 'Médico cardiologista')");
-        jdbc.update("INSERT INTO SAU_ESP (EspCod, EspNom, EspSit, EspCborCod) VALUES (1, 'Cardiologia', 'A', '225125')");
+        jdbc.update("INSERT INTO SAU_ESP (EspCod, EspNom, EspSit, EspCborCod) VALUES (1, 'Cardiologia', 1, '225125')");
         jdbc.update("INSERT INTO SAU_ESP (EspCod, EspNom) VALUES (2, 'Pediatria')");
     }
 
@@ -61,7 +61,7 @@ class EspecialidadeControllerIT extends AbstractIntegrationTest {
     @Test
     void createsValid() {
         given().spec(asUser("SAUDE_CADASTRO"))
-            .body(Map.of("codigo", 10, "nome", "Dermatologia", "situacao", "A"))
+            .body(Map.of("codigo", 10, "nome", "Dermatologia", "situacao", "1"))
             .when().post("/api/especialidades")
             .then().statusCode(201)
                 .header("Location", containsString("/api/especialidades/10"))

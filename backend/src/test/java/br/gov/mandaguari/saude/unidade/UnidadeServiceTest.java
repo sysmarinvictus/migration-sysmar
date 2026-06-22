@@ -9,6 +9,7 @@ import br.gov.mandaguari.saude.unidade.dto.UnidadeDtos.*;
 import br.gov.mandaguari.saude.unidade.mapper.UnidadeMapperImpl;
 import br.gov.mandaguari.saude.unidade.repository.UnidadeRepository;
 import br.gov.mandaguari.saude.unidade.service.UnidadeService;
+import br.gov.mandaguari.saude.unidade.service.UnidadeSubService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +29,7 @@ class UnidadeServiceTest {
 
     @Mock UnidadeRepository repo;
     @Mock AuditService audit;
+    @Mock UnidadeSubService subService;
 
     UnidadeService service;
 
@@ -45,13 +47,13 @@ class UnidadeServiceTest {
 
     @BeforeEach
     void setup() {
-        service = new UnidadeService(repo, new UnidadeMapperImpl(), audit);
+        service = new UnidadeService(repo, new UnidadeMapperImpl(), audit, subService);
     }
 
-    // R16: codigo system-assigned MAX+1
+    // R16: codigo system-assigned from seq_sau_uni_cod
     @Test
     void autoAssignsCodigoOnInsert() {
-        given(repo.findMaxCodigo()).willReturn(5);
+        given(repo.nextCodigo()).willReturn(6);
         given(repo.municipioExists(1)).willReturn(true);
         given(repo.save(any())).willAnswer(inv -> inv.getArgument(0));
 
@@ -134,7 +136,7 @@ class UnidadeServiceTest {
 
     @Test
     void createAcceptsValidPhone() {
-        given(repo.findMaxCodigo()).willReturn(0);
+        given(repo.nextCodigo()).willReturn(1);
         given(repo.municipioExists(1)).willReturn(true);
         given(repo.save(any())).willAnswer(inv -> inv.getArgument(0));
         assertThat(service.create(reqWithPhone("UBS A", "(44) 3221-5000")).telefone())
@@ -163,6 +165,77 @@ class UnidadeServiceTest {
         given(repo.municipioExists(1)).willReturn(true);
         assertThatThrownBy(() -> service.create(reqWithOrgaoAndDiretor()))
                 .isInstanceOf(BusinessRule.class).hasMessageContaining("Auditor");
+    }
+
+    // R26: Autorizador and Diretor must differ
+    @Test
+    void rejectsSameAutorizadorAndDiretor() {
+        given(repo.municipioExists(1)).willReturn(true);
+        assertThatThrownBy(() -> service.create(reqWithDirAut("OEM", 5L, 5L)))
+                .isInstanceOf(BusinessRule.class)
+                .hasMessageContaining("diferente do Diretor");
+    }
+
+    // R26: exception — OrgEmi starting 'U' allows Autorizador == Diretor
+    @Test
+    void allowsSameAutorizadorAndDiretorWhenOrgEmiStartsWithU() {
+        given(repo.nextCodigo()).willReturn(1);
+        given(repo.municipioExists(1)).willReturn(true);
+        given(repo.save(any())).willAnswer(inv -> inv.getArgument(0));
+        assertThat(service.create(reqWithDirAut("UXX", 5L, 5L)).codigo()).isEqualTo(1);
+    }
+
+    // R4: externo defaults to false on insert
+    @Test
+    void defaultsUniExtToFalse() {
+        given(repo.nextCodigo()).willReturn(1);
+        given(repo.municipioExists(1)).willReturn(true);
+        given(repo.save(any())).willAnswer(inv -> inv.getArgument(0));
+        assertThat(service.create(req("UBS A", VALID_CNPJ, "87900000", "Rua A", "1", "Centro", 1)).externo())
+                .isFalse();
+    }
+
+    // R32: UniNom stored UPPERCASE
+    @Test
+    void storesUniNomUpperCase() {
+        given(repo.nextCodigo()).willReturn(1);
+        given(repo.municipioExists(1)).willReturn(true);
+        given(repo.save(any())).willAnswer(inv -> inv.getArgument(0));
+        assertThat(service.create(req("ubs central", VALID_CNPJ, "87900000", "Rua A", "1", "Centro", 1)).nome())
+                .isEqualTo("UBS CENTRAL");
+    }
+
+    // R33: UniSigla stored UPPERCASE
+    @Test
+    void storesUniSiglaUpperCase() {
+        given(repo.nextCodigo()).willReturn(1);
+        given(repo.municipioExists(1)).willReturn(true);
+        given(repo.save(any())).willAnswer(inv -> inv.getArgument(0));
+        assertThat(service.create(reqWithText("UBS A", null, "Rua A", "Bairro", null, "ubsc")).sigla())
+                .isEqualTo("UBSC");
+    }
+
+    // R34: UniRazSoc stored UPPERCASE
+    @Test
+    void storesUniRazSocUpperCase() {
+        given(repo.nextCodigo()).willReturn(1);
+        given(repo.municipioExists(1)).willReturn(true);
+        given(repo.save(any())).willAnswer(inv -> inv.getArgument(0));
+        assertThat(service.create(reqWithText("UBS A", "prefeitura municipal", "Rua A", "Bairro", null, null)).razaoSocial())
+                .isEqualTo("PREFEITURA MUNICIPAL");
+    }
+
+    // R35: UniEnd, UniBai, UniRes stored UPPERCASE
+    @Test
+    void storesAddressFieldsUpperCase() {
+        given(repo.nextCodigo()).willReturn(1);
+        given(repo.municipioExists(1)).willReturn(true);
+        given(repo.save(any())).willAnswer(inv -> inv.getArgument(0));
+        UnidadeResponse res = service.create(
+                reqWithText("UBS A", null, "rua das flores", "centro velho", "joão da silva", null));
+        assertThat(res.endereco()).isEqualTo("RUA DAS FLORES");
+        assertThat(res.bairro()).isEqualTo("CENTRO VELHO");
+        assertThat(res.responsavel()).isEqualTo("JOÃO DA SILVA");
     }
 
     // delete guards
@@ -209,6 +282,7 @@ class UnidadeServiceTest {
         given(repo.isReferencedByPar2Des(1)).willReturn(false);
         given(repo.isReferencedByPar2Agend(1)).willReturn(false);
         service.delete(1);
+        verify(subService).cascadeDeleteForUnidade(1); // R52–R55
         verify(audit).record("DELETE", "SAU_UNI", 1);
     }
 
@@ -287,6 +361,30 @@ class UnidadeServiceTest {
                 null, null, null, null, null, null, null, null, null, null, null, null,
                 null, null, null, null, null, null, null, null, null, null, null, null, null, null,
                 1, null, 10L, null, null, null);
+    }
+
+    /** orgaoEmissor=orgEmi, diretorCodigo=dir, autorizadorCodigo=aut (for R26). */
+    private static UnidadeCreateRequest reqWithDirAut(String orgEmi, Long dir, Long aut) {
+        return new UnidadeCreateRequest(
+                "UBS A", null, VALID_CNPJ, "87900000", "Rua A", "1", null, "Bairro",
+                null, null, null, null, null,
+                null, null, null, orgEmi, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                1, null, dir, null, aut, null);
+    }
+
+    /** Varies the UPPERCASE-transformed text fields: nome, razaoSocial, endereco, bairro, responsavel, sigla. */
+    private static UnidadeCreateRequest reqWithText(String nome, String razSoc, String end,
+                                                    String bairro, String resp, String sigla) {
+        return new UnidadeCreateRequest(
+                nome, razSoc, VALID_CNPJ, "87900000", end, "1", null, bairro,
+                null, null, null, resp, null,
+                null, null, null, null, null, null, null, null, null,
+                null, sigla, null, null, null,
+                null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                1, null, null, null, null, null);
     }
 
     private static Unidade unidade(Integer cod) {

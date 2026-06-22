@@ -1,6 +1,8 @@
 package br.gov.mandaguari.saude.unidade.domain;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import java.sql.Types;
 
 @Entity
 @Table(name = "SAU_UNI")
@@ -20,9 +22,11 @@ public class Unidade {
     private String razaoSocial;
 
     @Column(name = "UniCnpj", length = 18)
+    @JdbcTypeCode(Types.CHAR)   // physical CHAR(18)
     private String cnpj;
 
     @Column(name = "UniCep", length = 8)
+    @JdbcTypeCode(Types.CHAR)   // physical CHAR(8)
     private String cep;
 
     @Column(name = "UniEnd", length = 70)
@@ -44,6 +48,7 @@ public class Unidade {
     private String fax;
 
     @Column(name = "UniLicFun", length = 10)
+    @JdbcTypeCode(Types.CHAR)   // physical CHAR(10)
     private String licencaFuncionamento;
 
     @Column(name = "UniRes", length = 50)
@@ -65,7 +70,7 @@ public class Unidade {
     private String orgaoEmissor;
 
     @Column(name = "UniEsfAdm")
-    private Short estrategiaFamiliar;
+    private Short esferaAdministrativa; // enum 1=PÚBLICO, 2=PRIVADO
 
     @Column(name = "UniPSF")
     private Short psf;
@@ -210,8 +215,8 @@ public class Unidade {
     public void setSipni(Short sipni) { this.sipni = sipni; }
     public String getOrgaoEmissor() { return orgaoEmissor; }
     public void setOrgaoEmissor(String orgaoEmissor) { this.orgaoEmissor = orgaoEmissor; }
-    public Short getEstrategiaFamiliar() { return estrategiaFamiliar; }
-    public void setEstrategiaFamiliar(Short estrategiaFamiliar) { this.estrategiaFamiliar = estrategiaFamiliar; }
+    public Short getEsferaAdministrativa() { return esferaAdministrativa; }
+    public void setEsferaAdministrativa(Short esferaAdministrativa) { this.esferaAdministrativa = esferaAdministrativa; }
     public Short getPsf() { return psf; }
     public void setPsf(Short psf) { this.psf = psf; }
     public Short getSisPreNatal() { return sisPreNatal; }
