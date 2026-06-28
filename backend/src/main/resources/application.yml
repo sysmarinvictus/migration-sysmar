@@ -32,6 +32,16 @@ security:
     refresh-token-ttl: ${JWT_REFRESH_TTL:P7D}
     issuer: receituario-modern
 
+# Audit trail (common/audit → physical SAU_LOG). Persistence is fail-safe: a SAU_LOG insert failure
+# never breaks the business transaction. empresa-codigo is the tenant (OQ3); 411420 = real MunCod in
+# the single-tenant parity env. default-usuario-codigo (0=system) is used when the principal is not a
+# numeric user id. LGPD: no patient/professional names are ever stored.
+audit:
+  persist:
+    enabled: ${AUDIT_PERSIST_ENABLED:true}
+  empresa-codigo: ${AUDIT_EMPRESA_CODIGO:411420}
+  default-usuario-codigo: ${AUDIT_DEFAULT_USUARIO_CODIGO:0}
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

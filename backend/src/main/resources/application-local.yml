@@ -14,6 +14,11 @@ spring:
     # When you instead point local at a COPY of the real populated DB, set this back to `true`
     # so Flyway adopts the existing schema instead of trying to recreate it.
     baseline-on-migrate: false
+audit:
+  persist:
+    enabled: ${AUDIT_PERSIST_ENABLED:true}
+  empresa-codigo: ${AUDIT_EMPRESA_CODIGO:411420}
+  default-usuario-codigo: ${AUDIT_DEFAULT_USUARIO_CODIGO:0}
 logging:
   level:
     br.gov.mandaguari.saude: DEBUG

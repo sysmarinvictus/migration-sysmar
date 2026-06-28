@@ -17,6 +17,12 @@ security:
     # non-null (e.g. a legacy-plaintext row), which would 500 any update/delete. Production supplies
     # CERT_ENC_KEY from the environment; never a real secret here.
     enc-key: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+# Audit persists to SAU_LOG in ITs (V9 baseline creates the table). Tenant=1 in test.
+audit:
+  persist:
+    enabled: true
+  empresa-codigo: 1
+  default-usuario-codigo: 0
 logging:
   level:
     br.gov.mandaguari.saude: DEBUG
