@@ -332,12 +332,31 @@ CREATE TABLE IF NOT EXISTS SAU_USUUNI (
     CONSTRAINT pk_sau_usuuni PRIMARY KEY (UsuCod)
 );
 
--- Usuário (SAU_USU) — MINIMAL stub: delete-guard for SAU_UNI (UsuUniCod).
+-- Usuário (SAU_USU) — auth subset (Wave-0 SAU_USU slice). Production has the full 110-col table;
+-- this baseline maps the 16 auth-essential columns the Usuario entity validates against (plus the
+-- pre-existing UsuUniCod delete-guard for SAU_UNI). NON-UNIQUE index usau_usu mirrors the live DB
+-- (login uniqueness is enforced in the service, R13/OQ10 — do NOT add a UNIQUE here).
 CREATE TABLE IF NOT EXISTS SAU_USU (
-    UsuCod     INTEGER NOT NULL,
-    UsuUniCod  INTEGER,
+    UsuCod              INTEGER NOT NULL,
+    UsuNom              VARCHAR(50),
+    UsuLogin            VARCHAR(20),
+    UsuSen              VARCHAR(100),
+    UsuKey              VARCHAR(100),
+    UsuTip              SMALLINT,
+    UsuBloq             SMALLINT,
+    UsuPrfCod           INTEGER,
+    UsuSysmar           BOOLEAN,
+    UsuProPesCod        BIGINT,
+    FunPesCod           BIGINT,
+    UsuTokenSoa         VARCHAR(5000),
+    UsuTokenExp         INTEGER,
+    UsuTokenData        TIMESTAMP,
+    UsuDataUltimoAcesso DATE,
+    UsuDataRedefinicao  DATE,
+    UsuUniCod           INTEGER,
     CONSTRAINT pk_sau_usu PRIMARY KEY (UsuCod)
 );
+CREATE INDEX IF NOT EXISTS usau_usu ON SAU_USU (UsuLogin);
 
 -- Remessa 1 (SAU_REM1) — MINIMAL stub: delete-guard for SAU_UNI (RemUniCod).
 CREATE TABLE IF NOT EXISTS SAU_REM1 (
