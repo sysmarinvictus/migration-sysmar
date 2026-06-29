@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!--
+    SAU_USU password bridge — ONE-TIME migration tool (NOT part of the app build).
+    Standalone Maven module: decrypts legacy GeneXus reversible passwords and re-hashes to BCrypt.
+    Requires the GeneXus runtime jar (com.genexus.util.Encryption) supplied at run time — it is NOT
+    in this repo (it lives on the legacy server). See README.md.
+  -->
+  <groupId>br.gov.mandaguari.saude.tools</groupId>
+  <artifactId>password-bridge</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- Set at run time: -Dgenexus.jar.path=/abs/path/to/genexus-runtime.jar -->
+    <genexus.jar.path>${env.GENEXUS_JAR}</genexus.jar.path>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.7.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-crypto</artifactId>
+      <version>6.4.2</version>
+    </dependency>
+    <!-- BCryptPasswordEncoder needs commons-logging via spring-core at runtime -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>6.2.1</version>
+    </dependency>
+    <!-- GeneXus runtime (com.genexus.util.Encryption) is loaded via REFLECTION at run time and added
+         to the exec:java classpath below (additionalClasspathElements) — no compile-time dependency. -->
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+        <configuration>
+          <release>21</release>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.1.1</version>
+        <configuration>
+          <mainClass>br.gov.mandaguari.saude.tools.PasswordBridge</mainClass>
+          <additionalClasspathElements>
+            <!-- GeneXus runtime classes (com.genexus.util.Encryption); a .zip works on the classpath.
+                 Set via -Dgenexus.jar.path=/abs/path/to/gxclassR.zip -->
+            <additionalClasspathElement>${genexus.jar.path}</additionalClasspathElement>
+          </additionalClasspathElements>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
