@@ -403,3 +403,33 @@ CREATE TABLE IF NOT EXISTS SAU_IMP (
 );
 CREATE INDEX IF NOT EXISTS isau_imp1     ON SAU_IMP (ProPesCod, EspCod);
 CREATE INDEX IF NOT EXISTS usau_imp_desc ON SAU_IMP (ImpCod DESC);
+
+-- Perfil (SAU_PRF) — RBAC profile tier. Wave-0. Confirmed against live saude-mandaguari DB:
+-- 2 cols (prfcod int PK, prfnom varchar(50)), 10 rows, ZERO physical FKs, no unique on PrfNom,
+-- no sequence/identity (PrfCod = MAX+1 service-allocated, legacy psau_inc_prf).
+CREATE TABLE IF NOT EXISTS SAU_PRF (
+    PrfCod  INTEGER NOT NULL,
+    PrfNom  VARCHAR(50),
+    CONSTRAINT pk_sau_prf PRIMARY KEY (PrfCod)
+);
+CREATE INDEX IF NOT EXISTS usau_prf_desc ON SAU_PRF (PrfCod DESC);
+
+-- SAU_PRFCON stub — per-profile program permissions. Full slice is Wave-0 (next). Created here as the
+-- CASCADE target of SAU_PRF delete (R6) and so the delete-guard/cascade can be exercised. Minimal subset.
+CREATE TABLE IF NOT EXISTS SAU_PRFCON (
+    PrfCod    INTEGER NOT NULL,
+    PrfPrgCod INTEGER NOT NULL,
+    PrfPrgCon SMALLINT DEFAULT 0,
+    PrfPrgInc SMALLINT DEFAULT 0,
+    PrfPrgAlt SMALLINT DEFAULT 0,
+    PrfPrgExc SMALLINT DEFAULT 0,
+    CONSTRAINT pk_sau_prfcon PRIMARY KEY (PrfCod, PrfPrgCod)
+);
+
+-- SAU_PAR4 stub — system parameters (the 'social professional' default profile points at SAU_PRF via
+-- ParProSocPrfCod). Created minimally so the SAU_PRF delete-guard (R5) can be exercised.
+CREATE TABLE IF NOT EXISTS SAU_PAR4 (
+    ParEmpCod       INTEGER NOT NULL,
+    ParProSocPrfCod INTEGER,
+    CONSTRAINT pk_sau_par4 PRIMARY KEY (ParEmpCod)
+);
