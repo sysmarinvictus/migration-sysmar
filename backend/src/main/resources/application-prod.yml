@@ -1,0 +1,53 @@
+# Production profile. Activate with SPRING_PROFILES_ACTIVE=prod.
+#
+# Hardening vs the base config (which is already the secure default — no profile = real auth + mandatory
+# JWT_SECRET, enforced by ProductionSecurityGuard which is active here since prod is neither local nor test):
+#   - API docs / Swagger UI DISABLED (do not expose the API surface publicly).
+#   - Actuator reduced to /health with NO details (no env/build/info leak).
+#   - SQL never logged; app logging at INFO, Spring/web at WARN.
+#   - Flyway VALIDATES against the already-populated GeneXus DB (adopt as baseline; never recreate).
+#
+# Required env (no fallbacks — the app fails fast if any is missing):
+#   DB_URL, DB_USER, DB_PASSWORD, JWT_SECRET (>= 32 bytes, NOT a placeholder), CORS_ALLOWED_ORIGINS,
+#   security.cert.enc-key (AES key for the SAU_PRO certificate-password converter).
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate          # Hibernate NEVER alters the existing schema; Flyway owns DDL
+    properties:
+      hibernate.format_sql: false
+  flyway:
+    baseline-on-migrate: true     # adopt the already-populated production DB as the baseline
+    baseline-version: 1
+    validate-on-migrate: true
+
+# Secrets/origins come ONLY from the environment (base config has no dev fallbacks for these).
+security:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}   # required; comma-separated. No default in prod.
+
+# Do not publish the API contract / interactive console in production.
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# Minimal actuator surface; no sensitive details.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true             # liveness/readiness for orchestrators
+
+logging:
+  level:
+    root: WARN
+    br.gov.mandaguari.saude: INFO
+    org.hibernate.SQL: 'OFF'
+    org.springframework.web: WARN

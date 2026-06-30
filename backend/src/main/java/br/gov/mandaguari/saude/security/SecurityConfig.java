@@ -1,5 +1,6 @@
 package br.gov.mandaguari.saude.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,8 +26,14 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
+    /** CORS origins — comma-separated, configurable per env (prod sets CORS_ALLOWED_ORIGINS). */
+    private final List<String> corsAllowedOrigins;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtFilter) { this.jwtFilter = jwtFilter; }
+    public SecurityConfig(JwtAuthenticationFilter jwtFilter,
+                          @Value("${security.cors.allowed-origins:http://localhost:5173}") List<String> corsAllowedOrigins) {
+        this.jwtFilter = jwtFilter;
+        this.corsAllowedOrigins = corsAllowedOrigins;
+    }
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -55,8 +62,10 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         var cfg = new CorsConfiguration();
-        // Lock to the frontend origin(s); override via env in real deployments.
-        cfg.setAllowedOrigins(List.of("http://localhost:5173"));
+        // Lock to the frontend origin(s). Default is the dev frontend; prod overrides via
+        // CORS_ALLOWED_ORIGINS (comma-separated). Restrictive by design — a wrong/empty value just
+        // blocks cross-origin calls (fail-closed), it does not widen access.
+        cfg.setAllowedOrigins(corsAllowedOrigins);
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         cfg.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         var source = new UrlBasedCorsConfigurationSource();
