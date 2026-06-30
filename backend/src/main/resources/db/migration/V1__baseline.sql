@@ -469,3 +469,24 @@ CREATE TABLE IF NOT EXISTS SAU_USUCON (
 CREATE INDEX IF NOT EXISTS isau_usucon1 ON SAU_USUCON (PrgCod);
 -- SAU_PRFCON (per-profile permissions) is created above with the SAU_PRF slice — its PrfPrgCod is
 -- VARCHAR(30) matching the live SAU_PRG.PrgCod key it references.
+
+-- ── Funcionário (SAU_FUN) — Wave-0. SYS_PES person-subtype (PK = SYS_PES.PesCod, user-selected, not
+-- generated). 5 own columns; name/CPF/phones live in SYS_PES (native access). No physical FK in prod.
+CREATE TABLE IF NOT EXISTS SAU_FUN (
+    FunPesCod         BIGINT       NOT NULL,
+    FunTraFon         VARCHAR(20),
+    FunTraRam         CHAR(10),
+    FunPesNomSoundex  VARCHAR(50),
+    FunSit            SMALLINT,
+    CONSTRAINT pk_sau_fun PRIMARY KEY (FunPesCod)
+);
+
+-- SYS_PES stub expansion — the funcionário (and future person slices) read/write these via native
+-- projection. Idempotent ADD COLUMN; the existing Wave-0 stub (PesCod/PesBaiCod/PesNom/PesNomSoundex)
+-- is left intact. Types confirmed against live saude-mandaguari.
+ALTER TABLE SYS_PES ADD COLUMN IF NOT EXISTS PesCPFCNPJ   CHAR(18);
+ALTER TABLE SYS_PES ADD COLUMN IF NOT EXISTS PesFon       VARCHAR(20);
+ALTER TABLE SYS_PES ADD COLUMN IF NOT EXISTS PesCel       VARCHAR(20);
+
+-- SAU_RECESP delete-guard column (funcionário reference) — the existing stub lacks it.
+ALTER TABLE SAU_RECESP ADD COLUMN IF NOT EXISTS FunPesCod BIGINT;
