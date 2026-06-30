@@ -51,9 +51,10 @@ public class UsuarioController {
         return service.get(id);
     }
 
+    // SECURITY (LGPD): the user picker exposes UsuNom (PII), so it stays SAUDE_ADMIN-only (inherits the
+    // class-level guard — do NOT downgrade to isAuthenticated()). A non-admin must not enumerate users/names.
     @GetMapping("/lookup")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Autocomplete de usuários (picker)")
+    @Operation(summary = "Autocomplete de usuários (picker, admin)")
     public List<UsuarioLookupItem> lookup(@RequestParam(required = false, defaultValue = "") String q,
                                           @PageableDefault(size = 10) Pageable pageable) {
         return service.lookup(q, pageable);
