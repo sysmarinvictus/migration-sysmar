@@ -1,0 +1,11 @@
+# Keep the build context small and never ship secrets/build output into the image.
+target/
+**/target/
+.env
+.env.*
+*.log
+.git
+.gitignore
+.idea/
+.vscode/
+*.iml

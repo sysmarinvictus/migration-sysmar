@@ -1,0 +1,47 @@
+# Production stack for the modern app (strangler-fig). The backend runs the SECURE `prod` profile and
+# talks to the EXISTING shared `saude-mandaguari` database (the same DB the legacy GeneXus app uses) — so
+# there is intentionally NO postgres service here. Flyway only VALIDATES that DB; it never recreates it.
+#
+# Usage:
+#   cp .env.prod.example .env.prod   # then fill in real secrets (never commit .env.prod)
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Required env lives in .env.prod (see .env.prod.example): DB_URL, DB_USER, DB_PASSWORD, JWT_SECRET,
+# CORS_ALLOWED_ORIGINS, CERT_ENC_KEY. SPRING_PROFILES_ACTIVE is pinned to `prod` below (do NOT override).
+name: receituario
+
+services:
+  backend:
+    build:
+      context: ./backend
+    image: receituario-backend:latest
+    container_name: receituario-backend
+    env_file:
+      - .env.prod
+    environment:
+      # Pinned here so a missing/wrong SPRING_PROFILES_ACTIVE can never ship the dev backdoor (sec review C1).
+      SPRING_PROFILES_ACTIVE: prod
+    # Lets DB_URL use host.docker.internal to reach a DB running on the host (Linux needs this mapping).
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8090:8080"          # legacy keeps :8080 on the host; the new app is published on :8090
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+      start_period: 70s
+
+  frontend:
+    build:
+      context: ./frontend
+    image: receituario-frontend:latest
+    container_name: receituario-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "8088:80"
+    restart: unless-stopped

@@ -10,6 +10,7 @@ frontend/src/lib/generated/
 # Env / secrets — never commit credentials (enforced by the .claude secret-scan hook)
 .env
 .env.*
+!.env.prod.example
 *.local
 
 # IDE / OS

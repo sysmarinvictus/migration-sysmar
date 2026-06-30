@@ -40,6 +40,10 @@ security:
   cors:
     # Comma-separated allowed origins for the SPA. Dev default; prod sets CORS_ALLOWED_ORIGINS.
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  cert:
+    # AES key (base64, 32 bytes) for the SAU_PRO certificate-password converter. Empty default →
+    # fail-closed at use (never stores cleartext). Supply CERT_ENC_KEY in real environments.
+    enc-key: ${CERT_ENC_KEY:}
 
 # Audit trail (common/audit → physical SAU_LOG). Persistence is fail-safe: a SAU_LOG insert failure
 # never breaks the business transaction. empresa-codigo is the tenant (OQ3); 411420 = real MunCod in
