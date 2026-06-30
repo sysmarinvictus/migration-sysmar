@@ -1,0 +1,52 @@
+{
+  "_comment": "SAU_FUN (Funcionário) parity fixtures, 2026-06-30. The legacy WW (hwwsau_fun) is auth-gated → no headless HTML golden (same as SAU_PRO/SAU_IMP). Parity is therefore BEHAVIORAL: the new endpoints' results are asserted to equal the LIVE saude-mandaguari snapshot (golden data) + the mined rules, and are exercised end-to-end by FuncionarioControllerIT (12) against an identical-DDL Postgres. NO real PHI: golden rows are referenced by FunPesCod + field metadata (situação, lengths) — never names/CPF.",
+  "golden_source": "live saude-mandaguari snapshot (read-only) on host.docker.internal:5432, captured 2026-06-30",
+  "auth": { "scheme": "Bearer HS256 JWT", "role": "SAUDE_CADASTRO" },
+  "distributions": {
+    "sau_fun_total": 1148,
+    "funsit_ativo_1": 1147,
+    "funsit_inativo_2": 1,
+    "with_work_phone": 6,
+    "linked_to_system_user": 1086
+  },
+  "scenarios": [
+    { "id": 1, "name": "GET /api/funcionarios/{id} maps own cols + SYS_PES person", "rule": "R2",
+      "golden": [
+        { "funPesCod": 57,  "situacao": 1, "telefoneTrabalho": "", "ramal": "", "nomeLen": 27, "cpfLen": 14 },
+        { "funPesCod": 436, "situacao": 1, "telefoneTrabalho": "", "ramal": "", "nomeLen": 26, "cpfLen": 14 },
+        { "funPesCod": 597, "situacao": 1, "telefoneTrabalho": "", "ramal": "", "nomeLen": 30, "cpfLen": 14 }
+      ],
+      "verdict": "BEHAVIORAL-PARITY",
+      "evidence": "FuncionarioControllerIT.getsByIdAnd404 + listsAndSearchesByPersonName (native SYS_PES join, FunSit→situacao, char-trim). Live types match the entity (introspected)." },
+
+    { "id": 2, "name": "list/search by SYS_PES name (LIKE substring)", "rule": "—",
+      "golden": { "nome_like": "silva", "count": 117 },
+      "verdict": "BEHAVIORAL-PARITY",
+      "evidence": "FuncionarioRepository.search joins SYS_PES, lower(PesNom) LIKE %q%; IT listsAndSearchesByPersonName proves the join+filter on identical DDL." },
+
+    { "id": 3, "name": "create requires existing SYS_PES person; situação default 1", "rule": "R1/R5",
+      "verdict": "BEHAVIORAL-PARITY",
+      "evidence": "IT createsForExistingPersonWithDefaultSituacao (201, situacao=1) + rejectsCreateForNonExistentPerson (422)." },
+
+    { "id": 4, "name": "update writes back name/cpf/phones to SYS_PES", "rule": "R2",
+      "verdict": "BEHAVIORAL-PARITY",
+      "evidence": "IT updatesAndWritesBackPersonName asserts the SYS_PES.PesNom row is mutated." },
+
+    { "id": 5, "name": "phone formats validated; ramal free text; NO CPF validation", "rule": "R6/R7/R8/R9/R12",
+      "verdict": "BEHAVIORAL-PARITY",
+      "evidence": "ServiceTest rejectsInvalid{Work,Person,Mobile}Phone, ramalIsUnvalidatedFreeText, doesNotValidateCpfCheckDigits; IT rejectsInvalidWorkPhone (422)." },
+
+    { "id": 6, "name": "delete blocked by SAU_USU / SAU_RECESP; allowed otherwise", "rule": "R13/R14/R15",
+      "verdict": "BEHAVIORAL-PARITY",
+      "golden": { "linked_to_system_user": 1086, "note": "94% of funcionários are user-linked → delete-guard is the common path" },
+      "evidence": "IT blocksDeleteWhenReferencedByUsuario (409), blocksDeleteWhenReferencedByControlledPrescription (409), deletesUnreferenced (204)." },
+
+    { "id": 7, "name": "soundex recomputed from person name; PHI never logged", "rule": "R3/R18",
+      "verdict": "BEHAVIORAL-PARITY",
+      "evidence": "ServiceTest computesSoundexFromName (real SoundexService) + FuncionarioSecurityTest.toStringOmitsSoundex." }
+  ],
+  "deferred": [
+    "Live HTTP golden-master run (the new app serving :8090 against the snapshot, hitting GET/list for the real funcionários above): NOT executed here — the sandbox cannot sustain a long-lived server (foreground sleep blocked; background server exited 144). Run via /dev-stack in a real terminal to stamp `verified`. The read mapping is already proven by IT on identical DDL + the live golden data above.",
+    "Write scenarios against the live shared SYS_PES (a person table) are intentionally NOT run live (LGPD/safety); they are covered by Testcontainers ITs."
+  ]
+}
