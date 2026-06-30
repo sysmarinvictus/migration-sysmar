@@ -1,0 +1,72 @@
+{
+  "_comment": "SAU_USU (authentication keystone) parity fixtures, 2026-06-30. UNLIKE the read/CRUD slices, this slice CANNOT be live golden-master'd pre-cutover: (1) the legacy login is a stateful GeneXus AJAX form (GXState/_EventName, integrity-hashed) — not headlessly drivable for a clean golden; (2) credential equivalence requires the offline password-bridge, which is a CUTOVER-only op — the snapshot has only 1/1230 users migrated (usukey NULL), so the new /auth/login correctly rejects 1229 as 'not migrated' and no JWT can be obtained against this DB. Equivalence is therefore established as BEHAVIORAL parity against the mined legacy rules (high-confidence, line-cited) + the 37-test unit/IT suite, with the credential-dependent scenarios explicitly DEFERRED-TO-CUTOVER (verify post-bridge). NO real PHI; NO mutation of the shared SAU_USU security table.",
+  "live_snapshot_facts": {
+    "captured": "2026-06-30 against host.docker.internal:5432/saude-mandaguari (read-only)",
+    "sau_usu_total": 1230,
+    "sau_usu_migrated_usukey_null": 1,
+    "sau_usu_not_migrated": 1229,
+    "sau_usu_sysmar": 12,
+    "sau_prf_total": 10,
+    "sau_prf_admin_named": 0,
+    "notes": "OQ12 RESOLVED: sau_prf has exactly (prfcod integer, prfnom varchar) → repo query correct. OQ13 RESOLVED: 0 profiles contain 'ADMIN' → profile-based elevation is inert on real data; /api/usuarios CRUD is SYSMAR-only in v1. OQ2 input: 12 SYSMAR superuser accounts exist — audit before cutover."
+  },
+  "auth": { "scheme": "Bearer HS256 JWT", "roles": ["ROLE_SUPERUSER", "SAUDE_ADMIN", "SAUDE_CADASTRO"] },
+  "scenarios": [
+    { "id": 1, "name": "login válido (senha correta) → emite token", "rule": "R1",
+      "legacy": "hindex_impl.java:888-889,2415 — verify = decrypt64(ususen,usukey)==senha (reversível)",
+      "modern": "AuthController.login + SauUsuUserDetailsService (bcrypt quando usukey NULL)",
+      "verdict": "DEFERRED-TO-CUTOVER",
+      "reason": "Credencial só é verificável após o bridge (snapshot 1/1230 migrado). Comportamento coberto por SauUsuUserDetailsServiceTest.migratedUser_isEnabledWithHashedPasswordAndBaselineRole + AuthControllerTest.login_issuesTokenForUsableAccount." },
+
+    { "id": 2, "name": "login inválido / senha errada → mesma mensagem genérica (sem enumeração)", "rule": "R3",
+      "legacy": "hindex_impl.java:866-918,670 — 'Usuário ou senha incorreta!' idêntico p/ usuário inexistente e senha errada",
+      "modern": "AuthController.login → 'Usuário ou senha inválidos' idêntico nos dois caminhos",
+      "verdict": "BEHAVIORAL-PARITY",
+      "tests": ["AuthControllerTest.login_unknownUserSameGenericFailure", "AuthControllerTest.login_rejectsWrongPasswordGenerically", "SauUsuUserDetailsServiceTest.ambiguousLogin_throwsUsernameNotFound_noEnumeration"],
+      "live_golden": "não capturável headless (form GX AJAX com GXState/_EventName)" },
+
+    { "id": 3, "name": "usuário bloqueado (UsuBloq=1) rejeitado APÓS senha correta", "rule": "R5",
+      "legacy": "hindex_impl.java:891-894 — 'Usuário Bloqueado!' após senha correta",
+      "modern": "AuthController.requireUsableAccount (AccountStatusUserDetailsChecker) após encoder.matches",
+      "verdict": "BEHAVIORAL-PARITY",
+      "tests": ["AuthControllerTest.login_rejectsBlockedUserEvenWithCorrectPassword", "SauUsuUserDetailsServiceTest.blockedUser_isAccountLockedAndNotAudited"],
+      "note": "Era o BLOCK da revisão (token emitido a bloqueado) — corrigido nesta sessão. Diff live de credencial DEFERRED (precisa de usuário migrado+bloqueado → bridge)." },
+
+    { "id": 4, "name": "troca de senha: exige senha atual + confirmação; rotaciona usukey; carimba dataRedefinicao", "rule": "R10/R11",
+      "legacy": "hmudasenhalogin_impl.java:598-700; psau_usu_mudasenha.java:71-80,162",
+      "modern": "UsuarioService.changePassword (bcrypt nova, usukey=NULL, dataRedefinicao=hoje)",
+      "verdict": "BEHAVIORAL-PARITY",
+      "tests": ["UsuarioServiceTest.changePassword_rejectsWrongCurrent", "UsuarioServiceTest.changePassword_rejectsConfirmationMismatch", "UsuarioServiceTest.changePassword_storesNewBcryptNullsKeyAndStampsDate"] },
+
+    { "id": 5, "name": "autorização: perfil precede per-usuário; bits Inc/Alt/Exc/Con por modo", "rule": "R8/R9",
+      "legacy": "pisauthorized.java:69-237,371-374; acessamodulo.java:64-413",
+      "modern": "coarse RBAC v1 (SAUDE_CADASTRO baseline; SAUDE_ADMIN p/ perfil admin/SYSMAR)",
+      "verdict": "DEFERRED",
+      "reason": "RBAC fino por-programa (SAU_PRFCON/USUCON) deferido p/ fatia de autorização (OQ7). Em v1 a autorização é coarse e documentada." },
+
+    { "id": 6, "name": "SYSMAR → bypassa tudo", "rule": "R2",
+      "legacy": "pisauthorized.java:65-68 (flag UsuSysmar) + acessamodulo.java:79 (login=='SYSMAR')",
+      "modern": "UsuSysmar=true ⇒ ROLE_SUPERUSER+SAUDE_ADMIN+SAUDE_CADASTRO; caminho mágico login=='SYSMAR' NÃO portado (OQ2)",
+      "verdict": "BEHAVIORAL-PARITY",
+      "tests": ["SauUsuUserDetailsServiceTest.superuserFlag_grantsSuperuserAndAdminAndCadastro"],
+      "live": "12 contas SYSMAR no snapshot → input do audit OQ2 antes do cutover" },
+
+    { "id": 7, "name": "criar usuário: login único, nome+login obrigatórios, usupesquisa* default negado", "rule": "R12/R13/R15",
+      "legacy": "sau_usu_impl.java:3247-3274 (req+único), :10878 (usupesquisa* default '0')",
+      "modern": "UsuarioService.create (R12/R13 no serviço; R15 colunas não mapeadas → DB default negado)",
+      "verdict": "BEHAVIORAL-PARITY",
+      "tests": ["UsuarioServiceTest.create_rejectsBlankNome", "UsuarioServiceTest.create_rejectsBlankLogin", "UsuarioServiceTest.create_rejectsDuplicateLogin", "UsuarioServiceTest.create_storesBcryptHashAndNullsKeyAndAudits"],
+      "note": "R15 (16 perms usupesquisa* LGPD) não mapeadas em v1 → DB default negado; enforcement server-side deferido (OQ9)." },
+
+    { "id": 8, "name": "deletar usuário referenciado por SAU_USUCON/SAU_USUUNI → bloqueado", "rule": "R17",
+      "legacy": "sau_usu_impl.java:5353-5369 — CannotDeleteReferencedRecord",
+      "modern": "UsuarioService.delete (guards nativos EXISTS sau_usucon/sau_usuuni)",
+      "verdict": "BEHAVIORAL-PARITY",
+      "tests": ["UsuarioServiceTest.delete_blockedWhenReferencedByUsuCon", "UsuarioServiceTest.delete_blockedWhenReferencedByUsuUni", "UsuarioServiceTest.delete_allowedWhenUnreferenced"] }
+  ],
+  "deferred_to_cutover": [
+    "Live credential golden-master (id 1, 3): run AFTER the password-bridge --commit at the auth cutover, against a migrated snapshot, with a SAU_USU backup + legacy coordination (OQ3). Pre-bridge the snapshot is 1/1230 migrated, so no JWT is obtainable via the real SAU_USU path.",
+    "OQ11 (login-audit timing), OQ14 (nextUsuCod scan/race) — correctness FLAGs to resolve before cutover.",
+    "OQ2 — audit the 12 SYSMAR accounts before cutover."
+  ]
+}
