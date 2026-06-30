@@ -29,20 +29,17 @@ The backend runs `SPRING_PROFILES_ACTIVE=prod` (pinned in the compose file). `Pr
 **aborts startup** if a dev/placeholder `JWT_SECRET` (or the dev login backdoor) leaks in — so a green
 boot is itself a security check.
 
-### ⚠ Frontend image: generate the API client first
-The SPA build needs the typed client at `frontend/src/lib/generated/`, which `orval` generates from the
-backend's **running** OpenAPI doc and which is **git-ignored** (absent from a clean checkout). So before
-`docker compose ... build`:
-```bash
-# with a backend serving /v3/api-docs (e.g. ./dev-up.sh on :8080):
-cd frontend && npm ci && npm run gen:api    # writes src/lib/generated/ (a build input)
-```
-The frontend Dockerfile fails fast with a clear message if `src/lib/generated/` is missing. The backend
-image has no such dependency and builds from a clean checkout (CI builds it on every push).
+### Frontend builds are deterministic (offline)
+`orval` reads the **committed** `frontend/openapi.json`, so `npm run gen:api` — and the CI / frontend-image
+builds — run **offline** with no backend. The generated client (`src/lib/generated/`) stays git-ignored and
+is regenerated during the build. Both prod images build from a clean checkout.
 
-> **Follow-up (determinism):** export a static `openapi.json` at backend-build time (springdoc) and point
-> `orval.config.ts` at the file, so `gen:api`, CI, and the frontend image all build offline. Until then the
-> frontend image is built locally after `gen:api`, and CI's `docker-build` job covers the backend image only.
+**Refresh the spec after an API change** (the only step that needs a backend — via Testcontainers, no real DB):
+```bash
+cd backend && mvn -o -Dit.test=OpenApiSpecExportIT -Dopenapi.export=true \
+  -Dsurefire.failIfNoSpecifiedTests=false -Dtest=NoneX -DfailIfNoTests=false verify
+# rewrites frontend/openapi.json — commit it; the SPA regenerates its client from it.
+```
 
 ## 3. What `prod` enforces (vs dev)
 - Real SAU_USU authentication (the `admin/admin123` dev backdoor is **not** loaded).

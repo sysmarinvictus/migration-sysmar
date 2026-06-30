@@ -9,13 +9,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-# PREREQUISITE: the typed API client (src/lib/generated/) is a BUILD INPUT. It is git-ignored and orval
-# generates it from a RUNNING backend (npm run gen:api → localhost:8080/v3/api-docs), so it cannot be
-# regenerated inside this offline build. Run `npm run gen:api` against the backend BEFORE building this
-# image (the generated files are then present in the build context — .dockerignore does not exclude them).
-# See DEPLOY.md "Frontend image" + the follow-up to commit a static OpenAPI spec for fully reproducible builds.
-RUN test -d src/lib/generated || { echo "ERROR: src/lib/generated missing — run 'npm run gen:api' first (see DEPLOY.md)"; exit 1; }
-RUN npm run build
+# OFFLINE build: orval reads the COMMITTED ./openapi.json (not a running backend), so gen:api needs no
+# network/backend. Regenerate the client here so the image always matches the committed spec, then build.
+RUN npm run gen:api && npm run build
 
 # ---- runtime stage ----
 FROM nginx:1.27-alpine
