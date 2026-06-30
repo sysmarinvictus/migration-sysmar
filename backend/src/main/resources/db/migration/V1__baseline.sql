@@ -417,8 +417,8 @@ CREATE INDEX IF NOT EXISTS usau_prf_desc ON SAU_PRF (PrfCod DESC);
 -- SAU_PRFCON stub — per-profile program permissions. Full slice is Wave-0 (next). Created here as the
 -- CASCADE target of SAU_PRF delete (R6) and so the delete-guard/cascade can be exercised. Minimal subset.
 CREATE TABLE IF NOT EXISTS SAU_PRFCON (
-    PrfCod    INTEGER NOT NULL,
-    PrfPrgCod INTEGER NOT NULL,
+    PrfCod    INTEGER     NOT NULL,
+    PrfPrgCod VARCHAR(30) NOT NULL,   -- program key (→ SAU_PRG.PrgCod); live type is varchar(30)
     PrfPrgCon SMALLINT DEFAULT 0,
     PrfPrgInc SMALLINT DEFAULT 0,
     PrfPrgAlt SMALLINT DEFAULT 0,
@@ -433,3 +433,39 @@ CREATE TABLE IF NOT EXISTS SAU_PAR4 (
     ParProSocPrfCod INTEGER,
     CONSTRAINT pk_sau_par4 PRIMARY KEY (ParEmpCod)
 );
+
+-- ── RBAC cluster (Wave-0) — confirmed against live saude-mandaguari DB ──────────────────────────
+-- Grupo de Programas (SAU_PRGGRP) — 28 rows, leaf parent of SAU_PRG.
+CREATE TABLE IF NOT EXISTS SAU_PRGGRP (
+    GrpCod INTEGER NOT NULL,
+    GrpNom VARCHAR(50),
+    CONSTRAINT pk_sau_prggrp PRIMARY KEY (GrpCod)
+);
+
+-- Programa do Sistema (SAU_PRG) — 1240 rows. PrgCod is a VARCHAR(30) program/screen name (NOT numeric).
+-- GrpCod → SAU_PRGGRP. Flags PrgAdm/PrgMed (smallint 0/1) + PrgAcessoPub (boolean public access).
+CREATE TABLE IF NOT EXISTS SAU_PRG (
+    PrgCod       VARCHAR(30) NOT NULL,
+    PrgNom       VARCHAR(100),
+    GrpCod       INTEGER,
+    PrgAdm       SMALLINT,
+    PrgMed       SMALLINT,
+    PrgAcessoPub BOOLEAN,
+    CONSTRAINT pk_sau_prg PRIMARY KEY (PrgCod)
+);
+CREATE INDEX IF NOT EXISTS isau_prg1 ON SAU_PRG (GrpCod);
+
+-- Controle de acesso por usuário (SAU_USUCON) — 1.5M rows. Composite PK (UsuCod, PrgCod).
+-- Per-user Inc/Alt/Exc/Con permission flags (smallint, 1=granted). Fallback tier when a user has no profile.
+CREATE TABLE IF NOT EXISTS SAU_USUCON (
+    UsuCod INTEGER     NOT NULL,
+    PrgCod VARCHAR(30) NOT NULL,
+    UsuCon SMALLINT DEFAULT 0,
+    UsuInc SMALLINT DEFAULT 0,
+    UsuAlt SMALLINT DEFAULT 0,
+    UsuExc SMALLINT DEFAULT 0,
+    CONSTRAINT pk_sau_usucon PRIMARY KEY (UsuCod, PrgCod)
+);
+CREATE INDEX IF NOT EXISTS isau_usucon1 ON SAU_USUCON (PrgCod);
+-- SAU_PRFCON (per-profile permissions) is created above with the SAU_PRF slice — its PrfPrgCod is
+-- VARCHAR(30) matching the live SAU_PRG.PrgCod key it references.
