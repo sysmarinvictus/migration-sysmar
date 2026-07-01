@@ -29,6 +29,7 @@ import ProfissionalListPage from "../features/profissional/ProfissionalListPage"
 import ProfissionalDetailPage from "../features/profissional/ProfissionalDetailPage";
 import ProfissionalFormPage from "../features/profissional/ProfissionalFormPage";
 import PessoaFormPage from "../features/pessoa/PessoaFormPage";
+import ProfissionalExternoFormPage from "../features/profissional-externo/ProfissionalExternoFormPage";
 import type { ReactNode } from "react";
 
 export default function App() {
@@ -75,6 +76,7 @@ function Shell() {
         {hasRole("SAUDE_CADASTRO") && <Link to="/formas-apresentacao">Formas de Apresentação</Link>}
         {hasRole("SAUDE_CADASTRO") && <Link to="/profissionais">Profissionais</Link>}
         {hasRole("SAUDE_CADASTRO") && <Link to="/pessoas/novo">Pessoas</Link>}
+        {hasRole("SAUDE_CADASTRO") && <Link to="/profissionais-externos/novo">Prof. Externo</Link>}
         <span className="ml-auto text-sm text-gray-600">{username}</span>
         <button onClick={logout} className="text-sm text-blue-600">Sair</button>
       </nav>
@@ -123,6 +125,7 @@ function Shell() {
           <Route path="/profissionais/:id/editar" element={<ProfissionalFormPage />} />
           <Route path="/pessoas/novo" element={<PessoaFormPage />} />
           <Route path="/pessoas/:id/editar" element={<PessoaFormPage />} />
+          <Route path="/profissionais-externos/novo" element={<ProfissionalExternoFormPage />} />
           <Route path="*" element={<p className="p-6">Página não encontrada.</p>} />
         </Routes>
       </main>

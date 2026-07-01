@@ -16,7 +16,7 @@ import br.gov.mandaguari.saude.common.error.DomainExceptions.BusinessRule;
  * medium-confidence and enforcing them subtly wrong would reject valid names. They are recorded as an
  * open_question for KB/IDE verification before parity cutover.
  */
-final class PessoaNomeValidator {
+public final class PessoaNomeValidator {
 
     /** Latin letters incl. Portuguese accents, space and apostrophe (accent-permissive R5). */
     private static final String LETTERS = "[\\p{L} ']+";
@@ -24,7 +24,7 @@ final class PessoaNomeValidator {
     private PessoaNomeValidator() {}
 
     /** R1–R5 for the required registry name (PesNom). */
-    static void validateRequired(String nome) {
+    public static void validateRequired(String nome) {
         if (nome == null || nome.isBlank()) {
             throw new BusinessRule("pes.nome.required", "Informe o Nome da Pessoa!");           // R1
         }
