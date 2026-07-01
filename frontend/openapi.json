@@ -6,7 +6,7 @@
     "version" : "0.1.0"
   },
   "servers" : [ {
-    "url" : "http://localhost:36219",
+    "url" : "http://localhost:37025",
     "description" : "Generated server url"
   } ],
   "security" : [ {
@@ -1048,6 +1048,64 @@
         "responses" : {
           "204" : {
             "description" : "No Content"
+          }
+        }
+      }
+    },
+    "/api/parametros/geral" : {
+      "put" : {
+        "tags" : [ "Parâmetros" ],
+        "summary" : "Atualizar os parâmetros gerais (validade de receita, dias de usuário/senha, cabeçalho)",
+        "operationId" : "updateGeral",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ParametroGeralUpdateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ParametroResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parametros/ambulatorial" : {
+      "put" : {
+        "tags" : [ "Parâmetros" ],
+        "summary" : "Atualizar os parâmetros ambulatoriais (flags de política)",
+        "operationId" : "updateAmbulatorial",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ParametroAmbulatorialUpdateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ParametroResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -4646,6 +4704,25 @@
         }
       }
     },
+    "/api/parametros" : {
+      "get" : {
+        "tags" : [ "Parâmetros" ],
+        "summary" : "Ler os parâmetros do sistema (subset mapeado)",
+        "operationId" : "get_21",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ParametroResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/medicamentos/lookup" : {
       "get" : {
         "tags" : [ "medicamento-controller" ],
@@ -7026,6 +7103,147 @@
           }
         }
       },
+      "ParametroGeralUpdateRequest" : {
+        "type" : "object",
+        "properties" : {
+          "validadeReceita" : {
+            "type" : "boolean"
+          },
+          "validadeReceitaSimplesDias" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "validadeReceitaUsoContinuoDias" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "validadeReceitaControleEspecialDias" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "inatividadeUsuarioDias" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "senhaUsuarioDias" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "secretaria" : {
+            "type" : "string"
+          },
+          "secretariaEndereco" : {
+            "type" : "string"
+          },
+          "secretariaCep" : {
+            "type" : "string"
+          },
+          "secretariaFone1" : {
+            "type" : "string"
+          },
+          "secretariaFone2" : {
+            "type" : "string"
+          },
+          "secretariaEmail" : {
+            "type" : "string"
+          },
+          "cadastroSemCns" : {
+            "type" : "boolean"
+          },
+          "reciboComprador" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "ParametroResponse" : {
+        "type" : "object",
+        "properties" : {
+          "empresaCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "validadeReceita" : {
+            "type" : "boolean"
+          },
+          "validadeReceitaSimplesDias" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "validadeReceitaUsoContinuoDias" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "validadeReceitaControleEspecialDias" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "inatividadeUsuarioDias" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "senhaUsuarioDias" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "secretaria" : {
+            "type" : "string"
+          },
+          "secretariaEndereco" : {
+            "type" : "string"
+          },
+          "secretariaCep" : {
+            "type" : "string"
+          },
+          "secretariaFone1" : {
+            "type" : "string"
+          },
+          "secretariaFone2" : {
+            "type" : "string"
+          },
+          "secretariaEmail" : {
+            "type" : "string"
+          },
+          "cadastroSemCns" : {
+            "type" : "boolean"
+          },
+          "reciboComprador" : {
+            "type" : "boolean"
+          },
+          "exigeCid10Atestado" : {
+            "type" : "boolean"
+          },
+          "estornarAtendimento" : {
+            "type" : "boolean"
+          },
+          "imprimeRiscoMaterno" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "atendimentoHistorico" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "ParametroAmbulatorialUpdateRequest" : {
+        "type" : "object",
+        "properties" : {
+          "exigeCid10Atestado" : {
+            "type" : "boolean"
+          },
+          "estornarAtendimento" : {
+            "type" : "boolean"
+          },
+          "imprimeRiscoMaterno" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "atendimentoHistorico" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
       "UnidadeAtualizarRequest" : {
         "type" : "object",
         "properties" : {
@@ -8936,12 +9154,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9037,12 +9255,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9083,12 +9301,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9157,12 +9375,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9215,12 +9433,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9291,12 +9509,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9360,12 +9578,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9424,12 +9642,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9528,12 +9746,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9586,12 +9804,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9644,12 +9862,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9702,12 +9920,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9760,12 +9978,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9806,12 +10024,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9864,12 +10082,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9922,12 +10140,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9980,12 +10198,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -10038,12 +10256,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -10099,12 +10317,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -10210,12 +10428,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
-          },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
