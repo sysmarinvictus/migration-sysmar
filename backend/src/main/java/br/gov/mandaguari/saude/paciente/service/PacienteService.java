@@ -220,11 +220,15 @@ public class PacienteService {
         pac.setNomeSoundex(soundex.compute(r.nome()));
         pac.setNomeMaeSoundex(soundex.compute(r.nomeMae()));
         pac.setNomeSocialSoundex(soundex.compute(r.nomeSocial()));
-        // R10/R11 audit columns (session unidade not modelled → OQ5; login/date from security context).
+        // R11 audit columns (login/date) from the security context.
         String actor = currentActor();
         pac.setDataUltimaAlteracao(LocalDateTime.now());
         pac.setUsuarioAlteracao(actor);
         if (insert) pac.setUsuarioInclusao(actor);
+        // R9/R10 (PacPesCadInsUniCod / PacPesCadAltUniCod = session unidade) are DEFERRED: the JWT auth
+        // model carries no session unidade (SLICE-SPEC OQ5). These columns stay null until a unidade is
+        // available in the security context. R18 (PacDocumentoLGPD masking) is likewise deferred (OQ3) —
+        // full CPF/CNS are returned only to the SAUDE_CADASTRO role that already has full patient access.
     }
 
     // --- helpers ---

@@ -162,6 +162,39 @@ class PacienteServiceTest {
         verify(audit).record(eq("DELETE"), eq("SAU_PAC"), eq(5L));
     }
 
+    // ---- update ----
+
+    @Test void updateKeepsOwnCnsNoFalseConflict() { // selfId exclusion (R3) on the update path
+        var pac = new Paciente(); pac.setId(5L);
+        when(repo.findById(5L)).thenReturn(Optional.of(pac));
+        when(pessoaRepo.findById(5L)).thenReturn(Optional.of(new Pessoa()));
+        when(pessoaRepo.findCpfOwners(any(), any(), any())).thenReturn(List.of());
+        when(repo.findCnsOwnerAmongPatients(any(), eq(5L))).thenReturn(Optional.empty()); // own CNS excluded
+        when(pessoaRepo.save(any())).thenAnswer(i -> i.getArgument(0));
+        when(repo.save(any())).thenAnswer(i -> i.getArgument(0));
+
+        service().update(5L, valid().build());
+
+        verify(pessoaRepo).save(any());                 // SYS_PES write-back
+        verify(repo).save(any());
+        verify(audit).record(eq("UPDATE"), eq("SAU_PAC"), eq(5L));
+    }
+
+    @Test void updateRejectsAnotherPatientsCns() { // R3 on update
+        var pac = new Paciente(); pac.setId(5L);
+        when(repo.findById(5L)).thenReturn(Optional.of(pac));
+        when(pessoaRepo.findById(5L)).thenReturn(Optional.of(new Pessoa()));
+        when(pessoaRepo.findCpfOwners(any(), any(), any())).thenReturn(List.of());
+        when(repo.findCnsOwnerAmongPatients(any(), eq(5L))).thenReturn(Optional.of(999L)); // another patient
+        assertThatThrownBy(() -> service().update(5L, valid().build()))
+                .isInstanceOf(Conflict.class).hasMessageContaining("utilizado pelo paciente 999");
+    }
+
+    @Test void updateNotFound() {
+        when(repo.findById(9L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service().update(9L, valid().build())).isInstanceOf(NotFound.class);
+    }
+
     // ---- reads ----
 
     @Test void getAuditsPhiRead() {
