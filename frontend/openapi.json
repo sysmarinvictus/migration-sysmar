@@ -6,7 +6,7 @@
     "version" : "0.1.0"
   },
   "servers" : [ {
-    "url" : "http://localhost:37025",
+    "url" : "http://localhost:45045",
     "description" : "Generated server url"
   } ],
   "security" : [ {
@@ -1110,6 +1110,89 @@
         }
       }
     },
+    "/api/pacientes/{id}" : {
+      "get" : {
+        "tags" : [ "Pacientes" ],
+        "summary" : "Obter o cadastro completo de um paciente (leitura de PHI auditada)",
+        "operationId" : "get_10",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PacienteResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Pacientes" ],
+        "summary" : "Atualizar o cadastro de um paciente (grava SAU_PAC + write-back SYS_PES)",
+        "operationId" : "update_11",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PacienteWriteRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PacienteResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Pacientes" ],
+        "summary" : "Excluir paciente (bloqueado se há Receituário de Controle Especial — Portaria 344/98)",
+        "operationId" : "delete_10",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        }
+      }
+    },
     "/api/medicamentos/{remCod}/unidades/{uniCod}" : {
       "put" : {
         "tags" : [ "medicamento-sub-controller" ],
@@ -1271,7 +1354,7 @@
     "/api/medicamentos/{id}" : {
       "get" : {
         "tags" : [ "medicamento-controller" ],
-        "operationId" : "get_10",
+        "operationId" : "get_11",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1296,7 +1379,7 @@
       },
       "put" : {
         "tags" : [ "medicamento-controller" ],
-        "operationId" : "update_11",
+        "operationId" : "update_12",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1331,7 +1414,7 @@
       },
       "delete" : {
         "tags" : [ "medicamento-controller" ],
-        "operationId" : "delete_10",
+        "operationId" : "delete_11",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1352,7 +1435,7 @@
       "get" : {
         "tags" : [ "Locais" ],
         "summary" : "Obter local por código",
-        "operationId" : "get_11",
+        "operationId" : "get_12",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1378,7 +1461,7 @@
       "put" : {
         "tags" : [ "Locais" ],
         "summary" : "Atualizar local",
-        "operationId" : "update_12",
+        "operationId" : "update_13",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1414,7 +1497,7 @@
       "delete" : {
         "tags" : [ "Locais" ],
         "summary" : "Excluir local",
-        "operationId" : "delete_11",
+        "operationId" : "delete_12",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1435,7 +1518,7 @@
       "get" : {
         "tags" : [ "Impedimentos" ],
         "summary" : "Obter impedimento por código",
-        "operationId" : "get_12",
+        "operationId" : "get_13",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1461,7 +1544,7 @@
       "put" : {
         "tags" : [ "Impedimentos" ],
         "summary" : "Atualizar impedimento",
-        "operationId" : "update_13",
+        "operationId" : "update_14",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1497,7 +1580,7 @@
       "delete" : {
         "tags" : [ "Impedimentos" ],
         "summary" : "Excluir impedimento",
-        "operationId" : "delete_12",
+        "operationId" : "delete_13",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1518,7 +1601,7 @@
       "get" : {
         "tags" : [ "Funcionários" ],
         "summary" : "Obter funcionário por código (PesCod)",
-        "operationId" : "get_13",
+        "operationId" : "get_14",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1544,7 +1627,7 @@
       "put" : {
         "tags" : [ "Funcionários" ],
         "summary" : "Atualizar funcionário (grava de volta nome/cpf/telefones em SYS_PES, R2)",
-        "operationId" : "update_14",
+        "operationId" : "update_15",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1580,7 +1663,7 @@
       "delete" : {
         "tags" : [ "Funcionários" ],
         "summary" : "Excluir funcionário (bloqueado por SAU_USU/SAU_RECESP, R13/R14)",
-        "operationId" : "delete_13",
+        "operationId" : "delete_14",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1600,7 +1683,7 @@
     "/api/formas-apresentacao/{id}" : {
       "get" : {
         "tags" : [ "forma-apresentacao-controller" ],
-        "operationId" : "get_14",
+        "operationId" : "get_15",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1625,7 +1708,7 @@
       },
       "put" : {
         "tags" : [ "forma-apresentacao-controller" ],
-        "operationId" : "update_15",
+        "operationId" : "update_16",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1660,7 +1743,7 @@
       },
       "delete" : {
         "tags" : [ "forma-apresentacao-controller" ],
-        "operationId" : "delete_14",
+        "operationId" : "delete_15",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1681,7 +1764,7 @@
       "get" : {
         "tags" : [ "Especialidades" ],
         "summary" : "Obter especialidade por código",
-        "operationId" : "get_15",
+        "operationId" : "get_16",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1707,7 +1790,7 @@
       "put" : {
         "tags" : [ "Especialidades" ],
         "summary" : "Atualizar especialidade",
-        "operationId" : "update_16",
+        "operationId" : "update_17",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1743,7 +1826,7 @@
       "delete" : {
         "tags" : [ "Especialidades" ],
         "summary" : "Excluir especialidade",
-        "operationId" : "delete_15",
+        "operationId" : "delete_16",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1764,7 +1847,7 @@
       "get" : {
         "tags" : [ "Distritos" ],
         "summary" : "Obter distrito por código",
-        "operationId" : "get_16",
+        "operationId" : "get_17",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1790,7 +1873,7 @@
       "put" : {
         "tags" : [ "Distritos" ],
         "summary" : "Atualizar distrito sanitário",
-        "operationId" : "update_17",
+        "operationId" : "update_18",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1826,7 +1909,7 @@
       "delete" : {
         "tags" : [ "Distritos" ],
         "summary" : "Excluir distrito sanitário",
-        "operationId" : "delete_16",
+        "operationId" : "delete_17",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1847,7 +1930,7 @@
       "get" : {
         "tags" : [ "Conselhos de Classe" ],
         "summary" : "Obter conselho de classe por código",
-        "operationId" : "get_17",
+        "operationId" : "get_18",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1873,7 +1956,7 @@
       "put" : {
         "tags" : [ "Conselhos de Classe" ],
         "summary" : "Atualizar conselho de classe",
-        "operationId" : "update_18",
+        "operationId" : "update_19",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1909,7 +1992,7 @@
       "delete" : {
         "tags" : [ "Conselhos de Classe" ],
         "summary" : "Excluir conselho de classe",
-        "operationId" : "delete_17",
+        "operationId" : "delete_18",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1930,7 +2013,7 @@
       "get" : {
         "tags" : [ "Bairros" ],
         "summary" : "Obter bairro por código",
-        "operationId" : "get_18",
+        "operationId" : "get_19",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1956,7 +2039,7 @@
       "put" : {
         "tags" : [ "Bairros" ],
         "summary" : "Atualizar bairro",
-        "operationId" : "update_19",
+        "operationId" : "update_20",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1992,7 +2075,7 @@
       "delete" : {
         "tags" : [ "Bairros" ],
         "summary" : "Excluir bairro",
-        "operationId" : "delete_18",
+        "operationId" : "delete_19",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -3220,6 +3303,95 @@
         }
       }
     },
+    "/api/pacientes" : {
+      "get" : {
+        "tags" : [ "Pacientes" ],
+        "summary" : "Buscar pacientes por nome, nome da mãe, prontuário, CPF ou CNS (paginado)",
+        "operationId" : "search",
+        "parameters" : [ {
+          "name" : "nome",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "nomeMae",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "prontuario",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "cpf",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "cns",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "pageable",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/Pageable"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PagePacienteListItem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Pacientes" ],
+        "summary" : "Cadastrar paciente (cria a pessoa SYS_PES + o SAU_PAC)",
+        "operationId" : "create_11",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PacienteWriteRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PacienteResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/medicamentos" : {
       "get" : {
         "tags" : [ "medicamento-controller" ],
@@ -3294,7 +3466,7 @@
       },
       "post" : {
         "tags" : [ "medicamento-controller" ],
-        "operationId" : "create_11",
+        "operationId" : "create_12",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3615,7 +3787,7 @@
       "post" : {
         "tags" : [ "Locais" ],
         "summary" : "Criar local",
-        "operationId" : "create_12",
+        "operationId" : "create_13",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3708,7 +3880,7 @@
       "post" : {
         "tags" : [ "Impedimentos" ],
         "summary" : "Registrar impedimento",
-        "operationId" : "create_13",
+        "operationId" : "create_14",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3792,7 +3964,7 @@
       "post" : {
         "tags" : [ "Funcionários" ],
         "summary" : "Cadastrar funcionário. O corpo INCLUI id (código da Pessoa) — não é gerado (R1).",
-        "operationId" : "create_14",
+        "operationId" : "create_15",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3851,7 +4023,7 @@
       },
       "post" : {
         "tags" : [ "forma-apresentacao-controller" ],
-        "operationId" : "create_15",
+        "operationId" : "create_16",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3912,7 +4084,7 @@
       "post" : {
         "tags" : [ "Especialidades" ],
         "summary" : "Criar especialidade",
-        "operationId" : "create_16",
+        "operationId" : "create_17",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3973,7 +4145,7 @@
       "post" : {
         "tags" : [ "Distritos" ],
         "summary" : "Criar distrito sanitário (código auto-atribuído)",
-        "operationId" : "create_17",
+        "operationId" : "create_18",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -4034,7 +4206,7 @@
       "post" : {
         "tags" : [ "Conselhos de Classe" ],
         "summary" : "Criar conselho de classe",
-        "operationId" : "create_18",
+        "operationId" : "create_19",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -4095,7 +4267,7 @@
       "post" : {
         "tags" : [ "Bairros" ],
         "summary" : "Criar bairro (código auto-atribuído)",
-        "operationId" : "create_19",
+        "operationId" : "create_20",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -4317,7 +4489,7 @@
       "get" : {
         "tags" : [ "TiposLogradouro" ],
         "summary" : "Obter tipo de logradouro por código",
-        "operationId" : "get_19",
+        "operationId" : "get_20",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -4481,7 +4653,7 @@
       "get" : {
         "tags" : [ "Profissionais Externos" ],
         "summary" : "Obter um profissional externo por código",
-        "operationId" : "get_20",
+        "operationId" : "get_21",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -4584,7 +4756,7 @@
       "get" : {
         "tags" : [ "Pessoas" ],
         "summary" : "Buscar pessoas por nome (registro/social), CPF/CNPJ ou CNS",
-        "operationId" : "search",
+        "operationId" : "search_1",
         "parameters" : [ {
           "name" : "nome",
           "in" : "query",
@@ -4708,7 +4880,7 @@
       "get" : {
         "tags" : [ "Parâmetros" ],
         "summary" : "Ler os parâmetros do sistema (subset mapeado)",
-        "operationId" : "get_21",
+        "operationId" : "get_22",
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -4723,10 +4895,48 @@
         }
       }
     },
+    "/api/pacientes/lookup" : {
+      "get" : {
+        "tags" : [ "Pacientes" ],
+        "summary" : "Autocomplete de pacientes (por nome/CNS) para telas de prescrição",
+        "operationId" : "lookup_10",
+        "parameters" : [ {
+          "name" : "q",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }, {
+          "name" : "pageable",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/Pageable"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/PacienteListItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/medicamentos/lookup" : {
       "get" : {
         "tags" : [ "medicamento-controller" ],
-        "operationId" : "lookup_10",
+        "operationId" : "lookup_11",
         "parameters" : [ {
           "name" : "q",
           "in" : "query",
@@ -4764,7 +4974,7 @@
       "get" : {
         "tags" : [ "Locais" ],
         "summary" : "Autocomplete de locais (FK picker)",
-        "operationId" : "lookup_11",
+        "operationId" : "lookup_12",
         "parameters" : [ {
           "name" : "q",
           "in" : "query",
@@ -4802,7 +5012,7 @@
       "get" : {
         "tags" : [ "Funcionários" ],
         "summary" : "Autocomplete de funcionários (seletor)",
-        "operationId" : "lookup_12",
+        "operationId" : "lookup_13",
         "parameters" : [ {
           "name" : "q",
           "in" : "query",
@@ -4839,7 +5049,7 @@
     "/api/formas-apresentacao/lookup" : {
       "get" : {
         "tags" : [ "forma-apresentacao-controller" ],
-        "operationId" : "lookup_13",
+        "operationId" : "lookup_14",
         "parameters" : [ {
           "name" : "q",
           "in" : "query",
@@ -4877,7 +5087,7 @@
       "get" : {
         "tags" : [ "Especialidades" ],
         "summary" : "Autocomplete de especialidades (FK picker)",
-        "operationId" : "lookup_14",
+        "operationId" : "lookup_15",
         "parameters" : [ {
           "name" : "q",
           "in" : "query",
@@ -4915,7 +5125,7 @@
       "get" : {
         "tags" : [ "Distritos" ],
         "summary" : "Autocomplete de distritos (FK picker)",
-        "operationId" : "lookup_15",
+        "operationId" : "lookup_16",
         "parameters" : [ {
           "name" : "q",
           "in" : "query",
@@ -4953,7 +5163,7 @@
       "get" : {
         "tags" : [ "Conselhos de Classe" ],
         "summary" : "Autocomplete de conselhos de classe (FK picker)",
-        "operationId" : "lookup_16",
+        "operationId" : "lookup_17",
         "parameters" : [ {
           "name" : "q",
           "in" : "query",
@@ -4991,7 +5201,7 @@
       "get" : {
         "tags" : [ "Bairros" ],
         "summary" : "Autocomplete de bairros (FK picker)",
-        "operationId" : "lookup_17",
+        "operationId" : "lookup_18",
         "parameters" : [ {
           "name" : "q",
           "in" : "query",
@@ -7239,6 +7449,245 @@
             "format" : "int32"
           },
           "atendimentoHistorico" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "PacienteWriteRequest" : {
+        "type" : "object",
+        "properties" : {
+          "nome" : {
+            "type" : "string"
+          },
+          "nomeSocial" : {
+            "type" : "string"
+          },
+          "usaNomeSocial" : {
+            "type" : "boolean"
+          },
+          "nomeMae" : {
+            "type" : "string"
+          },
+          "nomePai" : {
+            "type" : "string"
+          },
+          "cpfCnpj" : {
+            "type" : "string"
+          },
+          "cns" : {
+            "type" : "string"
+          },
+          "rg" : {
+            "type" : "string"
+          },
+          "dataNascimento" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "sexo" : {
+            "type" : "string"
+          },
+          "cep" : {
+            "type" : "string"
+          },
+          "endereco" : {
+            "type" : "string"
+          },
+          "numero" : {
+            "type" : "string"
+          },
+          "complemento" : {
+            "type" : "string"
+          },
+          "bairroCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "municipioCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "telefone" : {
+            "type" : "string"
+          },
+          "celular" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "etniaCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "paisCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "cboCod" : {
+            "type" : "string"
+          },
+          "unidadeCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "prontuario" : {
+            "type" : "string"
+          },
+          "numeroIdentificacao" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "alergia" : {
+            "type" : "string"
+          },
+          "historicoDoencas" : {
+            "type" : "string"
+          },
+          "obito" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "inconsciente" : {
+            "type" : "boolean"
+          },
+          "situacaoRua" : {
+            "type" : "boolean"
+          },
+          "surtoPsiquiatrico" : {
+            "type" : "boolean"
+          },
+          "rendaFamiliar" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "meioTransporte" : {
+            "type" : "string"
+          },
+          "beneficioSocial" : {
+            "type" : "boolean"
+          },
+          "cnh" : {
+            "type" : "string"
+          },
+          "situacao" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "PacienteResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "nome" : {
+            "type" : "string"
+          },
+          "nomeSocial" : {
+            "type" : "string"
+          },
+          "usaNomeSocial" : {
+            "type" : "boolean"
+          },
+          "nomeMae" : {
+            "type" : "string"
+          },
+          "nomePai" : {
+            "type" : "string"
+          },
+          "cpfCnpj" : {
+            "type" : "string"
+          },
+          "cns" : {
+            "type" : "string"
+          },
+          "rg" : {
+            "type" : "string"
+          },
+          "dataNascimento" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "sexo" : {
+            "type" : "string"
+          },
+          "cep" : {
+            "type" : "string"
+          },
+          "endereco" : {
+            "type" : "string"
+          },
+          "numero" : {
+            "type" : "string"
+          },
+          "complemento" : {
+            "type" : "string"
+          },
+          "bairroCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "municipioCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "telefone" : {
+            "type" : "string"
+          },
+          "celular" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "unidadeCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "prontuario" : {
+            "type" : "string"
+          },
+          "numeroIdentificacao" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "alergia" : {
+            "type" : "string"
+          },
+          "historicoDoencas" : {
+            "type" : "string"
+          },
+          "obito" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "inconsciente" : {
+            "type" : "boolean"
+          },
+          "situacaoRua" : {
+            "type" : "boolean"
+          },
+          "surtoPsiquiatrico" : {
+            "type" : "boolean"
+          },
+          "rendaFamiliar" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "meioTransporte" : {
+            "type" : "string"
+          },
+          "beneficioSocial" : {
+            "type" : "boolean"
+          },
+          "cnh" : {
+            "type" : "string"
+          },
+          "situacao" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -9825,6 +10274,88 @@
           },
           "nome" : {
             "type" : "string"
+          }
+        }
+      },
+      "PacienteListItem" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "nome" : {
+            "type" : "string"
+          },
+          "nomeMae" : {
+            "type" : "string"
+          },
+          "prontuario" : {
+            "type" : "string"
+          },
+          "cpfCnpj" : {
+            "type" : "string"
+          },
+          "cns" : {
+            "type" : "string"
+          },
+          "dataNascimento" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "situacao" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "obito" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "PagePacienteListItem" : {
+        "type" : "object",
+        "properties" : {
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "first" : {
+            "type" : "boolean"
+          },
+          "last" : {
+            "type" : "boolean"
+          },
+          "size" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "content" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PacienteListItem"
+            }
+          },
+          "number" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "sort" : {
+            "$ref" : "#/components/schemas/SortObject"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
+          "numberOfElements" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "empty" : {
+            "type" : "boolean"
           }
         }
       },

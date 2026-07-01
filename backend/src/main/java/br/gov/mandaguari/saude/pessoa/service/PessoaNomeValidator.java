@@ -32,13 +32,13 @@ public final class PessoaNomeValidator {
     }
 
     /** R39/R40: same quality rules but only when the optional name is filled. */
-    static void validateOptional(String nome, String codePrefix, String label) {
+    public static void validateOptional(String nome, String codePrefix, String label) {
         if (nome == null || nome.isBlank()) return;
         validateQuality(nome, codePrefix, label);
     }
 
     /** R41: social name — no double space + letters only (no surname/min-length requirement). */
-    static void validateSocial(String nomeSocial) {
+    public static void validateSocial(String nomeSocial) {
         if (nomeSocial == null || nomeSocial.isBlank()) return;
         if (nomeSocial.contains("  ")) {
             throw new BusinessRule("pes.nomeSocial.doubleSpace", "Nome Social não deve conter espaçamento duplo!"); // R41
