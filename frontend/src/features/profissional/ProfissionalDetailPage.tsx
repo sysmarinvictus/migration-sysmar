@@ -1,6 +1,7 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../lib/auth";
 import { useDeleteProfissional, useProfissional } from "./api";
+import ProfissionalEspecialidadesPanel from "./ProfissionalEspecialidadesPanel";
 import { situacaoLabel } from "./schema";
 
 function formatDate(iso: string | null | undefined): string {
@@ -123,6 +124,8 @@ export default function ProfissionalDetailPage() {
           <Row label="Situação" value={situacaoLabel(data.situacao)} />
         </dl>
       </section>
+
+      <ProfissionalEspecialidadesPanel profissionalId={data.id} />
     </div>
   );
 }

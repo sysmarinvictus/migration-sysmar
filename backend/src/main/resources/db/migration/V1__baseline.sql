@@ -61,6 +61,14 @@ CREATE TABLE IF NOT EXISTS SAU_PROESP (
     EspCod     INTEGER NOT NULL,
     CONSTRAINT pk_sau_proesp PRIMARY KEY (ProPesCod, EspCod)
 );
+-- Wave-4 SAU_PROESP slice: promote the stub to the full attribute set (idempotent; live DB already
+-- has these SMALLINT columns — ADD ... IF NOT EXISTS is a no-op there). See SAU_PROESP.slice.md.
+ALTER TABLE SAU_PROESP ADD COLUMN IF NOT EXISTS ProEspPri       SMALLINT;  -- 0/1 'prioritário' (R4)
+ALTER TABLE SAU_PROESP ADD COLUMN IF NOT EXISTS ProEspSit       SMALLINT;  -- 1=Ativo, default 1 (R3)
+ALTER TABLE SAU_PROESP ADD COLUMN IF NOT EXISTS ProEspAgeManQtd SMALLINT;  -- agenda manhã qtd
+ALTER TABLE SAU_PROESP ADD COLUMN IF NOT EXISTS ProEspAgeTarQtd SMALLINT;  -- agenda tarde qtd
+ALTER TABLE SAU_PROESP ADD COLUMN IF NOT EXISTS ProEspAgeNoiQtd SMALLINT;  -- agenda noite qtd
+CREATE INDEX IF NOT EXISTS isau_proesp2 ON SAU_PROESP (EspCod);
 
 -- Conselho de Classe (SAU_CONCLA) — professional licensing board (CRM/COREN/CRF).
 -- Types from the GeneXus reorg DDL (SAU_CONCLAConversion.xml): smallint PK, nullable varchars.
