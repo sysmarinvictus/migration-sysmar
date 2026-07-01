@@ -6,7 +6,7 @@
     "version" : "0.1.0"
   },
   "servers" : [ {
-    "url" : "http://localhost:46235",
+    "url" : "http://localhost:45543",
     "description" : "Generated server url"
   } ],
   "security" : [ {
@@ -779,11 +779,94 @@
         }
       }
     },
+    "/api/pessoas/{id}" : {
+      "get" : {
+        "tags" : [ "Pessoas" ],
+        "summary" : "Obter pessoa por código (PesCod) — honra o nome social (LGPD)",
+        "operationId" : "get_7",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PessoaResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Pessoas" ],
+        "summary" : "Atualizar o cadastro de uma pessoa física",
+        "operationId" : "update_8",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PessoaCadastroRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PessoaCadastroResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Pessoas" ],
+        "summary" : "Excluir pessoa (bloqueado se há Profissional/Funcionário/Paciente vinculado)",
+        "operationId" : "delete_7",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        }
+      }
+    },
     "/api/perfis/{id}" : {
       "get" : {
         "tags" : [ "Perfis" ],
         "summary" : "Obter perfil por código",
-        "operationId" : "get_7",
+        "operationId" : "get_8",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -809,7 +892,7 @@
       "put" : {
         "tags" : [ "Perfis" ],
         "summary" : "Atualizar perfil",
-        "operationId" : "update_8",
+        "operationId" : "update_9",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -845,7 +928,7 @@
       "delete" : {
         "tags" : [ "Perfis" ],
         "summary" : "Excluir perfil (bloqueado se referenciado; cascateia permissões)",
-        "operationId" : "delete_7",
+        "operationId" : "delete_8",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1023,7 +1106,7 @@
     "/api/medicamentos/{id}" : {
       "get" : {
         "tags" : [ "medicamento-controller" ],
-        "operationId" : "get_8",
+        "operationId" : "get_9",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1048,7 +1131,7 @@
       },
       "put" : {
         "tags" : [ "medicamento-controller" ],
-        "operationId" : "update_9",
+        "operationId" : "update_10",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1083,7 +1166,7 @@
       },
       "delete" : {
         "tags" : [ "medicamento-controller" ],
-        "operationId" : "delete_8",
+        "operationId" : "delete_9",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1104,7 +1187,7 @@
       "get" : {
         "tags" : [ "Locais" ],
         "summary" : "Obter local por código",
-        "operationId" : "get_9",
+        "operationId" : "get_10",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1130,7 +1213,7 @@
       "put" : {
         "tags" : [ "Locais" ],
         "summary" : "Atualizar local",
-        "operationId" : "update_10",
+        "operationId" : "update_11",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1166,7 +1249,7 @@
       "delete" : {
         "tags" : [ "Locais" ],
         "summary" : "Excluir local",
-        "operationId" : "delete_9",
+        "operationId" : "delete_10",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1187,7 +1270,7 @@
       "get" : {
         "tags" : [ "Impedimentos" ],
         "summary" : "Obter impedimento por código",
-        "operationId" : "get_10",
+        "operationId" : "get_11",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1213,7 +1296,7 @@
       "put" : {
         "tags" : [ "Impedimentos" ],
         "summary" : "Atualizar impedimento",
-        "operationId" : "update_11",
+        "operationId" : "update_12",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1249,7 +1332,7 @@
       "delete" : {
         "tags" : [ "Impedimentos" ],
         "summary" : "Excluir impedimento",
-        "operationId" : "delete_10",
+        "operationId" : "delete_11",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1270,7 +1353,7 @@
       "get" : {
         "tags" : [ "Funcionários" ],
         "summary" : "Obter funcionário por código (PesCod)",
-        "operationId" : "get_11",
+        "operationId" : "get_12",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1296,7 +1379,7 @@
       "put" : {
         "tags" : [ "Funcionários" ],
         "summary" : "Atualizar funcionário (grava de volta nome/cpf/telefones em SYS_PES, R2)",
-        "operationId" : "update_12",
+        "operationId" : "update_13",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1332,7 +1415,7 @@
       "delete" : {
         "tags" : [ "Funcionários" ],
         "summary" : "Excluir funcionário (bloqueado por SAU_USU/SAU_RECESP, R13/R14)",
-        "operationId" : "delete_11",
+        "operationId" : "delete_12",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1352,7 +1435,7 @@
     "/api/formas-apresentacao/{id}" : {
       "get" : {
         "tags" : [ "forma-apresentacao-controller" ],
-        "operationId" : "get_12",
+        "operationId" : "get_13",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1377,7 +1460,7 @@
       },
       "put" : {
         "tags" : [ "forma-apresentacao-controller" ],
-        "operationId" : "update_13",
+        "operationId" : "update_14",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1412,7 +1495,7 @@
       },
       "delete" : {
         "tags" : [ "forma-apresentacao-controller" ],
-        "operationId" : "delete_12",
+        "operationId" : "delete_13",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1433,7 +1516,7 @@
       "get" : {
         "tags" : [ "Especialidades" ],
         "summary" : "Obter especialidade por código",
-        "operationId" : "get_13",
+        "operationId" : "get_14",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1459,7 +1542,7 @@
       "put" : {
         "tags" : [ "Especialidades" ],
         "summary" : "Atualizar especialidade",
-        "operationId" : "update_14",
+        "operationId" : "update_15",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1495,7 +1578,7 @@
       "delete" : {
         "tags" : [ "Especialidades" ],
         "summary" : "Excluir especialidade",
-        "operationId" : "delete_13",
+        "operationId" : "delete_14",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1516,7 +1599,7 @@
       "get" : {
         "tags" : [ "Distritos" ],
         "summary" : "Obter distrito por código",
-        "operationId" : "get_14",
+        "operationId" : "get_15",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1542,7 +1625,7 @@
       "put" : {
         "tags" : [ "Distritos" ],
         "summary" : "Atualizar distrito sanitário",
-        "operationId" : "update_15",
+        "operationId" : "update_16",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1578,7 +1661,7 @@
       "delete" : {
         "tags" : [ "Distritos" ],
         "summary" : "Excluir distrito sanitário",
-        "operationId" : "delete_14",
+        "operationId" : "delete_15",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1599,7 +1682,7 @@
       "get" : {
         "tags" : [ "Conselhos de Classe" ],
         "summary" : "Obter conselho de classe por código",
-        "operationId" : "get_15",
+        "operationId" : "get_16",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1625,7 +1708,7 @@
       "put" : {
         "tags" : [ "Conselhos de Classe" ],
         "summary" : "Atualizar conselho de classe",
-        "operationId" : "update_16",
+        "operationId" : "update_17",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1661,7 +1744,7 @@
       "delete" : {
         "tags" : [ "Conselhos de Classe" ],
         "summary" : "Excluir conselho de classe",
-        "operationId" : "delete_15",
+        "operationId" : "delete_16",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1682,7 +1765,7 @@
       "get" : {
         "tags" : [ "Bairros" ],
         "summary" : "Obter bairro por código",
-        "operationId" : "get_16",
+        "operationId" : "get_17",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1708,7 +1791,7 @@
       "put" : {
         "tags" : [ "Bairros" ],
         "summary" : "Atualizar bairro",
-        "operationId" : "update_17",
+        "operationId" : "update_18",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1744,7 +1827,7 @@
       "delete" : {
         "tags" : [ "Bairros" ],
         "summary" : "Excluir bairro",
-        "operationId" : "delete_16",
+        "operationId" : "delete_17",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -2778,6 +2861,35 @@
         }
       }
     },
+    "/api/pessoas" : {
+      "post" : {
+        "tags" : [ "Pessoas" ],
+        "summary" : "Cadastrar pessoa física (SAU_PESF) — valida CPF/CNS, endereço, nacionalidade, etc.",
+        "operationId" : "create_7",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PessoaCadastroRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PessoaCadastroResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/perfis" : {
       "get" : {
         "tags" : [ "Perfis" ],
@@ -2814,7 +2926,7 @@
       "post" : {
         "tags" : [ "Perfis" ],
         "summary" : "Criar perfil (código auto-gerado)",
-        "operationId" : "create_7",
+        "operationId" : "create_8",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2913,7 +3025,7 @@
       },
       "post" : {
         "tags" : [ "medicamento-controller" ],
-        "operationId" : "create_8",
+        "operationId" : "create_9",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3234,7 +3346,7 @@
       "post" : {
         "tags" : [ "Locais" ],
         "summary" : "Criar local",
-        "operationId" : "create_9",
+        "operationId" : "create_10",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3327,7 +3439,7 @@
       "post" : {
         "tags" : [ "Impedimentos" ],
         "summary" : "Registrar impedimento",
-        "operationId" : "create_10",
+        "operationId" : "create_11",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3411,7 +3523,7 @@
       "post" : {
         "tags" : [ "Funcionários" ],
         "summary" : "Cadastrar funcionário. O corpo INCLUI id (código da Pessoa) — não é gerado (R1).",
-        "operationId" : "create_11",
+        "operationId" : "create_12",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3470,7 +3582,7 @@
       },
       "post" : {
         "tags" : [ "forma-apresentacao-controller" ],
-        "operationId" : "create_12",
+        "operationId" : "create_13",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3531,7 +3643,7 @@
       "post" : {
         "tags" : [ "Especialidades" ],
         "summary" : "Criar especialidade",
-        "operationId" : "create_13",
+        "operationId" : "create_14",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3592,7 +3704,7 @@
       "post" : {
         "tags" : [ "Distritos" ],
         "summary" : "Criar distrito sanitário (código auto-atribuído)",
-        "operationId" : "create_14",
+        "operationId" : "create_15",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3653,7 +3765,7 @@
       "post" : {
         "tags" : [ "Conselhos de Classe" ],
         "summary" : "Criar conselho de classe",
-        "operationId" : "create_15",
+        "operationId" : "create_16",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3714,7 +3826,7 @@
       "post" : {
         "tags" : [ "Bairros" ],
         "summary" : "Criar bairro (código auto-atribuído)",
-        "operationId" : "create_16",
+        "operationId" : "create_17",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3936,7 +4048,7 @@
       "get" : {
         "tags" : [ "TiposLogradouro" ],
         "summary" : "Obter tipo de logradouro por código",
-        "operationId" : "get_17",
+        "operationId" : "get_18",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -4143,11 +4255,11 @@
         }
       }
     },
-    "/api/pessoas/{id}" : {
+    "/api/pessoas/{id}/cadastro" : {
       "get" : {
         "tags" : [ "Pessoas" ],
-        "summary" : "Obter pessoa por código (PesCod) — honra o nome social (LGPD)",
-        "operationId" : "get_18",
+        "summary" : "Obter o cadastro completo de uma pessoa (p/ edição)",
+        "operationId" : "getCadastro",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -4163,7 +4275,7 @@
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PessoaResponse"
+                  "$ref" : "#/components/schemas/PessoaCadastroResponse"
                 }
               }
             }
@@ -5882,6 +5994,421 @@
             "format" : "int32"
           },
           "usuarioCodigo" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "PessoaCadastroRequest" : {
+        "type" : "object",
+        "properties" : {
+          "nome" : {
+            "type" : "string"
+          },
+          "nomeSocial" : {
+            "type" : "string"
+          },
+          "usaNomeSocial" : {
+            "type" : "boolean"
+          },
+          "nomePai" : {
+            "type" : "string"
+          },
+          "nomeMae" : {
+            "type" : "string"
+          },
+          "nomeConjuge" : {
+            "type" : "string"
+          },
+          "cpfCnpj" : {
+            "type" : "string"
+          },
+          "cns" : {
+            "type" : "string"
+          },
+          "rgIe" : {
+            "type" : "string"
+          },
+          "orgaoEmissorCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "rgUf" : {
+            "type" : "string"
+          },
+          "rgDataEmissao" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "dataNascimento" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "sexo" : {
+            "type" : "string"
+          },
+          "corCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "estadoCivilCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "situacaoFamiliarCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "etniaCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "tipoSanguineo" : {
+            "type" : "string"
+          },
+          "nacionalidadeTipo" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "paisCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "municipioNascCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "dataNaturalizacao" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "numeroPortaria" : {
+            "type" : "string"
+          },
+          "dataEntradaPais" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "cep" : {
+            "type" : "string"
+          },
+          "tipoLogradouroCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "endereco" : {
+            "type" : "string"
+          },
+          "enderecoNumero" : {
+            "type" : "string"
+          },
+          "enderecoComplemento" : {
+            "type" : "string"
+          },
+          "bairroCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "municipioCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "telefone" : {
+            "type" : "string"
+          },
+          "celular" : {
+            "type" : "string"
+          },
+          "fax" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "homePage" : {
+            "type" : "string"
+          },
+          "certidaoCivilTipo" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "certidaoNumero" : {
+            "type" : "string"
+          },
+          "certidaoLivro" : {
+            "type" : "string"
+          },
+          "certidaoFolha" : {
+            "type" : "string"
+          },
+          "certidaoData" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "certidaoCartorio" : {
+            "type" : "string"
+          },
+          "ctpsSerie" : {
+            "type" : "string"
+          },
+          "ctpsNumero" : {
+            "type" : "string"
+          },
+          "ctpsUf" : {
+            "type" : "string"
+          },
+          "ctpsData" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "pisPasep" : {
+            "type" : "string"
+          },
+          "tituloEleitorNumero" : {
+            "type" : "string"
+          },
+          "tituloEleitorZona" : {
+            "type" : "string"
+          },
+          "tituloEleitorSecao" : {
+            "type" : "string"
+          },
+          "nis" : {
+            "type" : "string"
+          },
+          "frequentaEscola" : {
+            "type" : "string"
+          },
+          "grauEscolaridade" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "escolaridade" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "cboCod" : {
+            "type" : "string"
+          },
+          "observacao" : {
+            "type" : "string"
+          },
+          "gerarBpa" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "PessoaCadastroResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "tipoPessoa" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "nome" : {
+            "type" : "string"
+          },
+          "nomeSocial" : {
+            "type" : "string"
+          },
+          "usaNomeSocial" : {
+            "type" : "boolean"
+          },
+          "nomeExibicao" : {
+            "type" : "string"
+          },
+          "nomePai" : {
+            "type" : "string"
+          },
+          "nomeMae" : {
+            "type" : "string"
+          },
+          "nomeConjuge" : {
+            "type" : "string"
+          },
+          "cpfCnpj" : {
+            "type" : "string"
+          },
+          "cns" : {
+            "type" : "string"
+          },
+          "rgIe" : {
+            "type" : "string"
+          },
+          "orgaoEmissorCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "rgUf" : {
+            "type" : "string"
+          },
+          "rgDataEmissao" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "dataNascimento" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "sexo" : {
+            "type" : "string"
+          },
+          "corCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "estadoCivilCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "situacaoFamiliarCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "etniaCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "tipoSanguineo" : {
+            "type" : "string"
+          },
+          "nacionalidadeTipo" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "paisCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "municipioNascCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "dataNaturalizacao" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "numeroPortaria" : {
+            "type" : "string"
+          },
+          "dataEntradaPais" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "cep" : {
+            "type" : "string"
+          },
+          "tipoLogradouroCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "endereco" : {
+            "type" : "string"
+          },
+          "enderecoNumero" : {
+            "type" : "string"
+          },
+          "enderecoComplemento" : {
+            "type" : "string"
+          },
+          "bairroCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "municipioCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "telefone" : {
+            "type" : "string"
+          },
+          "celular" : {
+            "type" : "string"
+          },
+          "fax" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "homePage" : {
+            "type" : "string"
+          },
+          "certidaoCivilTipo" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "certidaoNumero" : {
+            "type" : "string"
+          },
+          "certidaoLivro" : {
+            "type" : "string"
+          },
+          "certidaoFolha" : {
+            "type" : "string"
+          },
+          "certidaoData" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "certidaoCartorio" : {
+            "type" : "string"
+          },
+          "ctpsSerie" : {
+            "type" : "string"
+          },
+          "ctpsNumero" : {
+            "type" : "string"
+          },
+          "ctpsUf" : {
+            "type" : "string"
+          },
+          "ctpsData" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "pisPasep" : {
+            "type" : "string"
+          },
+          "tituloEleitorNumero" : {
+            "type" : "string"
+          },
+          "tituloEleitorZona" : {
+            "type" : "string"
+          },
+          "tituloEleitorSecao" : {
+            "type" : "string"
+          },
+          "nis" : {
+            "type" : "string"
+          },
+          "frequentaEscola" : {
+            "type" : "string"
+          },
+          "grauEscolaridade" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "escolaridade" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "cboCod" : {
+            "type" : "string"
+          },
+          "dataCadastro" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "observacao" : {
+            "type" : "string"
+          },
+          "gerarBpa" : {
             "type" : "integer",
             "format" : "int32"
           }
