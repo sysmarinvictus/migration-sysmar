@@ -6,18 +6,125 @@
     "version" : "0.1.0"
   },
   "servers" : [ {
-    "url" : "http://localhost:35713",
+    "url" : "http://localhost:36219",
     "description" : "Generated server url"
   } ],
   "security" : [ {
     "bearer-jwt" : [ ]
   } ],
   "paths" : {
+    "/api/usuarios/{usuCod}/unidades/{uniCod}" : {
+      "get" : {
+        "tags" : [ "Usuário — Unidades (permissões)" ],
+        "summary" : "Obter a matriz de permissões de um usuário numa unidade",
+        "operationId" : "get",
+        "parameters" : [ {
+          "name" : "usuCod",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "uniCod",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UsuarioUnidadeResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Usuário — Unidades (permissões)" ],
+        "summary" : "Atualizar as permissões de um usuário numa unidade",
+        "operationId" : "update",
+        "parameters" : [ {
+          "name" : "usuCod",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "uniCod",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UsuarioUnidadeUpsertRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UsuarioUnidadeResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Usuário — Unidades (permissões)" ],
+        "summary" : "Revogar o acesso de um usuário a uma unidade",
+        "operationId" : "delete",
+        "parameters" : [ {
+          "name" : "usuCod",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "uniCod",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        }
+      }
+    },
     "/api/usuarios/{id}" : {
       "get" : {
         "tags" : [ "Usuários (administração)" ],
         "summary" : "Obter usuário por código",
-        "operationId" : "get",
+        "operationId" : "get_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -53,7 +160,7 @@
       "put" : {
         "tags" : [ "Usuários (administração)" ],
         "summary" : "Atualizar usuário (bloquear/desbloquear via bloqueado)",
-        "operationId" : "update",
+        "operationId" : "update_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -89,7 +196,7 @@
       "delete" : {
         "tags" : [ "Usuários (administração)" ],
         "summary" : "Excluir usuário (bloqueado se referenciado por permissões/unidades)",
-        "operationId" : "delete",
+        "operationId" : "delete_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -113,7 +220,7 @@
       "get" : {
         "tags" : [ "Setores" ],
         "summary" : "Obter setor por código composto",
-        "operationId" : "get_1",
+        "operationId" : "get_2",
         "parameters" : [ {
           "name" : "unidadeId",
           "in" : "path",
@@ -147,7 +254,7 @@
       "put" : {
         "tags" : [ "Setores" ],
         "summary" : "Atualizar setor",
-        "operationId" : "update_1",
+        "operationId" : "update_2",
         "parameters" : [ {
           "name" : "unidadeId",
           "in" : "path",
@@ -191,7 +298,7 @@
       "delete" : {
         "tags" : [ "Setores" ],
         "summary" : "Excluir setor",
-        "operationId" : "delete_1",
+        "operationId" : "delete_2",
         "parameters" : [ {
           "name" : "unidadeId",
           "in" : "path",
@@ -290,7 +397,7 @@
     "/api/unidades/{codigo}" : {
       "get" : {
         "tags" : [ "unidade-controller" ],
-        "operationId" : "get_2",
+        "operationId" : "get_3",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -315,7 +422,7 @@
       },
       "put" : {
         "tags" : [ "unidade-controller" ],
-        "operationId" : "update_2",
+        "operationId" : "update_3",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -350,7 +457,7 @@
       },
       "delete" : {
         "tags" : [ "unidade-controller" ],
-        "operationId" : "delete_2",
+        "operationId" : "delete_3",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -371,7 +478,7 @@
       "get" : {
         "tags" : [ "Tipos de Medicamento" ],
         "summary" : "Obter tipo de medicamento por código",
-        "operationId" : "get_3",
+        "operationId" : "get_4",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -397,7 +504,7 @@
       "put" : {
         "tags" : [ "Tipos de Medicamento" ],
         "summary" : "Atualizar tipo de medicamento",
-        "operationId" : "update_3",
+        "operationId" : "update_4",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -433,7 +540,7 @@
       "delete" : {
         "tags" : [ "Tipos de Medicamento" ],
         "summary" : "Excluir tipo de medicamento",
-        "operationId" : "delete_3",
+        "operationId" : "delete_4",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -454,7 +561,7 @@
       "get" : {
         "tags" : [ "Programas" ],
         "summary" : "Obter programa por código",
-        "operationId" : "get_4",
+        "operationId" : "get_5",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -479,7 +586,7 @@
       "put" : {
         "tags" : [ "Programas" ],
         "summary" : "Atualizar programa",
-        "operationId" : "update_4",
+        "operationId" : "update_5",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -514,7 +621,7 @@
       "delete" : {
         "tags" : [ "Programas" ],
         "summary" : "Excluir programa (bloqueado se referenciado por permissões)",
-        "operationId" : "delete_4",
+        "operationId" : "delete_5",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -534,7 +641,7 @@
       "put" : {
         "tags" : [ "Profissional — Especialidades" ],
         "summary" : "Atualizar flags/agenda de uma especialidade do profissional",
-        "operationId" : "update_5",
+        "operationId" : "update_6",
         "parameters" : [ {
           "name" : "proPesCod",
           "in" : "path",
@@ -607,7 +714,7 @@
       "get" : {
         "tags" : [ "Profissionais" ],
         "summary" : "Obter profissional por código (PesCod). Não retorna certificado/senha.",
-        "operationId" : "get_5",
+        "operationId" : "get_6",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -643,7 +750,7 @@
       "put" : {
         "tags" : [ "Profissionais" ],
         "summary" : "Atualizar profissional (pode gravar de volta nome/cpf/telefones em SYS_PES, R2)",
-        "operationId" : "update_6",
+        "operationId" : "update_7",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -679,7 +786,7 @@
       "delete" : {
         "tags" : [ "Profissionais" ],
         "summary" : "Excluir profissional (bloqueado por 9 referências, R20-R26)",
-        "operationId" : "delete_5",
+        "operationId" : "delete_6",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -700,7 +807,7 @@
       "get" : {
         "tags" : [ "Posologias" ],
         "summary" : "Obter posologia por código",
-        "operationId" : "get_6",
+        "operationId" : "get_7",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -726,7 +833,7 @@
       "put" : {
         "tags" : [ "Posologias" ],
         "summary" : "Atualizar posologia",
-        "operationId" : "update_7",
+        "operationId" : "update_8",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -762,7 +869,7 @@
       "delete" : {
         "tags" : [ "Posologias" ],
         "summary" : "Excluir posologia",
-        "operationId" : "delete_6",
+        "operationId" : "delete_7",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -783,7 +890,7 @@
       "get" : {
         "tags" : [ "Pessoas" ],
         "summary" : "Obter pessoa por código (PesCod) — honra o nome social (LGPD)",
-        "operationId" : "get_7",
+        "operationId" : "get_8",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -809,7 +916,7 @@
       "put" : {
         "tags" : [ "Pessoas" ],
         "summary" : "Atualizar o cadastro de uma pessoa física",
-        "operationId" : "update_8",
+        "operationId" : "update_9",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -845,7 +952,7 @@
       "delete" : {
         "tags" : [ "Pessoas" ],
         "summary" : "Excluir pessoa (bloqueado se há Profissional/Funcionário/Paciente vinculado)",
-        "operationId" : "delete_7",
+        "operationId" : "delete_8",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -866,7 +973,7 @@
       "get" : {
         "tags" : [ "Perfis" ],
         "summary" : "Obter perfil por código",
-        "operationId" : "get_8",
+        "operationId" : "get_9",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -892,7 +999,7 @@
       "put" : {
         "tags" : [ "Perfis" ],
         "summary" : "Atualizar perfil",
-        "operationId" : "update_9",
+        "operationId" : "update_10",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -928,7 +1035,7 @@
       "delete" : {
         "tags" : [ "Perfis" ],
         "summary" : "Excluir perfil (bloqueado se referenciado; cascateia permissões)",
-        "operationId" : "delete_8",
+        "operationId" : "delete_9",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1106,7 +1213,7 @@
     "/api/medicamentos/{id}" : {
       "get" : {
         "tags" : [ "medicamento-controller" ],
-        "operationId" : "get_9",
+        "operationId" : "get_10",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1131,7 +1238,7 @@
       },
       "put" : {
         "tags" : [ "medicamento-controller" ],
-        "operationId" : "update_10",
+        "operationId" : "update_11",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1166,7 +1273,7 @@
       },
       "delete" : {
         "tags" : [ "medicamento-controller" ],
-        "operationId" : "delete_9",
+        "operationId" : "delete_10",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1187,7 +1294,7 @@
       "get" : {
         "tags" : [ "Locais" ],
         "summary" : "Obter local por código",
-        "operationId" : "get_10",
+        "operationId" : "get_11",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1213,7 +1320,7 @@
       "put" : {
         "tags" : [ "Locais" ],
         "summary" : "Atualizar local",
-        "operationId" : "update_11",
+        "operationId" : "update_12",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1249,7 +1356,7 @@
       "delete" : {
         "tags" : [ "Locais" ],
         "summary" : "Excluir local",
-        "operationId" : "delete_10",
+        "operationId" : "delete_11",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1270,7 +1377,7 @@
       "get" : {
         "tags" : [ "Impedimentos" ],
         "summary" : "Obter impedimento por código",
-        "operationId" : "get_11",
+        "operationId" : "get_12",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1296,7 +1403,7 @@
       "put" : {
         "tags" : [ "Impedimentos" ],
         "summary" : "Atualizar impedimento",
-        "operationId" : "update_12",
+        "operationId" : "update_13",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1332,7 +1439,7 @@
       "delete" : {
         "tags" : [ "Impedimentos" ],
         "summary" : "Excluir impedimento",
-        "operationId" : "delete_11",
+        "operationId" : "delete_12",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1353,7 +1460,7 @@
       "get" : {
         "tags" : [ "Funcionários" ],
         "summary" : "Obter funcionário por código (PesCod)",
-        "operationId" : "get_12",
+        "operationId" : "get_13",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1379,7 +1486,7 @@
       "put" : {
         "tags" : [ "Funcionários" ],
         "summary" : "Atualizar funcionário (grava de volta nome/cpf/telefones em SYS_PES, R2)",
-        "operationId" : "update_13",
+        "operationId" : "update_14",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1415,7 +1522,7 @@
       "delete" : {
         "tags" : [ "Funcionários" ],
         "summary" : "Excluir funcionário (bloqueado por SAU_USU/SAU_RECESP, R13/R14)",
-        "operationId" : "delete_12",
+        "operationId" : "delete_13",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1435,7 +1542,7 @@
     "/api/formas-apresentacao/{id}" : {
       "get" : {
         "tags" : [ "forma-apresentacao-controller" ],
-        "operationId" : "get_13",
+        "operationId" : "get_14",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1460,7 +1567,7 @@
       },
       "put" : {
         "tags" : [ "forma-apresentacao-controller" ],
-        "operationId" : "update_14",
+        "operationId" : "update_15",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1495,7 +1602,7 @@
       },
       "delete" : {
         "tags" : [ "forma-apresentacao-controller" ],
-        "operationId" : "delete_13",
+        "operationId" : "delete_14",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1516,7 +1623,7 @@
       "get" : {
         "tags" : [ "Especialidades" ],
         "summary" : "Obter especialidade por código",
-        "operationId" : "get_14",
+        "operationId" : "get_15",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1542,7 +1649,7 @@
       "put" : {
         "tags" : [ "Especialidades" ],
         "summary" : "Atualizar especialidade",
-        "operationId" : "update_15",
+        "operationId" : "update_16",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1578,7 +1685,7 @@
       "delete" : {
         "tags" : [ "Especialidades" ],
         "summary" : "Excluir especialidade",
-        "operationId" : "delete_14",
+        "operationId" : "delete_15",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1599,7 +1706,7 @@
       "get" : {
         "tags" : [ "Distritos" ],
         "summary" : "Obter distrito por código",
-        "operationId" : "get_15",
+        "operationId" : "get_16",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1625,7 +1732,7 @@
       "put" : {
         "tags" : [ "Distritos" ],
         "summary" : "Atualizar distrito sanitário",
-        "operationId" : "update_16",
+        "operationId" : "update_17",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1661,7 +1768,7 @@
       "delete" : {
         "tags" : [ "Distritos" ],
         "summary" : "Excluir distrito sanitário",
-        "operationId" : "delete_15",
+        "operationId" : "delete_16",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1682,7 +1789,7 @@
       "get" : {
         "tags" : [ "Conselhos de Classe" ],
         "summary" : "Obter conselho de classe por código",
-        "operationId" : "get_16",
+        "operationId" : "get_17",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1708,7 +1815,7 @@
       "put" : {
         "tags" : [ "Conselhos de Classe" ],
         "summary" : "Atualizar conselho de classe",
-        "operationId" : "update_17",
+        "operationId" : "update_18",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1744,7 +1851,7 @@
       "delete" : {
         "tags" : [ "Conselhos de Classe" ],
         "summary" : "Excluir conselho de classe",
-        "operationId" : "delete_16",
+        "operationId" : "delete_17",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1765,7 +1872,7 @@
       "get" : {
         "tags" : [ "Bairros" ],
         "summary" : "Obter bairro por código",
-        "operationId" : "get_17",
+        "operationId" : "get_18",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1791,7 +1898,7 @@
       "put" : {
         "tags" : [ "Bairros" ],
         "summary" : "Atualizar bairro",
-        "operationId" : "update_18",
+        "operationId" : "update_19",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -1827,7 +1934,7 @@
       "delete" : {
         "tags" : [ "Bairros" ],
         "summary" : "Excluir bairro",
-        "operationId" : "delete_17",
+        "operationId" : "delete_18",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -2097,10 +2204,85 @@
         }
       }
     },
+    "/api/usuarios/{usuCod}/unidades" : {
+      "get" : {
+        "tags" : [ "Usuário — Unidades (permissões)" ],
+        "summary" : "Listar as unidades (e permissões) de um usuário",
+        "operationId" : "list_1",
+        "parameters" : [ {
+          "name" : "usuCod",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/UsuarioUnidadeResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Usuário — Unidades (permissões)" ],
+        "summary" : "Conceder acesso de um usuário a uma unidade",
+        "operationId" : "create_1",
+        "parameters" : [ {
+          "name" : "usuCod",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "uniCod",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UsuarioUnidadeUpsertRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UsuarioUnidadeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/unidades" : {
       "get" : {
         "tags" : [ "unidade-controller" ],
-        "operationId" : "list_1",
+        "operationId" : "list_2",
         "parameters" : [ {
           "name" : "nome",
           "in" : "query",
@@ -2131,7 +2313,7 @@
       },
       "post" : {
         "tags" : [ "unidade-controller" ],
-        "operationId" : "create_1",
+        "operationId" : "create_2",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2160,7 +2342,7 @@
       "get" : {
         "tags" : [ "Setores" ],
         "summary" : "Listar setores de uma unidade (paginado)",
-        "operationId" : "list_2",
+        "operationId" : "list_3",
         "parameters" : [ {
           "name" : "unidadeId",
           "in" : "path",
@@ -2200,7 +2382,7 @@
       "post" : {
         "tags" : [ "Setores" ],
         "summary" : "Criar setor para a unidade",
-        "operationId" : "create_2",
+        "operationId" : "create_3",
         "parameters" : [ {
           "name" : "unidadeId",
           "in" : "path",
@@ -2498,7 +2680,7 @@
       "get" : {
         "tags" : [ "Tipos de Medicamento" ],
         "summary" : "Listar/buscar tipos de medicamento (paginado)",
-        "operationId" : "list_3",
+        "operationId" : "list_4",
         "parameters" : [ {
           "name" : "descricao",
           "in" : "query",
@@ -2530,7 +2712,7 @@
       "post" : {
         "tags" : [ "Tipos de Medicamento" ],
         "summary" : "Criar tipo de medicamento",
-        "operationId" : "create_3",
+        "operationId" : "create_4",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2559,7 +2741,7 @@
       "get" : {
         "tags" : [ "Programas" ],
         "summary" : "Listar/buscar programas (paginado)",
-        "operationId" : "list_4",
+        "operationId" : "list_5",
         "parameters" : [ {
           "name" : "q",
           "in" : "query",
@@ -2599,7 +2781,7 @@
       "post" : {
         "tags" : [ "Programas" ],
         "summary" : "Criar programa",
-        "operationId" : "create_4",
+        "operationId" : "create_5",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2628,7 +2810,7 @@
       "get" : {
         "tags" : [ "Profissionais" ],
         "summary" : "Listar/buscar profissionais (paginado). Nome = LIKE em SYS_PES.PesNom (R16).",
-        "operationId" : "list_5",
+        "operationId" : "list_6",
         "parameters" : [ {
           "name" : "id",
           "in" : "query",
@@ -2698,7 +2880,7 @@
       "post" : {
         "tags" : [ "Profissionais" ],
         "summary" : "Cadastrar profissional. O corpo INCLUI id (código da Pessoa) — não é gerado (R1).",
-        "operationId" : "create_5",
+        "operationId" : "create_6",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2737,7 +2919,7 @@
       "get" : {
         "tags" : [ "Profissional — Especialidades" ],
         "summary" : "Listar as especialidades de um profissional",
-        "operationId" : "list_6",
+        "operationId" : "list_7",
         "parameters" : [ {
           "name" : "proPesCod",
           "in" : "path",
@@ -2804,7 +2986,7 @@
       "post" : {
         "tags" : [ "Profissionais Externos" ],
         "summary" : "Registrar profissional externo (cria a pessoa + o SAU_PRO externo)",
-        "operationId" : "create_6",
+        "operationId" : "create_7",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2833,7 +3015,7 @@
       "get" : {
         "tags" : [ "Posologias" ],
         "summary" : "Listar/buscar posologias (paginado)",
-        "operationId" : "list_7",
+        "operationId" : "list_8",
         "parameters" : [ {
           "name" : "descricao",
           "in" : "query",
@@ -2865,7 +3047,7 @@
       "post" : {
         "tags" : [ "Posologias" ],
         "summary" : "Criar posologia (código auto-atribuído)",
-        "operationId" : "create_7",
+        "operationId" : "create_8",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2894,7 +3076,7 @@
       "post" : {
         "tags" : [ "Pessoas" ],
         "summary" : "Cadastrar pessoa física (SAU_PESF) — valida CPF/CNS, endereço, nacionalidade, etc.",
-        "operationId" : "create_8",
+        "operationId" : "create_9",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2923,7 +3105,7 @@
       "get" : {
         "tags" : [ "Perfis" ],
         "summary" : "Listar/buscar perfis (paginado)",
-        "operationId" : "list_8",
+        "operationId" : "list_9",
         "parameters" : [ {
           "name" : "nome",
           "in" : "query",
@@ -2955,7 +3137,7 @@
       "post" : {
         "tags" : [ "Perfis" ],
         "summary" : "Criar perfil (código auto-gerado)",
-        "operationId" : "create_9",
+        "operationId" : "create_10",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2983,7 +3165,7 @@
     "/api/medicamentos" : {
       "get" : {
         "tags" : [ "medicamento-controller" ],
-        "operationId" : "list_9",
+        "operationId" : "list_10",
         "parameters" : [ {
           "name" : "nome",
           "in" : "query",
@@ -3054,7 +3236,7 @@
       },
       "post" : {
         "tags" : [ "medicamento-controller" ],
-        "operationId" : "create_10",
+        "operationId" : "create_11",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3343,7 +3525,7 @@
       "get" : {
         "tags" : [ "Locais" ],
         "summary" : "Listar/buscar locais (paginado)",
-        "operationId" : "list_10",
+        "operationId" : "list_11",
         "parameters" : [ {
           "name" : "nome",
           "in" : "query",
@@ -3375,7 +3557,7 @@
       "post" : {
         "tags" : [ "Locais" ],
         "summary" : "Criar local",
-        "operationId" : "create_11",
+        "operationId" : "create_12",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3404,7 +3586,7 @@
       "get" : {
         "tags" : [ "Impedimentos" ],
         "summary" : "Listar impedimentos com filtros opcionais (paginado)",
-        "operationId" : "list_11",
+        "operationId" : "list_12",
         "parameters" : [ {
           "name" : "profissionalNome",
           "in" : "query",
@@ -3468,7 +3650,7 @@
       "post" : {
         "tags" : [ "Impedimentos" ],
         "summary" : "Registrar impedimento",
-        "operationId" : "create_12",
+        "operationId" : "create_13",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3497,7 +3679,7 @@
       "get" : {
         "tags" : [ "Funcionários" ],
         "summary" : "Listar/buscar funcionários (paginado). Nome = LIKE em SYS_PES.PesNom.",
-        "operationId" : "list_12",
+        "operationId" : "list_13",
         "parameters" : [ {
           "name" : "id",
           "in" : "query",
@@ -3552,7 +3734,7 @@
       "post" : {
         "tags" : [ "Funcionários" ],
         "summary" : "Cadastrar funcionário. O corpo INCLUI id (código da Pessoa) — não é gerado (R1).",
-        "operationId" : "create_13",
+        "operationId" : "create_14",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3580,7 +3762,7 @@
     "/api/formas-apresentacao" : {
       "get" : {
         "tags" : [ "forma-apresentacao-controller" ],
-        "operationId" : "list_13",
+        "operationId" : "list_14",
         "parameters" : [ {
           "name" : "descricao",
           "in" : "query",
@@ -3611,7 +3793,7 @@
       },
       "post" : {
         "tags" : [ "forma-apresentacao-controller" ],
-        "operationId" : "create_14",
+        "operationId" : "create_15",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3640,7 +3822,7 @@
       "get" : {
         "tags" : [ "Especialidades" ],
         "summary" : "Listar/buscar especialidades (paginado)",
-        "operationId" : "list_14",
+        "operationId" : "list_15",
         "parameters" : [ {
           "name" : "nome",
           "in" : "query",
@@ -3672,7 +3854,7 @@
       "post" : {
         "tags" : [ "Especialidades" ],
         "summary" : "Criar especialidade",
-        "operationId" : "create_15",
+        "operationId" : "create_16",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3701,7 +3883,7 @@
       "get" : {
         "tags" : [ "Distritos" ],
         "summary" : "Listar/buscar distritos sanitários (paginado)",
-        "operationId" : "list_15",
+        "operationId" : "list_16",
         "parameters" : [ {
           "name" : "nome",
           "in" : "query",
@@ -3733,7 +3915,7 @@
       "post" : {
         "tags" : [ "Distritos" ],
         "summary" : "Criar distrito sanitário (código auto-atribuído)",
-        "operationId" : "create_16",
+        "operationId" : "create_17",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3762,7 +3944,7 @@
       "get" : {
         "tags" : [ "Conselhos de Classe" ],
         "summary" : "Listar/buscar conselhos de classe (paginado)",
-        "operationId" : "list_16",
+        "operationId" : "list_17",
         "parameters" : [ {
           "name" : "q",
           "in" : "query",
@@ -3794,7 +3976,7 @@
       "post" : {
         "tags" : [ "Conselhos de Classe" ],
         "summary" : "Criar conselho de classe",
-        "operationId" : "create_17",
+        "operationId" : "create_18",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3823,7 +4005,7 @@
       "get" : {
         "tags" : [ "Bairros" ],
         "summary" : "Listar/buscar bairros (paginado)",
-        "operationId" : "list_17",
+        "operationId" : "list_18",
         "parameters" : [ {
           "name" : "nome",
           "in" : "query",
@@ -3855,7 +4037,7 @@
       "post" : {
         "tags" : [ "Bairros" ],
         "summary" : "Criar bairro (código auto-atribuído)",
-        "operationId" : "create_18",
+        "operationId" : "create_19",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -4043,7 +4225,7 @@
       "get" : {
         "tags" : [ "TiposLogradouro" ],
         "summary" : "Listar/buscar tipos de logradouro (paginado)",
-        "operationId" : "list_18",
+        "operationId" : "list_19",
         "parameters" : [ {
           "name" : "q",
           "in" : "query",
@@ -4077,7 +4259,7 @@
       "get" : {
         "tags" : [ "TiposLogradouro" ],
         "summary" : "Obter tipo de logradouro por código",
-        "operationId" : "get_18",
+        "operationId" : "get_19",
         "parameters" : [ {
           "name" : "codigo",
           "in" : "path",
@@ -4241,7 +4423,7 @@
       "get" : {
         "tags" : [ "Profissionais Externos" ],
         "summary" : "Obter um profissional externo por código",
-        "operationId" : "get_19",
+        "operationId" : "get_20",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -4875,7 +5057,7 @@
       "get" : {
         "tags" : [ "Auditoria (admin)" ],
         "summary" : "Consultar a trilha de auditoria (SAU_LOG), paginado e filtrável. Não retorna colunas PHI (nome/paciente/histórico).",
-        "operationId" : "list_19",
+        "operationId" : "list_20",
         "parameters" : [ {
           "name" : "tabela",
           "in" : "query",
@@ -5110,6 +5292,356 @@
   },
   "components" : {
     "schemas" : {
+      "UsuarioUnidadeUpsertRequest" : {
+        "type" : "object",
+        "properties" : {
+          "especialidadeCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "bloqueioTabela" : {
+            "type" : "boolean"
+          },
+          "bloqueioCadastro" : {
+            "type" : "boolean"
+          },
+          "bloqueioAmbulatorio" : {
+            "type" : "boolean"
+          },
+          "permiteConsultaDireta" : {
+            "type" : "boolean"
+          },
+          "bloqueioProntuarioConsulta" : {
+            "type" : "boolean"
+          },
+          "bloqueioProntuarioOdonto" : {
+            "type" : "boolean"
+          },
+          "bloqueioResultadoExame" : {
+            "type" : "boolean"
+          },
+          "bloqueioEsus" : {
+            "type" : "boolean"
+          },
+          "bloqueioCaps" : {
+            "type" : "boolean"
+          },
+          "bloqueioNutricao" : {
+            "type" : "boolean"
+          },
+          "bloqueioFarmacia" : {
+            "type" : "boolean"
+          },
+          "permiteBnafar" : {
+            "type" : "boolean"
+          },
+          "bloqueioAlmoxarifado" : {
+            "type" : "boolean"
+          },
+          "bloqueioRequisicao" : {
+            "type" : "boolean"
+          },
+          "bloqueioBeneficio" : {
+            "type" : "boolean"
+          },
+          "bloqueioTransporte" : {
+            "type" : "boolean"
+          },
+          "bloqueioVacina" : {
+            "type" : "boolean"
+          },
+          "bloqueioAgenda" : {
+            "type" : "boolean"
+          },
+          "bloqueioAgendaManual" : {
+            "type" : "boolean"
+          },
+          "bloqueioAgendaExterna" : {
+            "type" : "boolean"
+          },
+          "bloqueioAgendaEspecial" : {
+            "type" : "boolean"
+          },
+          "permiteAgendaAuditor" : {
+            "type" : "boolean"
+          },
+          "bloqueioLaboratorio" : {
+            "type" : "boolean"
+          },
+          "bloqueioHospital" : {
+            "type" : "boolean"
+          },
+          "bloqueioVigilancia" : {
+            "type" : "boolean"
+          },
+          "bloqueioAgravo" : {
+            "type" : "boolean"
+          },
+          "bloqueioCms" : {
+            "type" : "boolean"
+          },
+          "bloqueioOuvidoria" : {
+            "type" : "boolean"
+          },
+          "bloqueioImpressao" : {
+            "type" : "boolean"
+          },
+          "bloqueioExportacao" : {
+            "type" : "boolean"
+          },
+          "bloqueioParametro" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorio" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioTabela" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioCadastro" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioAmbulatorio" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioEsus" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioCaps" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioNutricao" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioVacina" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioFarmacia" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioAlmoxarifado" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioRequisicao" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioBeneficio" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioTransporte" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioAgenda" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioLaboratorio" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioHospital" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioVigilancia" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioAgravo" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioOuvidoria" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioExportacao" : {
+            "type" : "boolean"
+          },
+          "bloqueioGrafico" : {
+            "type" : "boolean"
+          },
+          "permiteAgendaAuditorPcd" : {
+            "type" : "boolean"
+          },
+          "permiteSoaBnafar" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "UsuarioUnidadeResponse" : {
+        "type" : "object",
+        "properties" : {
+          "usuCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "uniCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "especialidadeCod" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "bloqueioTabela" : {
+            "type" : "boolean"
+          },
+          "bloqueioCadastro" : {
+            "type" : "boolean"
+          },
+          "bloqueioAmbulatorio" : {
+            "type" : "boolean"
+          },
+          "permiteConsultaDireta" : {
+            "type" : "boolean"
+          },
+          "bloqueioProntuarioConsulta" : {
+            "type" : "boolean"
+          },
+          "bloqueioProntuarioOdonto" : {
+            "type" : "boolean"
+          },
+          "bloqueioResultadoExame" : {
+            "type" : "boolean"
+          },
+          "bloqueioEsus" : {
+            "type" : "boolean"
+          },
+          "bloqueioCaps" : {
+            "type" : "boolean"
+          },
+          "bloqueioNutricao" : {
+            "type" : "boolean"
+          },
+          "bloqueioFarmacia" : {
+            "type" : "boolean"
+          },
+          "permiteBnafar" : {
+            "type" : "boolean"
+          },
+          "bloqueioAlmoxarifado" : {
+            "type" : "boolean"
+          },
+          "bloqueioRequisicao" : {
+            "type" : "boolean"
+          },
+          "bloqueioBeneficio" : {
+            "type" : "boolean"
+          },
+          "bloqueioTransporte" : {
+            "type" : "boolean"
+          },
+          "bloqueioVacina" : {
+            "type" : "boolean"
+          },
+          "bloqueioAgenda" : {
+            "type" : "boolean"
+          },
+          "bloqueioAgendaManual" : {
+            "type" : "boolean"
+          },
+          "bloqueioAgendaExterna" : {
+            "type" : "boolean"
+          },
+          "bloqueioAgendaEspecial" : {
+            "type" : "boolean"
+          },
+          "permiteAgendaAuditor" : {
+            "type" : "boolean"
+          },
+          "bloqueioLaboratorio" : {
+            "type" : "boolean"
+          },
+          "bloqueioHospital" : {
+            "type" : "boolean"
+          },
+          "bloqueioVigilancia" : {
+            "type" : "boolean"
+          },
+          "bloqueioAgravo" : {
+            "type" : "boolean"
+          },
+          "bloqueioCms" : {
+            "type" : "boolean"
+          },
+          "bloqueioOuvidoria" : {
+            "type" : "boolean"
+          },
+          "bloqueioImpressao" : {
+            "type" : "boolean"
+          },
+          "bloqueioExportacao" : {
+            "type" : "boolean"
+          },
+          "bloqueioParametro" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorio" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioTabela" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioCadastro" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioAmbulatorio" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioEsus" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioCaps" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioNutricao" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioVacina" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioFarmacia" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioAlmoxarifado" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioRequisicao" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioBeneficio" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioTransporte" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioAgenda" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioLaboratorio" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioHospital" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioVigilancia" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioAgravo" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioOuvidoria" : {
+            "type" : "boolean"
+          },
+          "bloqueioRelatorioExportacao" : {
+            "type" : "boolean"
+          },
+          "bloqueioGrafico" : {
+            "type" : "boolean"
+          },
+          "permiteAgendaAuditorPcd" : {
+            "type" : "boolean"
+          },
+          "permiteSoaBnafar" : {
+            "type" : "boolean"
+          }
+        }
+      },
       "UsuarioUpdateRequest" : {
         "required" : [ "nome" ],
         "type" : "object",
@@ -8404,12 +8936,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -8505,12 +9037,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -8551,12 +9083,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -8625,12 +9157,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -8683,12 +9215,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -8759,12 +9291,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -8828,12 +9360,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -8892,12 +9424,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -8996,12 +9528,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9054,12 +9586,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9112,12 +9644,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9170,12 +9702,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9228,12 +9760,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9274,12 +9806,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9332,12 +9864,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9390,12 +9922,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9448,12 +9980,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9506,12 +10038,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9567,12 +10099,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
@@ -9678,12 +10210,12 @@
           "sort" : {
             "$ref" : "#/components/schemas/SortObject"
           },
-          "pageable" : {
-            "$ref" : "#/components/schemas/PageableObject"
-          },
           "numberOfElements" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
           },
           "empty" : {
             "type" : "boolean"
