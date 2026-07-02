@@ -1,0 +1,35 @@
+{
+  "slice": "SAU_RBAC",
+  "surface": "AutorizacaoController read/resolve only (engine not wired into other endpoints — OQ1)",
+  "method": "DB-state vs shared snapshot, READ-ONLY",
+  "note": "usercount/rows captured 2026-07-02 against non-prod snapshot db saude-mandaguari; users referenced by numeric UsuCod (no PII).",
+  "profileGrids": [
+    { "perfilId": 2, "totalRows": 1232, "anyGranted": 100, "valueDiff": 0 },
+    { "perfilId": 3, "totalRows": 1232, "anyGranted": 90, "valueDiff": 0 },
+    { "perfilId": 7, "totalRows": 1232, "anyGranted": 14, "valueDiff": 0,
+      "grantedProgramas": ["HBENEFICIARIADOBOLSAFAMILIA","HMUDASENHA","HSAU_ATE_LIS","HSAU_COMPACO","HVIEWSAU_AGEATE","HVIEWSAU_ATE","HVIEWSAU_PAC","HWWSAU_AGEATE","HWWSAU_ATE","HWWSAU_PAC","HWWSAU_PESF","SAU_AGEATE","SAU_ATE","SAU_PAC"] }
+  ],
+  "userGrids": [
+    { "usuCod": 100216, "validProfile": false, "usuconRows": 1240, "valueDiff": 0 },
+    { "usuCod": 669, "usuPrfCod": 1, "usuconRows": 1233, "note": "raw grid returned (not resolved)" }
+  ],
+  "checks": [
+    { "usuCod": 669, "programaId": "ARSAU_ATEMED", "mode": "CON", "expected": true, "actual": true, "tier": "profile(prf1) grant" },
+    { "usuCod": 669, "programaId": "AGENDA", "mode": "CON", "expected": false, "actual": false, "tier": "profile(prf1) deny; usucon con=1 IGNORED (precedence, not OR)" },
+    { "usuCod": 100216, "programaId": "AGENDA", "mode": "CON", "expected": true, "actual": true, "tier": "usucon fallback (no valid profile)" },
+    { "usuCod": 2, "programaId": "AGENDA", "mode": "CON", "expected": false, "actual": false, "rule": "R5 blocked (usubloq=1) beats granted usucon row" },
+    { "usuCod": 1, "programaId": "SAU_PAC", "mode": "EXC", "expected": true, "actual": true, "rule": "R2 sysmar bypass" },
+    { "usuCod": 1, "programaId": "NONEXISTENT_PRG_XYZ", "mode": "EXC", "expected": true, "actual": true, "rule": "R2 sysmar grants unknown program too" },
+    { "usuCod": 99999999, "programaId": "AGENDA", "mode": "CON", "expected": false, "actual": false, "rule": "unknown user fail-closed" }
+  ],
+  "emptyCases": [
+    { "endpoint": "GET /api/autorizacao/perfis/88888/permissoes", "expected": "[] HTTP 200", "actual": "[] HTTP 200" },
+    { "endpoint": "GET /api/autorizacao/usuarios/99999999/permissoes", "expected": "[] HTTP 200", "actual": "[] HTTP 200" }
+  ],
+  "authz": [
+    { "case": "no token", "endpoint": "GET /api/autorizacao/perfis/1/permissoes", "expected": 401, "actual": 401 },
+    { "case": "SAUDE_CADASTRO only", "endpoint": "GET /api/autorizacao/perfis/7/permissoes", "expected": 403, "actual": 403 }
+  ],
+  "verdict": "PARITY 13/13",
+  "deferred": ["PUT permission-grant write-parity", "OQ5 PrgAcessoPub tier-0 semantics"]
+}

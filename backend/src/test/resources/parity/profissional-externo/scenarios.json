@@ -1,0 +1,79 @@
+{
+  "slice": "SAU_PESF_PROFEXT",
+  "domain": "profissionalexterno",
+  "endpoint": "GET /api/profissionais-externos/{id}",
+  "method": "DB-state vs NON-PROD snapshot, READ-ONLY (zero writes)",
+  "date": "2026-07-02",
+  "auth": "JWT SAUDE_CADASTRO",
+  "phi_note": "nome/cns/numeroConselho are PHI; matched values stored as md5 or <redacted>, referenced by numeric ProPesCod only",
+  "external_flag_column": "sau_pro.proext (smallint); 1=external, 0/null=internal",
+  "scenarios": [
+    {
+      "id": "1a-get-external",
+      "input": { "propescod": 106189 },
+      "db": { "proext": 1, "conclacod": 71, "pesmuncod": 411520, "pronumcr_trim": "25594", "prodatini": "2020-08-03", "prodatfim": "0001-01-01", "prosit": 1, "pestip": 1, "pesnom_md5": "1bb18600b7101fed10dd20afa3da1798", "propesnumcns_trim_md5": "ab367fc8a96a272f8d0aaf2088795c73" },
+      "expect": { "status": 200, "externo": 1, "conselhoClasseCod": 71, "municipioCod": 411520, "numeroConselho_trim": "25594", "dataInicio": "2020-08-03", "dataFim": "0001-01-01", "situacao": 1, "nome": "<redacted-phi>", "cns": "<redacted-phi>" },
+      "equivalent": true
+    },
+    {
+      "id": "1b-get-external",
+      "input": { "propescod": 106190 },
+      "db": { "proext": 1, "conclacod": 71, "pesmuncod": 411520, "pronumcr_trim": "43162", "prodatini": "2020-08-03", "prodatfim": "0001-01-01", "prosit": 1, "pesnom_md5": "6a12e7a634333ec7d7cfe8b3b2bf4410" },
+      "expect": { "status": 200, "externo": 1, "conselhoClasseCod": 71, "municipioCod": 411520, "numeroConselho_trim": "43162", "situacao": 1 },
+      "equivalent": true
+    },
+    {
+      "id": "1c-get-external",
+      "input": { "propescod": 106191 },
+      "db": { "proext": 1, "conclacod": 71, "pesmuncod": 411520, "pronumcr_trim": "34080", "prodatini": "2020-08-03", "prodatfim": "0001-01-01", "prosit": 1, "pesnom_md5": "afcb504896623e18db2a296919975be1" },
+      "expect": { "status": 200, "externo": 1, "conselhoClasseCod": 71, "municipioCod": 411520, "numeroConselho_trim": "34080", "situacao": 1 },
+      "equivalent": true
+    },
+    {
+      "id": "1d-get-external",
+      "input": { "propescod": 106192 },
+      "db": { "proext": 1, "conclacod": 71, "pesmuncod": 411520, "pronumcr_trim": "29434", "prodatini": "2020-08-03", "prodatfim": "0001-01-01", "prosit": 1, "pesnom_md5": "32ec0f0e3fba969e795f3178480fdcd8" },
+      "expect": { "status": 200, "externo": 1, "conselhoClasseCod": 71, "municipioCod": 411520, "numeroConselho_trim": "29434", "situacao": 1 },
+      "equivalent": true
+    },
+    {
+      "id": "2-not-found",
+      "input": { "propescod": 99999999 },
+      "db": { "exists": false },
+      "expect": { "status": 404, "problem_type": "not-found" },
+      "equivalent": true
+    },
+    {
+      "id": "3a-non-external-proext0",
+      "input": { "propescod": 57 },
+      "db": { "proext": 0, "conclacod": 0, "pestip": 1 },
+      "expect": { "status": 200, "externo": 0 },
+      "equivalent": true,
+      "behavioral_note": "endpoint does NOT filter on proext=1; returns internal professional with externo=0 (D1)"
+    },
+    {
+      "id": "3b-non-external-proext0",
+      "input": { "propescod": 247 },
+      "db": { "proext": 0, "conclacod": 0, "pestip": 1 },
+      "expect": { "status": 200, "externo": 0 },
+      "equivalent": true,
+      "behavioral_note": "same as 3a (D1)"
+    },
+    {
+      "id": "3c-proext-null",
+      "input": { "propescod": 597 },
+      "db": { "proext": null, "prodatini": null, "prodatfim": null },
+      "expect": { "status": 200, "externo": null, "dataInicio": null, "dataFim": null },
+      "equivalent": true,
+      "behavioral_note": "null flag + genuinely-null dates passed through faithfully (D1)"
+    },
+    {
+      "id": "5-authz-no-token",
+      "input": { "propescod": 106189, "token": null },
+      "expect": { "status": 401 },
+      "equivalent": true
+    }
+  ],
+  "verdict": "PARITY 7/7 read scenarios; 1 non-blocking behavioral note (D1: GET-by-id not guarded on proext=1). Write-parity (POST composite create) DEFERRED to copy-DB run.",
+  "writes_performed": 0
+}

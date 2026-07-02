@@ -1,0 +1,47 @@
+{
+  "slice": "SAU_PAR",
+  "domain": "parametro",
+  "method": "READ-ONLY DB-state vs snapshot",
+  "date": "2026-07-02",
+  "app": "http://localhost:8090",
+  "app_empresa_codigo": 411420,
+  "snapshot_sau_par_parempcod": [364],
+  "finding": {
+    "type": "config-tenancy-divergence",
+    "is_code_bug": false,
+    "app_empresa_codigo": 411420,
+    "snapshot_row_empresa": 364,
+    "http_404_detail": "Parâmetros da empresa 411420 não encontrados",
+    "would_succeed_at_correct_tenant": true,
+    "resolution": "start app with AUDIT_EMPRESA_CODIGO=364 or use snapshot keyed to 411420"
+  },
+  "scenarios": [
+    { "id": 1, "name": "GET /api/parametros SAUDE_ADMIN", "expected_status": 404, "actual_status": 404, "equivalent": true, "note": "404 correct for tenant 411420 not present in snapshot" },
+    { "id": 2, "name": "field fidelity", "status": "BLOCKED", "reason": "GET 404 under current tenant; row 364 verified at DB level" },
+    { "id": "3a", "name": "no token", "expected_status": 401, "actual_status": 401, "equivalent": true },
+    { "id": "3b", "name": "SAUDE_CADASTRO only", "expected_status": 403, "actual_status": 403, "equivalent": true }
+  ],
+  "sau_par_364": {
+    "parempcod": 364,
+    "parvalidadereceita": false,
+    "parvalidadereceitasimples": 0,
+    "parvalidadereceitausocon": 0,
+    "parvalidadereceitaconesp": 0,
+    "parinausudias": 10,
+    "parsenusudias": 30,
+    "parsecr": "",
+    "parsecrend": "",
+    "parsecrcep": "",
+    "parsecrfone1": "",
+    "parsecrfone2": "",
+    "parsecremail": "",
+    "parcadsemcns": false,
+    "parreccomprador": true,
+    "parexigecid10atestado": false,
+    "parestornaratendimento": true,
+    "parimpriscomaterno": 1,
+    "paratehis": 0
+  },
+  "mutations_performed": 0,
+  "phi_scan": "CLEAN (config only; secretaria fields empty)"
+}
