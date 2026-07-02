@@ -17,7 +17,12 @@ import java.util.Optional;
  */
 public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
-    /** Search by person name / mother name / CPF / CNS (SYS_PES) or prontuário (SAU_PAC). Returns a projection. */
+    /**
+     * Search by person name / mother name / CPF / CNS (SYS_PES) or prontuário (SAU_PAC). Returns a projection.
+     * CPF is matched on the DIGITS of {@code PesCPFCNPJ} ({@code regexp_replace(...,'[^0-9]','')}) because the
+     * column stores CPF heterogeneously (mostly formatted "412.867.079-00", some raw); the service passes raw
+     * digits, so both sides are normalized. Found by SAU_PAC parity (D1); see parity/paciente/PARITY-REPORT.md.
+     */
     @Query(value = """
             SELECT pac.PacPesCod AS id, pes.PesNom AS nome, pes.PesNomMae AS nomeMae,
                    pac.PacProNum AS prontuario, pes.PesCPFCNPJ AS cpfCnpj, pes.PesNumCns AS cns,
@@ -26,7 +31,7 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
             WHERE (CAST(:nome AS VARCHAR) IS NULL OR lower(pes.PesNom) LIKE lower(concat('%', CAST(:nome AS VARCHAR), '%')))
               AND (CAST(:nomeMae AS VARCHAR) IS NULL OR lower(pes.PesNomMae) LIKE lower(concat('%', CAST(:nomeMae AS VARCHAR), '%')))
               AND (CAST(:prontuario AS VARCHAR) IS NULL OR pac.PacProNum LIKE concat(CAST(:prontuario AS VARCHAR), '%'))
-              AND (CAST(:cpf AS VARCHAR) IS NULL OR pes.PesCPFCNPJ LIKE concat(CAST(:cpf AS VARCHAR), '%'))
+              AND (CAST(:cpf AS VARCHAR) IS NULL OR regexp_replace(pes.PesCPFCNPJ, '[^0-9]', '', 'g') LIKE concat(CAST(:cpf AS VARCHAR), '%'))
               AND (CAST(:cns AS VARCHAR) IS NULL OR pes.PesNumCns LIKE concat(CAST(:cns AS VARCHAR), '%'))
             """,
             countQuery = """
@@ -34,7 +39,7 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
             WHERE (CAST(:nome AS VARCHAR) IS NULL OR lower(pes.PesNom) LIKE lower(concat('%', CAST(:nome AS VARCHAR), '%')))
               AND (CAST(:nomeMae AS VARCHAR) IS NULL OR lower(pes.PesNomMae) LIKE lower(concat('%', CAST(:nomeMae AS VARCHAR), '%')))
               AND (CAST(:prontuario AS VARCHAR) IS NULL OR pac.PacProNum LIKE concat(CAST(:prontuario AS VARCHAR), '%'))
-              AND (CAST(:cpf AS VARCHAR) IS NULL OR pes.PesCPFCNPJ LIKE concat(CAST(:cpf AS VARCHAR), '%'))
+              AND (CAST(:cpf AS VARCHAR) IS NULL OR regexp_replace(pes.PesCPFCNPJ, '[^0-9]', '', 'g') LIKE concat(CAST(:cpf AS VARCHAR), '%'))
               AND (CAST(:cns AS VARCHAR) IS NULL OR pes.PesNumCns LIKE concat(CAST(:cns AS VARCHAR), '%'))
             """,
             nativeQuery = true)

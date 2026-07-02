@@ -1,0 +1,82 @@
+{
+  "slice": "SAU_PAC",
+  "domain": "paciente",
+  "date": "2026-07-02",
+  "method": "DB-state vs shared snapshot",
+  "auth": "JWT SAUDE_CADASTRO",
+  "mode": "READ-ONLY",
+  "newAppBase": "http://localhost:8090",
+  "goldenMaster": "snapshot DB saude-mandaguari (sau_pac=80325, sys_pes=83105)",
+  "note": "PHI redacted: patients by numeric code; matched values not transcribed. Write-parity (create/update/delete + R14 Portaria-344 guard) DEFERRED.",
+  "scenarios": [
+    {
+      "id": "1a", "name": "search total by nome", "endpoint": "/api/pacientes?nome=SILVA",
+      "sql": "SELECT count(*) FROM sau_pac pac JOIN sys_pes p ON p.pescod=pac.pacpescod WHERE p.pesnom ILIKE '%SILVA%'",
+      "legacy": 13294, "new": 13294, "equivalent": true
+    },
+    {
+      "id": "1b", "name": "search total by nome", "endpoint": "/api/pacientes?nome=MARIA",
+      "legacy": 6110, "new": 6110, "equivalent": true
+    },
+    {
+      "id": "1c", "name": "search total by nome", "endpoint": "/api/pacientes?nome=JOSE",
+      "legacy": 3254, "new": 3254, "equivalent": true
+    },
+    {
+      "id": "2a", "name": "search by CPF", "endpoint": "/api/pacientes?cpf=<formatted-cpf-of-523>",
+      "sql": "SELECT count(*) FROM sys_pes WHERE btrim(pescpfcnpj) LIKE '<formatted>%'",
+      "legacy": 1, "new": 0, "equivalent": false,
+      "divergence": "D1: service strips CPF to digits but column stores formatted CPF; LIKE never matches. BLOCKER."
+    },
+    {
+      "id": "2b", "name": "search by CNS", "endpoint": "/api/pacientes?cns=<cns-of-523>",
+      "legacy": 1, "new": 1, "matchedIds": [523], "equivalent": true
+    },
+    {
+      "id": "2c", "name": "search by prontuario", "endpoint": "/api/pacientes?prontuario=335",
+      "legacy": 1, "new": 1, "matchedIds": [26644], "equivalent": true
+    },
+    {
+      "id": "2d", "name": "search by nomeMae", "endpoint": "/api/pacientes?nomeMae=CONCEICAO",
+      "legacy": 1465, "new": 1465, "equivalent": true
+    },
+    {
+      "id": "3", "name": "detail field-by-field (30 fields)", "endpoint": "/api/pacientes/{id}",
+      "patients": [523, 409, 124267, 243, 26644, 470, 19463],
+      "fieldsCompared": ["nome","nomeMae","nomePai","cpfCnpj","cns","rg","dataNascimento","sexo","cep","endereco","numero","bairroCod","municipioCod","celular","email","usaNomeSocial","unidadeCod","prontuario","numeroIdentificacao","alergia","historicoDoencas","obito","inconsciente","situacaoRua","surtoPsiquiatrico","rendaFamiliar","meioTransporte","beneficioSocial","cnh","situacao"],
+      "result": "7/7 patients all fields byte-identical (null-preserving, whitespace-faithful)",
+      "equivalent": true
+    },
+    {
+      "id": "4a", "name": "lookup", "endpoint": "/api/pacientes/lookup?q=IRENE",
+      "legacyMatchCount": 149, "legacyFirst10": [17872,33726,39951,87348,108741,14460,27053,11848,103230,103866],
+      "newFirst10": [17872,33726,39951,87348,108741,14460,27053,11848,103230,103866],
+      "order": "PesNom asc, cap 10", "equivalent": true
+    },
+    {
+      "id": "4b", "name": "lookup", "endpoint": "/api/pacientes/lookup?q=ZULMIRA",
+      "legacyMatchCount": 18, "legacyFirst10": [31922,81062,105868,23966,20378,33904,28238,74805,121931,11982],
+      "newFirst10": [31922,81062,105868,23966,20378,33904,28238,74805,121931,11982],
+      "equivalent": true
+    },
+    {
+      "id": "5", "name": "not found", "endpoint": "/api/pacientes/999999999",
+      "legacy": "no row", "new": "HTTP 404", "equivalent": true
+    },
+    {
+      "id": "6", "name": "type fidelity", "result": "entity<->live MATCH on read path (PacProNum char(10) trimmed; PacSit/PacObi/PacRendaFamiliar smallint<->Integer; booleans null-preserving; PesNumCns/PesCPFCNPJ char trimmed; PesNasDat date<->LocalDate)",
+      "equivalent": true
+    }
+  ],
+  "verdict": "DIVERGENCE",
+  "scenariosParity": "11/12",
+  "blockers": ["D1: CPF search filter never matches (digits-vs-formatted mismatch)"],
+  "deferred": ["write-parity: create, update (SYS_PES write-back), delete + R14 Portaria-344 SAU_RECESP delete-guard"],
+  "safety": {
+    "writeRequests": 0,
+    "rowsMutated": 0,
+    "sauPacCountBefore": 80325, "sauPacCountAfter": 80325,
+    "sysPesCountBefore": 83105, "sysPesCountAfter": 83105,
+    "zzparityRows": 0
+  }
+}

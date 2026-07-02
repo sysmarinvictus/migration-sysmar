@@ -1,0 +1,66 @@
+{
+  "slice": "SAU_PROESP",
+  "endpoint": "GET /api/profissionais/{proPesCod}/especialidades",
+  "method": "DB-state vs shared snapshot (READ-ONLY)",
+  "auth": "JWT SAUDE_CADASTRO",
+  "snapshotRowCount": 1904,
+  "scenarios": [
+    {
+      "name": "list-fidelity-multi",
+      "proPesCod": 105227,
+      "expectedStatus": 200,
+      "expectedCount": 19,
+      "orderedBy": "especialidadeId asc",
+      "sample": [
+        {"especialidadeId": 2, "prioritario": false, "situacao": 2, "agendaManhaQtd": 0, "agendaTardeQtd": 0, "agendaNoiteQtd": 0},
+        {"especialidadeId": 4187, "prioritario": false, "situacao": 1, "agendaManhaQtd": 0, "agendaTardeQtd": 0, "agendaNoiteQtd": 0}
+      ]
+    },
+    {
+      "name": "flag-semantics-prioritario",
+      "proPesCod": 105242,
+      "expectedStatus": 200,
+      "expectedCount": 7,
+      "assert": "especialidadeId=2327 -> prioritario=true (ProEspPri=1); all others false"
+    },
+    {
+      "name": "flag-semantics-mixed",
+      "proPesCod": 13916,
+      "expectedStatus": 200,
+      "expectedCount": 6,
+      "assert": "espcod 1049/1054/1057/1066 prioritario=true; 2146/4258 situacao=2"
+    },
+    {
+      "name": "list-single-a",
+      "proPesCod": 106765,
+      "expectedStatus": 200,
+      "expectedCount": 1
+    },
+    {
+      "name": "list-single-b",
+      "proPesCod": 57,
+      "expectedStatus": 200,
+      "expectedCount": 1,
+      "assert": "espcod 2961 prioritario=true situacao=1"
+    },
+    {
+      "name": "zero-specialties",
+      "proPesCod": 974,
+      "note": "exists in SAU_PRO, no SAU_PROESP rows",
+      "expectedStatus": 200,
+      "expectedBody": []
+    },
+    {
+      "name": "unknown-professional",
+      "proPesCod": 99999999,
+      "note": "not in SAU_PRO (R1 requireProfissional)",
+      "expectedStatus": 404
+    },
+    {
+      "name": "auth-guard-no-token",
+      "proPesCod": 106765,
+      "authorization": null,
+      "expectedStatus": 401
+    }
+  ]
+}

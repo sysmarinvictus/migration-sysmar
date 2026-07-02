@@ -99,6 +99,30 @@ class PacienteControllerIT extends AbstractIntegrationTest {
 
     // ---- read / update ----
 
+    @Test void searchByCpfNormalizesStoredFormatting() { // D1 parity fix — PesCPFCNPJ stored formatted
+        // Seed a person whose CPF is stored FORMATTED, as in the live snapshot.
+        jdbc.update("INSERT INTO SYS_PES (PesCod, PesNom, PesCPFCNPJ) VALUES (900001, 'Formatado Silva', '412.867.079-00')");
+        jdbc.update("INSERT INTO SAU_PAC (PacPesCod, PacSit) VALUES (900001, 1)");
+        // Searching by RAW digits must still find it (both sides normalized to digits).
+        given().spec(asUser("SAUDE_CADASTRO")).queryParam("cpf", "41286707900")
+            .when().get("/api/pacientes")
+            .then().statusCode(200)
+                .body("content", hasSize(1))
+                .body("content[0].id", equalTo(900001));
+    }
+
+    @Test void rejectsDuplicateCpfStoredFormatted() { // D1 write-path: R17 uniqueness must see formatted CPF
+        // An existing person whose CPF is stored FORMATTED (as in the live snapshot).
+        jdbc.update("INSERT INTO SYS_PES (PesCod, PesNom, PesCPFCNPJ) VALUES (900002, 'Existente', '529.982.247-25')");
+        // Creating a patient with the SAME CPF (raw digits) must be rejected as a duplicate (409), not allowed.
+        Map<String, Object> b = validBody();
+        b.remove("cns");
+        b.put("cpfCnpj", "52998224725");
+        given().spec(asUser("SAUDE_CADASTRO")).body(b)
+            .when().post("/api/pacientes")
+            .then().statusCode(409);
+    }
+
     @Test void searchesByNome() {
         given().spec(asUser("SAUDE_CADASTRO")).body(validBody()).when().post("/api/pacientes").then().statusCode(201);
         given().spec(asUser("SAUDE_CADASTRO")).queryParam("nome", "Maria")

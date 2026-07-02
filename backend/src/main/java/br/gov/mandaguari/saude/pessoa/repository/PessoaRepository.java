@@ -67,7 +67,7 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
             WHERE (CAST(:nome AS VARCHAR) IS NULL
                    OR lower(pes.PesNom)    LIKE lower(concat('%', CAST(:nome AS VARCHAR), '%'))
                    OR lower(pes.PesNomSoc) LIKE lower(concat('%', CAST(:nome AS VARCHAR), '%')))
-              AND (CAST(:cpf AS VARCHAR) IS NULL OR pes.PesCPFCNPJ LIKE concat(CAST(:cpf AS VARCHAR), '%'))
+              AND (CAST(:cpf AS VARCHAR) IS NULL OR regexp_replace(pes.PesCPFCNPJ, '[^0-9]', '', 'g') LIKE concat(CAST(:cpf AS VARCHAR), '%'))
               AND (CAST(:cns AS VARCHAR) IS NULL OR pes.PesNumCns  LIKE concat(CAST(:cns AS VARCHAR), '%'))
             """,
             countQuery = """
@@ -75,7 +75,7 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
             WHERE (CAST(:nome AS VARCHAR) IS NULL
                    OR lower(pes.PesNom)    LIKE lower(concat('%', CAST(:nome AS VARCHAR), '%'))
                    OR lower(pes.PesNomSoc) LIKE lower(concat('%', CAST(:nome AS VARCHAR), '%')))
-              AND (CAST(:cpf AS VARCHAR) IS NULL OR pes.PesCPFCNPJ LIKE concat(CAST(:cpf AS VARCHAR), '%'))
+              AND (CAST(:cpf AS VARCHAR) IS NULL OR regexp_replace(pes.PesCPFCNPJ, '[^0-9]', '', 'g') LIKE concat(CAST(:cpf AS VARCHAR), '%'))
               AND (CAST(:cns AS VARCHAR) IS NULL OR pes.PesNumCns  LIKE concat(CAST(:cns AS VARCHAR), '%'))
             """,
             nativeQuery = true)
@@ -87,7 +87,14 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
             + "or lower(p.nomeSocial) like lower(concat('%', :q, '%')) order by p.nome")
     List<Pessoa> lookup(@Param("q") String q, Pageable pageable);
 
-    /** R17: CPF/CNPJ uniqueness PERSON-WIDE (across all subtypes). Returns conflicting ids (excl. self). */
-    @Query("select p.id from Pessoa p where p.cpfCnpj like concat(:cpf, '%') and p.id <> :selfId")
+    /**
+     * R17: CPF/CNPJ uniqueness PERSON-WIDE (across all subtypes). Returns conflicting ids (excl. self).
+     * Matches on the DIGITS of {@code PesCPFCNPJ} — the column stores CPF/CNPJ heterogeneously (mostly
+     * formatted "412.867.079-00", some raw) and callers pass raw digits; without normalizing the stored
+     * side a formatted duplicate would go UNDETECTED (silent data-integrity bug). Found via SAU_PAC parity
+     * D1 (read-search) and fixed here for the write-path uniqueness check too. Native (regexp_replace).
+     */
+    @Query(value = "SELECT PesCod FROM SYS_PES WHERE regexp_replace(PesCPFCNPJ, '[^0-9]', '', 'g') LIKE concat(CAST(:cpf AS VARCHAR), '%') AND PesCod <> :selfId",
+            nativeQuery = true)
     List<Long> findCpfOwners(@Param("cpf") String cpf, @Param("selfId") Long selfId, Pageable limit);
 }
