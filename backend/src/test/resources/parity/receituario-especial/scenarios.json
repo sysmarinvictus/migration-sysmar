@@ -1,0 +1,43 @@
+{
+  "slice": "SAU_RECESP",
+  "domain": "receituario-especial",
+  "method": "DB-state vs shared snapshot (1510 rows)",
+  "auth": "JWT SAUDE_CADASTRO",
+  "mode": "READ-ONLY",
+  "snapshot": { "db": "saude-mandaguari", "sau_recesp": 1510, "sau_recesp1": 2298 },
+  "note": "Write-parity (create/copy/delete) DEFERRED pending CRF regulatory sign-off (CLAUDE Rule 5). No PHI committed: patients referenced by numeric code; matched names compared via md5, never stored.",
+  "scenarios": [
+    { "id": 1, "name": "list total", "request": "GET /api/receituarios-especiais?size=1",
+      "assert": "totalElements == SELECT count(*) FROM sau_recesp", "expected": 1510, "result": "PASS" },
+    { "id": 2, "name": "list row fidelity", "request": "GET /api/receituarios-especiais?size=5&page=0",
+      "assert": "each row unidade/numero/data/paciente/prescritor == sau_recesp; pacienteNome == sys_pes.PesNom (md5)",
+      "sample_keys": ["2/41","2/40","2/39","2/38","2/37"], "result": "PASS" },
+    { "id": 3, "name": "filter by unidade", "request": "GET /api/receituarios-especiais?unidade=30&size=1",
+      "assert": "totalElements == count WHERE recespunicod=30", "expected": 1423, "result": "PASS" },
+    { "id": 4, "name": "filter by paciente", "request": "GET /api/receituarios-especiais?paciente=1649&size=1",
+      "assert": "totalElements == count WHERE pacpescod=1649", "expected": 17, "result": "PASS" },
+    { "id": 5, "name": "filter by nome", "requests": ["?nome=silva","?nome=santos"],
+      "assert": "totalElements == count WHERE PesNom ILIKE %token% via SAU_PAC->SYS_PES",
+      "expected": { "silva": 208, "santos": 163 }, "result": "PASS" },
+    { "id": 6, "name": "detail field-by-field (master + itens)",
+      "request": "GET /api/receituarios-especiais/{unidade}/{numero}",
+      "keys": [{ "key": "37/15", "itens": 13 }, { "key": "2/4", "itens": 1 }, { "key": "30/77", "itens": 6 }],
+      "assert": "all master fields == sau_recesp row; itens[] (11 fields) == sau_recesp1 rows in seq order (text via md5)",
+      "result": "PASS" },
+    { "id": 7, "name": "derivations", "keys": ["37/15","2/4","30/77"],
+      "assert": "pacienteIdade == age(RecEspDat,PesNasDat) [57/46/55]; pacienteNomeExibicao==PesNom (no social name in snapshot); avisos==[] (CNS present)",
+      "coverage_note": "R13/R16 positive branches: 0 snapshot prescriptions have blank CNS or social name -> covered by unit/IT, not parity",
+      "result": "PASS" },
+    { "id": 8, "name": "not found", "request": "GET /api/receituarios-especiais/999999/999999",
+      "assert": "HTTP 404", "result": "PASS" },
+    { "id": 9, "name": "ordering", "request": "GET /api/receituarios-especiais (first page)",
+      "assert": "ORDER BY recespunicod ASC, recespcod DESC", "observed": ["2/41","2/40","2/39","2/38","2/37"], "result": "PASS" }
+  ],
+  "deferred_write_scenarios": [
+    "create valid (server-allocated numero = max+1 per unit, R1)",
+    "create rejects (R4/R5/R6/R12/R20/R23)",
+    "copy / clone (R31)",
+    "delete (legacy hard-delete R29; modern blocks 409 — intended improvement, OQ2)"
+  ],
+  "verdict": "PARITY 9/9 (read surface). Write-parity deferred pending CRF sign-off; not cleared for cutover."
+}
