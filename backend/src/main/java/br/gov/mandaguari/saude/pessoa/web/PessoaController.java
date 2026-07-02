@@ -26,7 +26,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/pessoas")
 @Tag(name = "Pessoas")
-@PreAuthorize("hasRole('SAUDE_CADASTRO')")
 public class PessoaController {
 
     private final PessoaService service;
@@ -38,12 +37,14 @@ public class PessoaController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PESF', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter pessoa por código (PesCod) — honra o nome social (LGPD)")
     public PessoaResponse get(@PathVariable Long id) {
         return service.get(id);
     }
 
     @GetMapping("/search")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PESF', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Buscar pessoas por nome (registro/social), CPF/CNPJ ou CNS")
     public Page<PessoaResponse> search(@RequestParam(required = false) String nome,
                                        @RequestParam(required = false) String cpf,
@@ -53,6 +54,7 @@ public class PessoaController {
     }
 
     @GetMapping("/lookup")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PESF', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Autocomplete de pessoas (resolução p/ formulários de subtipo)")
     public List<PessoaLookupItem> lookup(@RequestParam(required = false, defaultValue = "") String q,
                                          @PageableDefault(size = 10) Pageable pageable) {
@@ -62,12 +64,14 @@ public class PessoaController {
     // --- SAU_PESF cadastro write path ---
 
     @GetMapping("/{id}/cadastro")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PESF', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter o cadastro completo de uma pessoa (p/ edição)")
     public PessoaCadastroResponse getCadastro(@PathVariable Long id) {
         return cadastro.getCadastro(id);
     }
 
     @PostMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_PESF', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Cadastrar pessoa física (SAU_PESF) — valida CPF/CNS, endereço, nacionalidade, etc.")
     public ResponseEntity<PessoaCadastroResponse> create(@RequestBody PessoaCadastroRequest req,
                                                          UriComponentsBuilder uri) {
@@ -77,12 +81,14 @@ public class PessoaController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PESF', 'ALT', 'SAUDE_CADASTRO')")
     @Operation(summary = "Atualizar o cadastro de uma pessoa física")
     public PessoaCadastroResponse update(@PathVariable Long id, @RequestBody PessoaCadastroRequest req) {
         return cadastro.update(id, req);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PESF', 'EXC', 'SAUDE_CADASTRO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir pessoa (bloqueado se há Profissional/Funcionário/Paciente vinculado)")
     public void delete(@PathVariable Long id) {

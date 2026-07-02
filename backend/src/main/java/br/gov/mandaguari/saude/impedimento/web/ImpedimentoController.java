@@ -29,7 +29,7 @@ public class ImpedimentoController {
     public ImpedimentoController(ImpedimentoService service) { this.service = service; }
 
     @GetMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_IMP', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Listar impedimentos com filtros opcionais (paginado)")
     public Page<ImpedimentoResponse> list(
             @RequestParam(required = false) String profissionalNome,
@@ -42,14 +42,14 @@ public class ImpedimentoController {
     }
 
     @GetMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_IMP', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter impedimento por código")
     public ImpedimentoResponse get(@PathVariable Integer codigo) {
         return service.get(codigo);
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_IMP', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Registrar impedimento")
     public ResponseEntity<ImpedimentoResponse> create(@Valid @RequestBody ImpedimentoCreateRequest req,
                                                        UriComponentsBuilder uri) {
@@ -59,7 +59,7 @@ public class ImpedimentoController {
     }
 
     @PutMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_IMP', 'ALT', 'SAUDE_CADASTRO')")
     @Operation(summary = "Atualizar impedimento")
     public ImpedimentoResponse update(@PathVariable Integer codigo,
                                        @Valid @RequestBody ImpedimentoUpdateRequest req) {
@@ -67,7 +67,7 @@ public class ImpedimentoController {
     }
 
     @DeleteMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_IMP', 'EXC', 'SAUDE_CADASTRO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir impedimento")
     public void delete(@PathVariable Integer codigo) {

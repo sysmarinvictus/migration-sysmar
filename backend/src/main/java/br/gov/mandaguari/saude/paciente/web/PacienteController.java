@@ -24,7 +24,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/pacientes")
 @Tag(name = "Pacientes")
-@PreAuthorize("hasRole('SAUDE_CADASTRO')")
 public class PacienteController {
 
     private final PacienteService service;
@@ -32,6 +31,7 @@ public class PacienteController {
     public PacienteController(PacienteService service) { this.service = service; }
 
     @GetMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_PAC', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Buscar pacientes por nome, nome da mãe, prontuário, CPF ou CNS (paginado)")
     public Page<PacienteListItem> search(@RequestParam(required = false) String nome,
                                          @RequestParam(required = false) String nomeMae,
@@ -43,6 +43,7 @@ public class PacienteController {
     }
 
     @GetMapping("/lookup")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PAC', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Autocomplete de pacientes (por nome/CNS) para telas de prescrição")
     public List<PacienteListItem> lookup(@RequestParam(required = false, defaultValue = "") String q,
                                          @PageableDefault(size = 10) Pageable pageable) {
@@ -50,12 +51,14 @@ public class PacienteController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PAC', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter o cadastro completo de um paciente (leitura de PHI auditada)")
     public PacienteResponse get(@PathVariable Long id) {
         return service.get(id);
     }
 
     @PostMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_PAC', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Cadastrar paciente (cria a pessoa SYS_PES + o SAU_PAC)")
     public ResponseEntity<PacienteResponse> create(@RequestBody PacienteWriteRequest req,
                                                    UriComponentsBuilder uri) {
@@ -65,12 +68,14 @@ public class PacienteController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PAC', 'ALT', 'SAUDE_CADASTRO')")
     @Operation(summary = "Atualizar o cadastro de um paciente (grava SAU_PAC + write-back SYS_PES)")
     public PacienteResponse update(@PathVariable Long id, @RequestBody PacienteWriteRequest req) {
         return service.update(id, req);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PAC', 'EXC', 'SAUDE_CADASTRO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir paciente (bloqueado se há Receituário de Controle Especial — Portaria 344/98)")
     public void delete(@PathVariable Long id) {

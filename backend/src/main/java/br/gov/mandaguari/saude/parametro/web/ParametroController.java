@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/parametros")
 @Tag(name = "Parâmetros")
-@PreAuthorize("hasRole('SAUDE_ADMIN')")
 public class ParametroController {
 
     private final ParametroService service;
@@ -23,18 +22,21 @@ public class ParametroController {
     public ParametroController(ParametroService service) { this.service = service; }
 
     @GetMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_PAR_GER', 'CON', 'SAUDE_ADMIN')")
     @Operation(summary = "Ler os parâmetros do sistema (subset mapeado)")
     public ParametroResponse get() {
         return service.get();
     }
 
     @PutMapping("/geral")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PAR_GER', 'ALT', 'SAUDE_ADMIN')")
     @Operation(summary = "Atualizar os parâmetros gerais (validade de receita, dias de usuário/senha, cabeçalho)")
     public ParametroResponse updateGeral(@RequestBody ParametroGeralUpdateRequest req) {
         return service.updateGeral(req);
     }
 
     @PutMapping("/ambulatorial")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PAR_AMB', 'ALT', 'SAUDE_ADMIN')")
     @Operation(summary = "Atualizar os parâmetros ambulatoriais (flags de política)")
     public ParametroResponse updateAmbulatorial(@RequestBody ParametroAmbulatorialUpdateRequest req) {
         return service.updateAmbulatorial(req);

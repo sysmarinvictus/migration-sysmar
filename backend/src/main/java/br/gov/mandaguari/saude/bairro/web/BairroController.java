@@ -28,7 +28,7 @@ public class BairroController {
     public BairroController(BairroService service) { this.service = service; }
 
     @GetMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_BAI', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Listar/buscar bairros (paginado)")
     public Page<BairroResponse> list(@RequestParam(required = false) String nome,
                                      @PageableDefault(size = 20, sort = "nome") Pageable pageable) {
@@ -36,7 +36,7 @@ public class BairroController {
     }
 
     @GetMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_BAI', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter bairro por código")
     public BairroResponse get(@PathVariable Integer codigo) {
         return service.get(codigo);
@@ -52,7 +52,7 @@ public class BairroController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_BAI', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Criar bairro (código auto-atribuído)")
     public ResponseEntity<BairroResponse> create(@Valid @RequestBody BairroCreateRequest req,
                                                  UriComponentsBuilder uri) {
@@ -62,7 +62,7 @@ public class BairroController {
     }
 
     @PutMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_BAI', 'ALT', 'SAUDE_CADASTRO')")
     @Operation(summary = "Atualizar bairro")
     public BairroResponse update(@PathVariable Integer codigo,
                                  @Valid @RequestBody BairroUpdateRequest req) {
@@ -70,7 +70,7 @@ public class BairroController {
     }
 
     @DeleteMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_BAI', 'EXC', 'SAUDE_CADASTRO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir bairro")
     public void delete(@PathVariable Integer codigo) {

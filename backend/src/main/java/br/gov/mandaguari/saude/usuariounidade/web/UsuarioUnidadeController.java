@@ -21,7 +21,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/usuarios/{usuCod}/unidades")
 @Tag(name = "Usuário — Unidades (permissões)")
-@PreAuthorize("hasRole('SAUDE_ADMIN')")
 public class UsuarioUnidadeController {
 
     private final UsuarioUnidadeService service;
@@ -29,18 +28,21 @@ public class UsuarioUnidadeController {
     public UsuarioUnidadeController(UsuarioUnidadeService service) { this.service = service; }
 
     @GetMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_USUUNI', 'CON', 'SAUDE_ADMIN')")
     @Operation(summary = "Listar as unidades (e permissões) de um usuário")
     public List<UsuarioUnidadeResponse> list(@PathVariable Integer usuCod) {
         return service.list(usuCod);
     }
 
     @GetMapping("/{uniCod}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_USUUNI', 'CON', 'SAUDE_ADMIN')")
     @Operation(summary = "Obter a matriz de permissões de um usuário numa unidade")
     public UsuarioUnidadeResponse get(@PathVariable Integer usuCod, @PathVariable Integer uniCod) {
         return service.get(usuCod, uniCod);
     }
 
     @PostMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_USUUNI', 'INC', 'SAUDE_ADMIN')")
     @Operation(summary = "Conceder acesso de um usuário a uma unidade")
     public ResponseEntity<UsuarioUnidadeResponse> create(@PathVariable Integer usuCod,
                                                          @RequestParam Integer uniCod,
@@ -52,6 +54,7 @@ public class UsuarioUnidadeController {
     }
 
     @PutMapping("/{uniCod}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_USUUNI', 'ALT', 'SAUDE_ADMIN')")
     @Operation(summary = "Atualizar as permissões de um usuário numa unidade")
     public UsuarioUnidadeResponse update(@PathVariable Integer usuCod, @PathVariable Integer uniCod,
                                          @RequestBody UsuarioUnidadeUpsertRequest req) {
@@ -59,6 +62,7 @@ public class UsuarioUnidadeController {
     }
 
     @DeleteMapping("/{uniCod}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_USUUNI', 'EXC', 'SAUDE_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Revogar o acesso de um usuário a uma unidade")
     public void delete(@PathVariable Integer usuCod, @PathVariable Integer uniCod) {

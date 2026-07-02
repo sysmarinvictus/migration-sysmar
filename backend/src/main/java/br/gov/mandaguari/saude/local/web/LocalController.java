@@ -34,7 +34,7 @@ public class LocalController {
     public LocalController(LocalService service) { this.service = service; }
 
     @GetMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_LOC', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Listar/buscar locais (paginado)")
     public Page<LocalResponse> list(@RequestParam(required = false) String nome,
                                     @PageableDefault(size = 20, sort = "nome") Pageable pageable) {
@@ -42,7 +42,7 @@ public class LocalController {
     }
 
     @GetMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_LOC', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter local por código")
     public LocalResponse get(@PathVariable Integer codigo) {
         return service.get(codigo);
@@ -57,7 +57,7 @@ public class LocalController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_LOC', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Criar local")
     public ResponseEntity<LocalResponse> create(@Valid @RequestBody LocalCreateRequest req,
                                                 UriComponentsBuilder uri) {
@@ -67,14 +67,14 @@ public class LocalController {
     }
 
     @PutMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_LOC', 'ALT', 'SAUDE_CADASTRO')")
     @Operation(summary = "Atualizar local")
     public LocalResponse update(@PathVariable Integer codigo, @Valid @RequestBody LocalUpdateRequest req) {
         return service.update(codigo, req);
     }
 
     @DeleteMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_LOC', 'EXC', 'SAUDE_CADASTRO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir local")
     public void delete(@PathVariable Integer codigo) {

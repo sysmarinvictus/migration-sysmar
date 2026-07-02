@@ -34,7 +34,7 @@ public class TipoMedicamentoController {
     public TipoMedicamentoController(TipoMedicamentoService service) { this.service = service; }
 
     @GetMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_TIPREM', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Listar/buscar tipos de medicamento (paginado)")
     public Page<TipoMedicamentoResponse> list(@RequestParam(required = false) String descricao,
                                               @PageableDefault(size = 20, sort = "descricao") Pageable pageable) {
@@ -42,7 +42,7 @@ public class TipoMedicamentoController {
     }
 
     @GetMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_TIPREM', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter tipo de medicamento por código")
     public TipoMedicamentoResponse get(@PathVariable Integer codigo) {
         return service.get(codigo);
@@ -57,7 +57,7 @@ public class TipoMedicamentoController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_TIPREM', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Criar tipo de medicamento")
     public ResponseEntity<TipoMedicamentoResponse> create(@Valid @RequestBody TipoMedicamentoCreateRequest req,
                                                           UriComponentsBuilder uri) {
@@ -67,7 +67,7 @@ public class TipoMedicamentoController {
     }
 
     @PutMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_TIPREM', 'ALT', 'SAUDE_CADASTRO')")
     @Operation(summary = "Atualizar tipo de medicamento")
     public TipoMedicamentoResponse update(@PathVariable Integer codigo,
                                           @Valid @RequestBody TipoMedicamentoUpdateRequest req) {
@@ -75,7 +75,7 @@ public class TipoMedicamentoController {
     }
 
     @DeleteMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_TIPREM', 'EXC', 'SAUDE_CADASTRO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir tipo de medicamento")
     public void delete(@PathVariable Integer codigo) {

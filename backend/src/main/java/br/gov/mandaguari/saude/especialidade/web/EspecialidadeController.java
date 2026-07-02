@@ -28,7 +28,7 @@ public class EspecialidadeController {
     public EspecialidadeController(EspecialidadeService service) { this.service = service; }
 
     @GetMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_ESP', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Listar/buscar especialidades (paginado)")
     public Page<EspecialidadeResponse> list(@RequestParam(required = false) String nome,
                                             @PageableDefault(size = 20, sort = "nome") Pageable pageable) {
@@ -36,7 +36,7 @@ public class EspecialidadeController {
     }
 
     @GetMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_ESP', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter especialidade por código")
     public EspecialidadeResponse get(@PathVariable Integer codigo) {
         return service.get(codigo);
@@ -51,7 +51,7 @@ public class EspecialidadeController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_ESP', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Criar especialidade")
     public ResponseEntity<EspecialidadeResponse> create(@Valid @RequestBody EspecialidadeCreateRequest req,
                                                         UriComponentsBuilder uri) {
@@ -61,7 +61,7 @@ public class EspecialidadeController {
     }
 
     @PutMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_ESP', 'ALT', 'SAUDE_CADASTRO')")
     @Operation(summary = "Atualizar especialidade")
     public EspecialidadeResponse update(@PathVariable Integer codigo,
                                         @Valid @RequestBody EspecialidadeUpdateRequest req) {
@@ -69,7 +69,7 @@ public class EspecialidadeController {
     }
 
     @DeleteMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_ESP', 'EXC', 'SAUDE_CADASTRO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir especialidade")
     public void delete(@PathVariable Integer codigo) {

@@ -19,7 +19,6 @@ import java.net.URI;
 @RestController
 @RequestMapping("/api/profissionais-externos")
 @Tag(name = "Profissionais Externos")
-@PreAuthorize("hasRole('SAUDE_CADASTRO')")
 public class ProfissionalExternoController {
 
     private final ProfissionalExternoService service;
@@ -27,6 +26,7 @@ public class ProfissionalExternoController {
     public ProfissionalExternoController(ProfissionalExternoService service) { this.service = service; }
 
     @PostMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_PESF_PROFEXT', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Registrar profissional externo (cria a pessoa + o SAU_PRO externo)")
     public ResponseEntity<ProfissionalExternoResponse> create(@RequestBody ProfissionalExternoCreateRequest req,
                                                               UriComponentsBuilder uri) {
@@ -36,6 +36,7 @@ public class ProfissionalExternoController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PESF_PROFEXT', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter um profissional externo por código")
     public ProfissionalExternoResponse get(@PathVariable Long id) {
         return service.get(id);

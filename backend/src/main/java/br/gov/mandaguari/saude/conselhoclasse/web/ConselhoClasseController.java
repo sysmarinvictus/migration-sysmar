@@ -34,7 +34,7 @@ public class ConselhoClasseController {
     public ConselhoClasseController(ConselhoClasseService service) { this.service = service; }
 
     @GetMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_CONCLA', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Listar/buscar conselhos de classe (paginado)")
     public Page<ConselhoClasseResponse> list(@RequestParam(required = false) String q,
                                              @PageableDefault(size = 20, sort = "codigo") Pageable pageable) {
@@ -42,7 +42,7 @@ public class ConselhoClasseController {
     }
 
     @GetMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_CONCLA', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter conselho de classe por código")
     public ConselhoClasseResponse get(@PathVariable Short codigo) {
         return service.get(codigo);
@@ -57,7 +57,7 @@ public class ConselhoClasseController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_CONCLA', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Criar conselho de classe")
     public ResponseEntity<ConselhoClasseResponse> create(@Valid @RequestBody ConselhoClasseCreateRequest req,
                                                          UriComponentsBuilder uri) {
@@ -67,7 +67,7 @@ public class ConselhoClasseController {
     }
 
     @PutMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_CONCLA', 'ALT', 'SAUDE_CADASTRO')")
     @Operation(summary = "Atualizar conselho de classe")
     public ConselhoClasseResponse update(@PathVariable Short codigo,
                                          @Valid @RequestBody ConselhoClasseUpdateRequest req) {
@@ -75,7 +75,7 @@ public class ConselhoClasseController {
     }
 
     @DeleteMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_CONCLA', 'EXC', 'SAUDE_CADASTRO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir conselho de classe")
     public void delete(@PathVariable Short codigo) {

@@ -26,7 +26,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/funcionarios")
 @Tag(name = "Funcionários")
-@PreAuthorize("hasRole('SAUDE_CADASTRO')")
 public class FuncionarioController {
 
     private final FuncionarioService service;
@@ -34,6 +33,7 @@ public class FuncionarioController {
     public FuncionarioController(FuncionarioService service) { this.service = service; }
 
     @GetMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_FUN', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Listar/buscar funcionários (paginado). Nome = LIKE em SYS_PES.PesNom.")
     public Page<FuncionarioResponse> list(@RequestParam(required = false) Long id,
                                           @RequestParam(required = false) String nome,
@@ -44,6 +44,7 @@ public class FuncionarioController {
     }
 
     @GetMapping("/lookup")
+    @PreAuthorize("@authz.can(authentication, 'SAU_FUN', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Autocomplete de funcionários (seletor)")
     public List<FuncionarioLookupItem> lookup(@RequestParam(required = false, defaultValue = "") String q,
                                               @PageableDefault(size = 20) Pageable pageable) {
@@ -51,12 +52,14 @@ public class FuncionarioController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_FUN', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter funcionário por código (PesCod)")
     public FuncionarioResponse get(@PathVariable Long id) {
         return service.get(id);
     }
 
     @PostMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_FUN', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Cadastrar funcionário. O corpo INCLUI id (código da Pessoa) — não é gerado (R1).")
     public ResponseEntity<FuncionarioResponse> create(@Valid @RequestBody FuncionarioCreateRequest req,
                                                       UriComponentsBuilder uri) {
@@ -66,12 +69,14 @@ public class FuncionarioController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_FUN', 'ALT', 'SAUDE_CADASTRO')")
     @Operation(summary = "Atualizar funcionário (grava de volta nome/cpf/telefones em SYS_PES, R2)")
     public FuncionarioResponse update(@PathVariable Long id, @Valid @RequestBody FuncionarioUpdateRequest req) {
         return service.update(id, req);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_FUN', 'EXC', 'SAUDE_CADASTRO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir funcionário (bloqueado por SAU_USU/SAU_RECESP, R13/R14)")
     public void delete(@PathVariable Long id) {

@@ -15,7 +15,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/medicamentos")
-@PreAuthorize("hasRole('SAUDE_CADASTRO')")
 public class MedicamentoController {
 
     private final MedicamentoService service;
@@ -23,6 +22,7 @@ public class MedicamentoController {
     public MedicamentoController(MedicamentoService service) { this.service = service; }
 
     @GetMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_REM', 'CON', 'SAUDE_CADASTRO')")
     public Page<MedicamentoResponse> list(
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) Integer tipoMedicamentoCodigo,
@@ -35,16 +35,19 @@ public class MedicamentoController {
     }
 
     @GetMapping("/lookup")
+    @PreAuthorize("@authz.can(authentication, 'SAU_REM', 'CON', 'SAUDE_CADASTRO')")
     public List<MedicamentoLookupItem> lookup(@RequestParam(defaultValue = "") String q, Pageable pageable) {
         return service.lookup(q, pageable);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_REM', 'CON', 'SAUDE_CADASTRO')")
     public MedicamentoResponse get(@PathVariable Integer id) {
         return service.get(id);
     }
 
     @PostMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_REM', 'INC', 'SAUDE_CADASTRO')")
     public ResponseEntity<MedicamentoResponse> create(@Valid @RequestBody MedicamentoCreateRequest req) {
         MedicamentoResponse body = service.create(req);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -53,11 +56,13 @@ public class MedicamentoController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_REM', 'ALT', 'SAUDE_CADASTRO')")
     public MedicamentoResponse update(@PathVariable Integer id, @Valid @RequestBody MedicamentoUpdateRequest req) {
         return service.update(id, req);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_REM', 'EXC', 'SAUDE_CADASTRO')")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

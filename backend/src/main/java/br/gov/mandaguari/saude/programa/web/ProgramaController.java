@@ -31,14 +31,14 @@ public class ProgramaController {
     public ProgramaController(ProgramaService service) { this.service = service; }
 
     @GetMapping("/grupos")
-    @PreAuthorize("hasRole('SAUDE_ADMIN')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRG', 'CON', 'SAUDE_ADMIN')")
     @Operation(summary = "Listar grupos de programas (SAU_PRGGRP)")
     public List<GrupoProgramaResponse> grupos() {
         return service.listGrupos();
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('SAUDE_ADMIN')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRG', 'CON', 'SAUDE_ADMIN')")
     @Operation(summary = "Listar/buscar programas (paginado)")
     public Page<ProgramaResponse> list(@RequestParam(required = false) String q,
                                        @RequestParam(required = false) Integer grupoId,
@@ -47,7 +47,7 @@ public class ProgramaController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('SAUDE_ADMIN')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRG', 'CON', 'SAUDE_ADMIN')")
     @Operation(summary = "Obter programa por código")
     public ProgramaResponse get(@PathVariable String id) {
         return service.get(id);
@@ -62,7 +62,7 @@ public class ProgramaController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('SAUDE_ADMIN')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRG', 'INC', 'SAUDE_ADMIN')")
     @Operation(summary = "Criar programa")
     public ResponseEntity<ProgramaResponse> create(@Valid @RequestBody ProgramaCreateRequest req,
                                                    UriComponentsBuilder uri) {
@@ -72,14 +72,14 @@ public class ProgramaController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('SAUDE_ADMIN')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRG', 'ALT', 'SAUDE_ADMIN')")
     @Operation(summary = "Atualizar programa")
     public ProgramaResponse update(@PathVariable String id, @Valid @RequestBody ProgramaUpdateRequest req) {
         return service.update(id, req);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('SAUDE_ADMIN')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRG', 'EXC', 'SAUDE_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir programa (bloqueado se referenciado por permissões)")
     public void delete(@PathVariable String id) {

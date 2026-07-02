@@ -45,6 +45,15 @@ security:
     # fail-closed at use (never stores cleartext). Supply CERT_ENC_KEY in real environments.
     enc-key: ${CERT_ENC_KEY:}
 
+# Fine-grained per-program RBAC (SAU_RBAC / pisauthorized), wired via bean `authz`.
+#   shadow  — legacy coarse role still decides; the RBAC verdict is computed alongside and any
+#             divergence is logged. Use this to confirm the live SAU_PRFCON/SAU_USUCON matrix is
+#             populated for each program code BEFORE trusting it. Zero lock-out risk (default).
+#   enforce — pure deny-by-default RBAC verdict decides (faithful to GeneXus). Flip per environment
+#             only after the shadow logs show no divergence for the wired programs.
+rbac:
+  enforcement: ${RBAC_ENFORCEMENT:shadow}
+
 # Audit trail (common/audit → physical SAU_LOG). Persistence is fail-safe: a SAU_LOG insert failure
 # never breaks the business transaction. empresa-codigo is the tenant (OQ3); 411420 = real MunCod in
 # the single-tenant parity env. default-usuario-codigo (0=system) is used when the principal is not a

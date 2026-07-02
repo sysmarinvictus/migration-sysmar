@@ -32,7 +32,7 @@ public class PerfilController {
     public PerfilController(PerfilService service) { this.service = service; }
 
     @GetMapping
-    @PreAuthorize("hasRole('SAUDE_ADMIN')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRF', 'CON', 'SAUDE_ADMIN')")
     @Operation(summary = "Listar/buscar perfis (paginado)")
     public Page<PerfilResponse> list(@RequestParam(required = false) String nome,
                                      @PageableDefault(size = 20, sort = "nome") Pageable pageable) {
@@ -40,7 +40,7 @@ public class PerfilController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('SAUDE_ADMIN')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRF', 'CON', 'SAUDE_ADMIN')")
     @Operation(summary = "Obter perfil por código")
     public PerfilResponse get(@PathVariable Integer id) {
         return service.get(id);
@@ -55,7 +55,7 @@ public class PerfilController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('SAUDE_ADMIN')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRF', 'INC', 'SAUDE_ADMIN')")
     @Operation(summary = "Criar perfil (código auto-gerado)")
     public ResponseEntity<PerfilResponse> create(@Valid @RequestBody PerfilCreateRequest req,
                                                  UriComponentsBuilder uri) {
@@ -65,14 +65,14 @@ public class PerfilController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('SAUDE_ADMIN')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRF', 'ALT', 'SAUDE_ADMIN')")
     @Operation(summary = "Atualizar perfil")
     public PerfilResponse update(@PathVariable Integer id, @Valid @RequestBody PerfilUpdateRequest req) {
         return service.update(id, req);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('SAUDE_ADMIN')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRF', 'EXC', 'SAUDE_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir perfil (bloqueado se referenciado; cascateia permissões)")
     public void delete(@PathVariable Integer id) {

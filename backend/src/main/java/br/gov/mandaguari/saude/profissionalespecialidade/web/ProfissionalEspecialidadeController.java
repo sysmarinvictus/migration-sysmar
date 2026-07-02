@@ -21,7 +21,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/profissionais/{proPesCod}/especialidades")
 @Tag(name = "Profissional — Especialidades")
-@PreAuthorize("hasRole('SAUDE_CADASTRO')")
 public class ProfissionalEspecialidadeController {
 
     private final ProfissionalEspecialidadeService service;
@@ -31,12 +30,14 @@ public class ProfissionalEspecialidadeController {
     }
 
     @GetMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_PROESP', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Listar as especialidades de um profissional")
     public List<EspecialidadeDoProfissionalResponse> list(@PathVariable Long proPesCod) {
         return service.list(proPesCod);
     }
 
     @PostMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_PROESP', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Adicionar uma especialidade ao profissional")
     public ResponseEntity<EspecialidadeDoProfissionalResponse> add(
             @PathVariable Long proPesCod,
@@ -49,6 +50,7 @@ public class ProfissionalEspecialidadeController {
     }
 
     @PutMapping("/{espCod}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PROESP', 'ALT', 'SAUDE_CADASTRO')")
     @Operation(summary = "Atualizar flags/agenda de uma especialidade do profissional")
     public EspecialidadeDoProfissionalResponse update(
             @PathVariable Long proPesCod,
@@ -58,6 +60,7 @@ public class ProfissionalEspecialidadeController {
     }
 
     @DeleteMapping("/{espCod}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PROESP', 'EXC', 'SAUDE_CADASTRO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Remover uma especialidade do profissional (R5: bloqueado se há Impedimento)")
     public void remove(@PathVariable Long proPesCod, @PathVariable Integer espCod) {

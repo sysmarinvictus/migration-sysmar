@@ -26,7 +26,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/usuarios")
 @Tag(name = "Usuários (administração)")
-@PreAuthorize("hasRole('SAUDE_ADMIN')")
 public class UsuarioController {
 
     private final UsuarioService service;
@@ -34,6 +33,7 @@ public class UsuarioController {
     public UsuarioController(UsuarioService service) { this.service = service; }
 
     @GetMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_USU', 'CON', 'SAUDE_ADMIN')")
     @Operation(summary = "Listar/buscar usuários (paginado) — filtros login/nome/bloqueado")
     @ApiResponses(@ApiResponse(responseCode = "200", description = "Página de usuários (sem segredos)"))
     public Page<UsuarioResponse> list(@RequestParam(required = false) String login,
@@ -44,6 +44,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_USU', 'CON', 'SAUDE_ADMIN')")
     @Operation(summary = "Obter usuário por código")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Usuário"),
                    @ApiResponse(responseCode = "404", description = "Não encontrado")})
@@ -54,6 +55,7 @@ public class UsuarioController {
     // SECURITY (LGPD): the user picker exposes UsuNom (PII), so it stays SAUDE_ADMIN-only (inherits the
     // class-level guard — do NOT downgrade to isAuthenticated()). A non-admin must not enumerate users/names.
     @GetMapping("/lookup")
+    @PreAuthorize("@authz.can(authentication, 'SAU_USU', 'CON', 'SAUDE_ADMIN')")
     @Operation(summary = "Autocomplete de usuários (picker, admin)")
     public List<UsuarioLookupItem> lookup(@RequestParam(required = false, defaultValue = "") String q,
                                           @PageableDefault(size = 10) Pageable pageable) {
@@ -61,6 +63,7 @@ public class UsuarioController {
     }
 
     @PostMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_USU', 'INC', 'SAUDE_ADMIN')")
     @Operation(summary = "Criar usuário (login único; senha bcrypt; default desbloqueado)")
     @ApiResponses({@ApiResponse(responseCode = "201", description = "Criado"),
                    @ApiResponse(responseCode = "409", description = "Login já em uso")})
@@ -72,12 +75,14 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_USU', 'ALT', 'SAUDE_ADMIN')")
     @Operation(summary = "Atualizar usuário (bloquear/desbloquear via bloqueado)")
     public UsuarioResponse update(@PathVariable Integer id, @Valid @RequestBody UsuarioUpdateRequest req) {
         return service.update(id, req);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_USU', 'EXC', 'SAUDE_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir usuário (bloqueado se referenciado por permissões/unidades)")
     @ApiResponses({@ApiResponse(responseCode = "204", description = "Excluído"),

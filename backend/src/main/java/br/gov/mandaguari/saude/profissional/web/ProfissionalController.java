@@ -34,7 +34,7 @@ public class ProfissionalController {
     public ProfissionalController(ProfissionalService service) { this.service = service; }
 
     @GetMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRO', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Listar/buscar profissionais (paginado). Nome = LIKE em SYS_PES.PesNom (R16).")
     public Page<ProfissionalResponse> list(
             @RequestParam(required = false) Long id,
@@ -48,7 +48,7 @@ public class ProfissionalController {
     }
 
     @GetMapping("/lookup")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRO', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Autocomplete de profissionais (seletor de prescritor)")
     public List<ProfissionalLookupItem> lookup(@RequestParam(required = false, defaultValue = "") String q,
                                                @PageableDefault(size = 20) Pageable pageable) {
@@ -56,7 +56,7 @@ public class ProfissionalController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRO', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter profissional por código (PesCod). Não retorna certificado/senha.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Encontrado"),
@@ -67,7 +67,7 @@ public class ProfissionalController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRO', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Cadastrar profissional. O corpo INCLUI id (código da Pessoa) — não é gerado (R1).")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Criado"),
@@ -81,7 +81,7 @@ public class ProfissionalController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRO', 'ALT', 'SAUDE_CADASTRO')")
     @Operation(summary = "Atualizar profissional (pode gravar de volta nome/cpf/telefones em SYS_PES, R2)")
     public ProfissionalResponse update(@PathVariable Long id,
                                        @Valid @RequestBody ProfissionalUpdateRequest req) {
@@ -89,7 +89,7 @@ public class ProfissionalController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_PRO', 'EXC', 'SAUDE_CADASTRO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir profissional (bloqueado por 9 referências, R20-R26)")
     public void delete(@PathVariable Long id) {

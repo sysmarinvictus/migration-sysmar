@@ -69,6 +69,19 @@ public abstract class AbstractIntegrationTest {
         return new RequestSpecBuilder().setContentType(ContentType.JSON).build();
     }
 
+    /**
+     * A request spec for a token whose subject is a numeric {@code UsuCod} — required to exercise the
+     * per-program RBAC engine ({@code @authz.can} / {@link br.gov.mandaguari.saude.autorizacao.service.PermissionResolver}),
+     * which resolves permissions by user id and denies non-numeric principals. Seed the matching
+     * {@code SAU_USU} (+ {@code SAU_PRFCON}/{@code SAU_USUCON}) rows in the test's setup.
+     */
+    protected RequestSpecification asUserId(int usuCod, String... roles) {
+        return new RequestSpecBuilder()
+                .setContentType(ContentType.JSON)
+                .addHeader("Authorization", "Bearer " + jwt.issueAccessToken(String.valueOf(usuCod), List.of(roles)))
+                .build();
+    }
+
     protected String bearer(String... roles) {
         return jwt.issueAccessToken("tester", List.of(roles));
     }

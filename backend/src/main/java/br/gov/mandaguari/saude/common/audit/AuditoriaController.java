@@ -39,7 +39,7 @@ public class AuditoriaController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_LOG', 'CON', 'ADMIN')")
     @Operation(summary = "Consultar a trilha de auditoria (SAU_LOG), paginado e filtrável. "
             + "Não retorna colunas PHI (nome/paciente/histórico).")
     @ApiResponses({

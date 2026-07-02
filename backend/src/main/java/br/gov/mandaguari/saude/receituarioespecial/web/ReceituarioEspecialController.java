@@ -27,7 +27,6 @@ import java.net.URI;
 @RestController
 @RequestMapping("/api/receituarios-especiais")
 @Tag(name = "Receituários — Controle Especial")
-@PreAuthorize("hasRole('SAUDE_CADASTRO')")
 public class ReceituarioEspecialController {
 
     private final ReceituarioEspecialService service;
@@ -35,6 +34,7 @@ public class ReceituarioEspecialController {
     public ReceituarioEspecialController(ReceituarioEspecialService service) { this.service = service; }
 
     @GetMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_RECESP', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Buscar receituários de controle especial (por nome do paciente, unidade ou paciente)")
     public Page<ReceituarioEspecialListItem> search(@RequestParam(required = false) String nome,
                                                     @RequestParam(required = false) Integer unidade,
@@ -44,12 +44,14 @@ public class ReceituarioEspecialController {
     }
 
     @GetMapping("/{unidade}/{numero}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_RECESP', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter um receituário de controle especial (leitura de PHI auditada)")
     public ReceituarioEspecialResponse get(@PathVariable Integer unidade, @PathVariable Long numero) {
         return service.get(unidade, numero);
     }
 
     @PostMapping
+    @PreAuthorize("@authz.can(authentication, 'SAU_RECESP', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Emitir um receituário de controle especial (número alocado por unidade)")
     public ResponseEntity<ReceituarioEspecialResponse> create(@RequestBody ReceituarioEspecialWriteRequest req,
                                                               UriComponentsBuilder uri) {
@@ -60,6 +62,7 @@ public class ReceituarioEspecialController {
     }
 
     @PutMapping("/{unidade}/{numero}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_RECESP', 'ALT', 'SAUDE_CADASTRO')")
     @Operation(summary = "Atualizar um receituário de controle especial (cabeçalho + itens)")
     public ReceituarioEspecialResponse update(@PathVariable Integer unidade, @PathVariable Long numero,
                                               @RequestBody ReceituarioEspecialWriteRequest req) {
@@ -67,6 +70,7 @@ public class ReceituarioEspecialController {
     }
 
     @PostMapping("/{unidade}/{numero}/copia")
+    @PreAuthorize("@authz.can(authentication, 'SAU_RECESP', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Copiar um receituário (clona com novo número na mesma unidade)")
     public ResponseEntity<ReceituarioEspecialResponse> copy(@PathVariable Integer unidade,
                                                             @PathVariable Long numero, UriComponentsBuilder uri) {
@@ -77,6 +81,7 @@ public class ReceituarioEspecialController {
     }
 
     @DeleteMapping("/{unidade}/{numero}")
+    @PreAuthorize("@authz.can(authentication, 'SAU_RECESP', 'EXC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Excluir (BLOQUEADO — retenção Portaria 344/98, pendente de definição regulatória)")
     public void delete(@PathVariable Integer unidade, @PathVariable Long numero) {
         service.delete(unidade, numero);   // always throws Conflict (R29 / OQ2)

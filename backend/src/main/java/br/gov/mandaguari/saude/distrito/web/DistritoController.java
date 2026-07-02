@@ -28,7 +28,7 @@ public class DistritoController {
     public DistritoController(DistritoService service) { this.service = service; }
 
     @GetMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_DIS', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Listar/buscar distritos sanitários (paginado)")
     public Page<DistritoResponse> list(@RequestParam(required = false) String nome,
                                        @PageableDefault(size = 20, sort = "codigo") Pageable pageable) {
@@ -36,7 +36,7 @@ public class DistritoController {
     }
 
     @GetMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_DIS', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter distrito por código")
     public DistritoResponse get(@PathVariable Short codigo) {
         return service.get(codigo);
@@ -52,7 +52,7 @@ public class DistritoController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_DIS', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Criar distrito sanitário (código auto-atribuído)")
     public ResponseEntity<DistritoResponse> create(@Valid @RequestBody DistritoCreateRequest req,
                                                    UriComponentsBuilder uri) {
@@ -62,7 +62,7 @@ public class DistritoController {
     }
 
     @PutMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_DIS', 'ALT', 'SAUDE_CADASTRO')")
     @Operation(summary = "Atualizar distrito sanitário")
     public DistritoResponse update(@PathVariable Short codigo,
                                    @Valid @RequestBody DistritoUpdateRequest req) {
@@ -70,7 +70,7 @@ public class DistritoController {
     }
 
     @DeleteMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_DIS', 'EXC', 'SAUDE_CADASTRO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir distrito sanitário")
     public void delete(@PathVariable Short codigo) {

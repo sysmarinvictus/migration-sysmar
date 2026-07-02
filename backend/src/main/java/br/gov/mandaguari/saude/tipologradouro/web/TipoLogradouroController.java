@@ -28,7 +28,7 @@ public class TipoLogradouroController {
     public TipoLogradouroController(TipoLogradouroRepository repo) { this.repo = repo; }
 
     @GetMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_TIPLOG', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Listar/buscar tipos de logradouro (paginado)")
     public Page<TipoLogradouroResponse> list(
             @RequestParam(required = false) String q,
@@ -38,7 +38,7 @@ public class TipoLogradouroController {
     }
 
     @GetMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_TIPLOG', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter tipo de logradouro por código")
     public TipoLogradouroResponse get(@PathVariable Integer codigo) {
         var t = repo.findById(codigo)

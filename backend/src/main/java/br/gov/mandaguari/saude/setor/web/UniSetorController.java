@@ -28,7 +28,7 @@ public class UniSetorController {
     public UniSetorController(UniSetorService service) { this.service = service; }
 
     @GetMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_UNISETOR', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Listar setores de uma unidade (paginado)")
     public Page<UniSetorResponse> list(@PathVariable Integer unidadeId,
                                        @RequestParam(required = false) String nome,
@@ -37,7 +37,7 @@ public class UniSetorController {
     }
 
     @GetMapping("/{setorId}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_UNISETOR', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter setor por código composto")
     public UniSetorResponse get(@PathVariable Integer unidadeId, @PathVariable Integer setorId) {
         return service.get(unidadeId, setorId);
@@ -53,7 +53,7 @@ public class UniSetorController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_UNISETOR', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Criar setor para a unidade")
     public ResponseEntity<UniSetorResponse> create(@PathVariable Integer unidadeId,
                                                    @Valid @RequestBody UniSetorCreateRequest req,
@@ -65,7 +65,7 @@ public class UniSetorController {
     }
 
     @PutMapping("/{setorId}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_UNISETOR', 'ALT', 'SAUDE_CADASTRO')")
     @Operation(summary = "Atualizar setor")
     public UniSetorResponse update(@PathVariable Integer unidadeId,
                                    @PathVariable Integer setorId,
@@ -74,7 +74,7 @@ public class UniSetorController {
     }
 
     @DeleteMapping("/{setorId}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_UNISETOR', 'EXC', 'SAUDE_CADASTRO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir setor")
     public void delete(@PathVariable Integer unidadeId, @PathVariable Integer setorId) {

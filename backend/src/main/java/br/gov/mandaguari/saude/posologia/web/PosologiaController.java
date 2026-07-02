@@ -28,7 +28,7 @@ public class PosologiaController {
     public PosologiaController(PosologiaService service) { this.service = service; }
 
     @GetMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_REMOBS', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Listar/buscar posologias (paginado)")
     public Page<PosologiaResponse> list(@RequestParam(required = false) String descricao,
                                         @PageableDefault(size = 20, sort = "descricao") Pageable pageable) {
@@ -36,7 +36,7 @@ public class PosologiaController {
     }
 
     @GetMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_REMOBS', 'CON', 'SAUDE_CADASTRO')")
     @Operation(summary = "Obter posologia por código")
     public PosologiaResponse get(@PathVariable Integer codigo) {
         return service.get(codigo);
@@ -53,7 +53,7 @@ public class PosologiaController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_REMOBS', 'INC', 'SAUDE_CADASTRO')")
     @Operation(summary = "Criar posologia (código auto-atribuído)")
     public ResponseEntity<PosologiaResponse> create(@Valid @RequestBody PosologiaCreateRequest req,
                                                     UriComponentsBuilder uri) {
@@ -63,7 +63,7 @@ public class PosologiaController {
     }
 
     @PutMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_REMOBS', 'ALT', 'SAUDE_CADASTRO')")
     @Operation(summary = "Atualizar posologia")
     public PosologiaResponse update(@PathVariable Integer codigo,
                                     @Valid @RequestBody PosologiaUpdateRequest req) {
@@ -71,7 +71,7 @@ public class PosologiaController {
     }
 
     @DeleteMapping("/{codigo}")
-    @PreAuthorize("hasRole('SAUDE_CADASTRO')")
+    @PreAuthorize("@authz.can(authentication, 'SAU_REMOBS', 'EXC', 'SAUDE_CADASTRO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir posologia")
     public void delete(@PathVariable Integer codigo) {
