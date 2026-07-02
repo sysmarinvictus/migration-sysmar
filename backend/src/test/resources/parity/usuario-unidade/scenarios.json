@@ -1,0 +1,60 @@
+{
+  "slice": "SAU_USUUNI",
+  "domain": "usuariounidade",
+  "method": "db-state-vs-snapshot (READ-ONLY)",
+  "snapshot": { "table": "sau_usuuni", "pk": ["UsuCod", "UniUsuCod"], "baselineRowCount": 1427 },
+  "auth": { "roleRequired": "SAUDE_ADMIN", "cadastroOnly": "403", "noToken": "401" },
+  "writeParity": "DEFERRED",
+  "scenarios": [
+    {
+      "id": "1-list-fidelity",
+      "endpoint": "GET /api/usuarios/{usuCod}/unidades",
+      "users": [
+        { "usuCod": 100046, "expectedRows": 30 },
+        { "usuCod": 1,      "expectedRows": 29 },
+        { "usuCod": 100043, "expectedRows": 28 },
+        { "usuCod": 100145, "expectedRows": 28 }
+      ],
+      "assert": "http 200; array length == SELECT count(*) FROM sau_usuuni WHERE usucod=?; each element uniCod+especialidadeCod+all 54 flags == matching sau_usuuni row",
+      "result": "PASS (0 divergences, ~6210 field comparisons)"
+    },
+    {
+      "id": "3-zero-rows",
+      "endpoint": "GET /api/usuarios/2/unidades",
+      "assert": "user exists in sau_usu with 0 usuuni rows -> http 200, empty array []",
+      "result": "PASS"
+    },
+    {
+      "id": "4-unknown-user",
+      "cases": [
+        { "endpoint": "GET /api/usuarios/999999/unidades", "expect": 404 },
+        { "endpoint": "GET /api/usuarios/999999/unidades/1", "expect": 404 },
+        { "endpoint": "GET /api/usuarios/1/unidades/999999", "expect": 404 }
+      ],
+      "assert": "R1 usuarioExists gate + missing (user,unit) row -> 404",
+      "result": "PASS"
+    },
+    {
+      "id": "5a-espcod-nonzero",
+      "endpoint": "GET /api/usuarios/100229/unidades/11",
+      "assert": "especialidadeCod == 1130 (non-zero FK to SAU_ESP), usuCod=100229, uniCod=11",
+      "result": "PASS"
+    },
+    {
+      "id": "5b-type-fidelity",
+      "endpoint": "GET /api/usuarios/1/unidades/1",
+      "assert": "usuCod/uniCod/especialidadeCod are JSON ints; all 54 Bloq*/Per* flags are JSON booleans (not 0/1)",
+      "result": "PASS"
+    },
+    {
+      "id": "6-authz",
+      "cases": [
+        { "token": "none",            "endpoint": "GET /api/usuarios/1/unidades",   "expect": 401 },
+        { "token": "SAUDE_CADASTRO",  "endpoint": "GET /api/usuarios/1/unidades",   "expect": 403 },
+        { "token": "SAUDE_CADASTRO",  "endpoint": "GET /api/usuarios/1/unidades/1", "expect": 403 },
+        { "token": "invalid",         "endpoint": "GET /api/usuarios/1/unidades",   "expect": 401 }
+      ],
+      "result": "PASS"
+    }
+  ]
+}

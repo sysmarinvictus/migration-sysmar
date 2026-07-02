@@ -1,0 +1,94 @@
+{
+  "slice": "SAU_PESF",
+  "table": "sys_pes",
+  "method": "db-state-vs-snapshot READ-ONLY",
+  "date": "2026-07-02",
+  "snapshotRowCount": 83105,
+  "phi": "values redacted to md5; persons referenced by numeric PesCod only",
+  "detail": {
+    "endpoint": "/api/pessoas/{id}/cadastro",
+    "note": "field values stored as md5 of trimmed value; empty md5 d41d8cd98f00b204e9800998ecf8427e",
+    "persons": [
+      {
+        "pesCod": 2,
+        "nome_md5": "6131765e6e79f3e5dd03159a54056889",
+        "nomeSocial_md5": "d41d8cd98f00b204e9800998ecf8427e",
+        "usaNomeSocial": false,
+        "nomeMae_md5": "9d205b0016eabc89ff958218c697261f",
+        "nomePai_md5": "722e36c4ad88a23b40a8f5a4a3842568",
+        "cpfDigits_md5": "45a470589320eb6f7377786264acdcc9",
+        "cns_md5": "5f5919acd6f9831d82fe9c581acd5555",
+        "dataNascimento": "1958-07-17",
+        "sexo": "F",
+        "bairroCod": 1252,
+        "municipioCod": 411420
+      },
+      {
+        "pesCod": 3,
+        "nome_md5": "eccc0df70449623ca33cdcf2a1a132e3",
+        "cpfDigits_md5": "83881df702a8458493e570e3c511a9e2",
+        "cns_md5": "d422e2331b92b365525d1d26ac4f7566",
+        "dataNascimento": "1960-08-04",
+        "sexo": "M",
+        "escolaridade": 56
+      },
+      {
+        "pesCod": 4,
+        "nome_md5": "6d9177d7cbddf5c591983d312f01e22c",
+        "nomeSocial_md5": "6d9177d7cbddf5c591983d312f01e22c",
+        "usaNomeSocial": false,
+        "cpfDigits_md5": "e19a242f892f5057b58ac990e8c9fc15",
+        "cns_md5": "4de4794bcfd1c366dd201044f9d76c90",
+        "dataNascimento": "1990-08-31",
+        "sexo": "M"
+      },
+      {
+        "pesCod": 6,
+        "nome_md5": "d5aa66cb436c6bb00e7677c0c3dbe7a9",
+        "cpfDigits_md5": "6def10f5f4a90d26685bbaebb182280f",
+        "cns_md5": "b4de3176261bf05e3a53cc4000de4721",
+        "dataNascimento": "1974-01-29",
+        "sexo": "F",
+        "corCod": 4,
+        "estadoCivilCod": 2,
+        "situacaoFamiliarCod": 1
+      },
+      {
+        "pesCod": 103852,
+        "nome_md5": "0fe110de614149e35f9851b1c56c0905",
+        "nomeSocial_md5": "9eba0fd5656fcec372a07d0bdaed3d64",
+        "usaNomeSocial": true,
+        "cpfDigits_md5": "81807bc8dc42c0785e89d1118756db24",
+        "cns_md5": "b544dad98bc98594b0c92e7853d4ac96",
+        "dataNascimento": "2007-02-02",
+        "sexo": "M"
+      }
+    ]
+  },
+  "searchNome": [
+    { "q": "SOARES", "expectedTotal": 819, "apiTotal": 819 },
+    { "q": "GUEDES", "expectedTotal": 110, "apiTotal": 110 }
+  ],
+  "searchCpf": {
+    "note": "D1 fix — stored formatted, normalized via regexp_replace. Real CPF redacted (LGPD): use PesCod 4's own PesCPFCNPJ from snapshot at replay time.",
+    "cases": [
+      { "input": "<PesCod4 CPF raw 11 digits — redacted>", "expectedTotal": 1, "expectedId": 4, "apiTotal": 1, "apiId": 4 },
+      { "input": "<PesCod4 CPF formatted — redacted>", "expectedTotal": 1, "expectedId": 4, "apiTotal": 1, "apiId": 4 }
+    ]
+  },
+  "searchCns": [
+    { "input": "<PesCod4 CNS 15 digits — redacted>", "expectedTotal": 1, "expectedId": 4, "apiTotal": 1, "apiId": 4 }
+  ],
+  "lookup": {
+    "q": "GUEDES",
+    "goldenCount": 110,
+    "expectedIdOrderByPesNom": [71562, 69168, 26280, 26322, 78926, 124182, 14031, 110291],
+    "apiIdOrder": [71562, 69168, 26280, 26322, 78926, 124182, 14031, 110291],
+    "labelField": "nomeExibicao",
+    "labelMatchesPesNom": true
+  },
+  "notFound": { "endpoint": "/api/pessoas/999999999/cadastro", "expectedStatus": 404, "apiStatus": 404 },
+  "verdict": "PARITY 20/20 read; write-parity DEFERRED",
+  "writesPerformed": 0,
+  "rowCountAfter": 83105
+}

@@ -1,0 +1,40 @@
+{
+  "slice": "SAU_PRF",
+  "domain": "perfil",
+  "method": "db-state-vs-snapshot (read-only)",
+  "capturedAt": "2026-07-02",
+  "goldenMaster": {
+    "table": "sau_prf",
+    "count": 10,
+    "maxPrfCod": 10,
+    "rows": [
+      { "id": 1, "nome": "HSAU_PRONTUARIO" },
+      { "id": 2, "nome": "ENFERMEIRO" },
+      { "id": 3, "nome": "CIRURGIÃO DENTISTA" },
+      { "id": 4, "nome": "AUXILIAR OU TÉCNICO DE ENFERMAGEM" },
+      { "id": 5, "nome": "AUXILIAR OU TÉCNICO DE SAÚDE BUCAL" },
+      { "id": 6, "nome": "ACS" },
+      { "id": 7, "nome": "ATENDENTE" },
+      { "id": 8, "nome": "RESTRITO" },
+      { "id": 9, "nome": "ESTAGIARIO AUDITORIA" },
+      { "id": 10, "nome": "AUXILIARES DA AUDITORIA" }
+    ]
+  },
+  "scenarios": [
+    { "name": "list-total", "request": "GET /api/perfis?size=100", "auth": "SAUDE_ADMIN", "expect": { "totalElements": 10, "orderBy": "nome ASC" } },
+    { "name": "get-by-id", "request": "GET /api/perfis/{1,6,10}", "auth": "SAUDE_ADMIN", "expect": [ { "id": 1, "nome": "HSAU_PRONTUARIO" }, { "id": 6, "nome": "ACS" }, { "id": 10, "nome": "AUXILIARES DA AUDITORIA" } ] },
+    { "name": "lookup-exact", "request": "GET /api/perfis/lookup?q=enfermeiro", "auth": "authenticated", "expect": [ { "id": 2, "nome": "ENFERMEIRO" } ] },
+    { "name": "lookup-substring-order", "request": "GET /api/perfis/lookup?q=aud", "auth": "authenticated", "expect": [ { "id": 10, "nome": "AUXILIARES DA AUDITORIA" }, { "id": 9, "nome": "ESTAGIARIO AUDITORIA" } ] },
+    { "name": "not-found", "request": "GET /api/perfis/9999", "auth": "SAUDE_ADMIN", "expect": { "status": 404 } },
+    { "name": "authz-no-token-list", "request": "GET /api/perfis", "auth": "none", "expect": { "status": 401 } },
+    { "name": "authz-cadastro-list", "request": "GET /api/perfis", "auth": "SAUDE_CADASTRO", "expect": { "status": 403 } },
+    { "name": "authz-cadastro-get", "request": "GET /api/perfis/1", "auth": "SAUDE_CADASTRO", "expect": { "status": 403 } },
+    { "name": "authz-lookup-authenticated", "request": "GET /api/perfis/lookup?q=acs", "auth": "SAUDE_CADASTRO", "expect": { "status": 200 } },
+    { "name": "authz-lookup-no-token", "request": "GET /api/perfis/lookup?q=acs", "auth": "none", "expect": { "status": 401 } }
+  ],
+  "deferred": {
+    "reason": "READ-ONLY parity run; mutating scenarios excluded",
+    "scenarios": ["create R1/R3", "blank-nome reject R2", "delete-guard R4 (SAU_USU)", "delete-guard R5 (SAU_PAR4)", "cascade R6 (SAU_PRFCON)"],
+    "coverage": "12 unit + 13 IT (spec status: tested)"
+  }
+}
